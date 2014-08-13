@@ -2,6 +2,21 @@
 Protected Class BasicTests
 Inherits TestGroup
 	#tag Method, Flags = &h21
+		Private Sub EmbeddedQuoteTest()
+		  Dim jI As New JSONItem_MTC
+		  jI.Value("name") = "John ""Doey"" Doe"
+		  
+		  Dim raw As String = jI.ToString
+		  
+		  Dim jO As New JSONItem_MTC(raw)
+		  
+		  For Each k As String In jI.Names
+		    Assert.IsTrue(jI.Value(k) = jO.Value(k), k)
+		  Next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub EmptyStringTest()
 		  Dim jI As New JSONItem_MTC
 		  jI.Value("name") = ""
