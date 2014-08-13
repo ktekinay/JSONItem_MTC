@@ -389,6 +389,10 @@ Protected Class JSONItem_MTC
 		  if value IsA JSONItem_MTC then
 		    JSONItem_MTC( value ).ToString( output, settings, level )
 		    
+		  elseif value IsA Dictionary then
+		    dim child as JSONItem_MTC = Dictionary( value )
+		    child.ToString( output, settings, level )
+		    
 		  elseif value.Type = Variant.TypeString then
 		    EncodeString( value, settings.EscapeSlashes, output )
 		    
@@ -600,6 +604,25 @@ Protected Class JSONItem_MTC
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub Operator_Convert(d As Dictionary)
+		  self.Constructor()
+		  
+		  dim keys() as variant = d.Keys
+		  for each name as string in keys
+		    self.Value( name ) = d.Value( name )
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Operator_Subscript(index As Integer) As Variant
+		  return self.Value( index )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Remove(index As Integer)
 		  if not EnsureArray() then
 		    return
@@ -673,6 +696,7 @@ Protected Class JSONItem_MTC
 		    next i
 		    
 		    if notCompact then
+		      'output.Append indenter
 		      output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )
 		    end if
 		    output.Append "]"
@@ -707,6 +731,7 @@ Protected Class JSONItem_MTC
 		    next
 		    
 		    if notCompact then
+		      'output.Append indenter
 		      output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )
 		    end if
 		    output.Append "}"
