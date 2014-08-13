@@ -15,16 +15,16 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h21
 		Private Sub SimpleToFromTest()
-		  Dim jF As New JSONItem_MTC
-		  jF.Value("name") = "John Doe"
-		  jF.Value("age") = 32
-		  jF.Value("wage") = 14.56
+		  Dim jI As New JSONItem_MTC
+		  jI.Value("name") = "John Doe"
+		  jI.Value("age") = 32
+		  jI.Value("wage") = 14.56
 		  
-		  Dim jT As New JSONItem_MTC(jF.ToString)
+		  Dim jO As New JSONItem_MTC(jI.ToString)
 		  
-		  Assert.AreEqual(jF.Value("name").StringValue, jT.Value("name").StringValue, "Names equal")
-		  Assert.AreEqual(jF.Value("age").IntegerValue, jT.Value("age").IntegerValue, "Ages equal")
-		  Assert.AreEqual(jF.Value("wage").DoubleValue, jT.Value("wage").DoubleValue, 0.001, "Wages equal")
+		  For Each k As String In jI.Names
+		    Assert.IsTrue(jI.Value(k) = jO.Value(k), k + " matches")
+		  Next
 		End Sub
 	#tag EndMethod
 
