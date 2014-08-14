@@ -501,7 +501,7 @@
    <SourceLine>outMB.StringValue( outIndex, 6 ) = insertValue</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif  thisByte &gt; 127 then // high-ascii</SourceLine>
+   <SourceLine>elseif EncodeUnicode and thisByte &gt; 127 then // high-ascii</SourceLine>
    <SourceLine>dim byteLength as integer</SourceLine>
    <SourceLine>if thisByte &gt; 240 then</SourceLine>
    <SourceLine>byteLength = 4</SourceLine>
@@ -517,7 +517,7 @@
    <SourceLine></SourceLine>
    <SourceLine>inIndex = inIndex + byteLength</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>else // thisByte &gt; 31 and thisByte &lt; 128 </SourceLine>
+   <SourceLine>else // thisByte &gt; 31 and thisByte &lt; 128  or not EncodeUnicode</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
