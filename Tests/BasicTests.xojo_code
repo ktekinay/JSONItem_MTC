@@ -2,6 +2,17 @@
 Protected Class BasicTests
 Inherits TestGroup
 	#tag Method, Flags = &h21
+		Private Sub CaseSensitiveKeyTest()
+		  dim j as new JSONItem_MTC
+		  j.Value( "a" ) = 1
+		  j.Value( "A" ) = 2
+		  
+		  Assert.AreEqual( 2, j.Count, "Should be 2 objects" )
+		  Assert.AreEqual( 1, j.Value( "a" ).IntegerValue )
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub EmbeddedQuoteTest()
 		  Dim jI As New JSONItem_MTC
 		  jI.Value("name") = "John ""Doey"" Doe"
