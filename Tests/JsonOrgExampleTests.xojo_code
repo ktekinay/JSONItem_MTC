@@ -2,7 +2,7 @@
 Protected Class JsonOrgExampleTests
 Inherits TestGroup
 	#tag Method, Flags = &h21
-		Private Sub GloassaryTest()
+		Private Sub GlossaryTest()
 		  Dim j As New JSONItem_MTC(kExampleGlossary)
 		  Dim jG As JSONItem_MTC = j.Value("glossary")
 		  
