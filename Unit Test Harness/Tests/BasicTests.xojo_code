@@ -40,6 +40,45 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub ObjectsTest()
+		  dim j as new JSONItem_MTC
+		  
+		  try
+		    j.Append new date
+		    Assert.Fail( "Shouldn't be able to add a date" )
+		  catch err as JSONException
+		    Assert.Pass()
+		  end try
+		  
+		  dim f as FolderItem = SpecialFolder.Desktop
+		  try
+		    j.Append f
+		    Assert.Fail( "Shouldn't be able to add a FolderItem" )
+		  catch err as JSONException
+		    Assert.Pass()
+		  end try
+		  
+		  dim child as new JSONItem_MTC( "[]" ) // Empty array
+		  try
+		    j.Append child
+		    Assert.Pass
+		  catch err as JSONException
+		    Assert.Pass( "Should be allowed to append JSONItem_MTC" )
+		  end try
+		  
+		  dim d as new Dictionary
+		  try
+		    j.Append d
+		    Assert.Pass
+		  catch err as JSONException
+		    Assert.Pass( "Should be allowed to append Dictionary" )
+		  end try
+		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub SimpleToFromTest()
 		  Dim jI As New JSONItem_MTC
 		  jI.Value("name") = "John Doe"
