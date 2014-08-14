@@ -325,7 +325,6 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   8
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "JSONItem"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -360,7 +359,6 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   9
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "JSONItem_MTC"
       TextAlign       =   0
       TextColor       =   &c00000000
