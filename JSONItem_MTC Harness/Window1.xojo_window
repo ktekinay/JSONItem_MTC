@@ -371,6 +371,38 @@ Begin Window Window1
       Visible         =   True
       Width           =   100
    End
+   Begin CheckBox cbEncodeUnicode
+      AutoDeactivate  =   True
+      Bold            =   False
+      Caption         =   "Encode Unicode"
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   646
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   0
+      State           =   0
+      TabIndex        =   10
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   254
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   143
+   End
 End
 #tag EndWindow
 
@@ -556,6 +588,7 @@ End
 		    
 		    dim j2 as new JSONItem_MTC( fldJSON.Text )
 		    j2.Compact = cbCompact.Value
+		    j2.EncodeUnicode = cbEncodeUnicode.Value
 		    fldJSONMTCOut.Text = j2.ToString
 		    
 		  catch err as RuntimeException
