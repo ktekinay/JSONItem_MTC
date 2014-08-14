@@ -299,7 +299,7 @@
    <SourceLine>pos = pos + 4</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
-   <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
    <SourceLine>return ""</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
