@@ -1275,7 +1275,8 @@
    <SourceLine>case Variant.TypeObject</SourceLine>
    <SourceLine>select case value</SourceLine>
    <SourceLine>case IsA Dictionary</SourceLine>
-   <SourceLine>case IsA Date</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>raise new JSONException( "Unrecognized Object", 11 )</SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
