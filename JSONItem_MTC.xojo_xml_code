@@ -19,7 +19,7 @@
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>raise new JSONException( "Unexpected end of JSON string", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred at", 2, pos )</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -224,13 +224,13 @@
    <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer) As String</SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kQuote then</SourceLine>
-   <SourceLine>raise new JSONException( "String is missing an opening quote", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -242,7 +242,8 @@
    <SourceLine>dim inBackslash as boolean</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>raise new JSONException( "String missing closing quote", 0 )</SourceLine>
+   <SourceLine>dim msg as string = if( self.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
+   <SourceLine>raise new JSONException( msg, 6, pos )</SourceLine>
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -333,7 +334,7 @@
    <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer) As Variant</SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -362,7 +363,8 @@
    <SourceLine>dim endPos as integer = pos + 1</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if endPos &gt; lastPos then</SourceLine>
-   <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
+   <SourceLine>dim msg as string = if( self.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
+   <SourceLine>raise new JSONException( msg, 6, endPos + 1 )</SourceLine>
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -393,7 +395,7 @@
    <SourceLine>elseif IsNumeric( valueString ) then</SourceLine>
    <SourceLine>value = val( valueString )</SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>raise new JSONException( "Unrecognized value in JSON string", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value", 10, startPos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return value</SourceLine>
@@ -552,10 +554,12 @@
    <SourceLine>dim child as JSONItem_MTC = Dictionary( value )</SourceLine>
    <SourceLine>child.ToString( output, settings, level )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif value.Type = Variant.TypeString then</SourceLine>
+   <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
+   <SourceLine>value.Type = Variant.TypePString then</SourceLine>
    <SourceLine>EncodeString( value, settings.EscapeSlashes, output )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif value.Type = Variant.TypeDouble or value.Type = Variant.TypeSingle then</SourceLine>
+   <SourceLine>elseif value.Type = Variant.TypeDouble or value.Type = Variant.TypeSingle or _</SourceLine>
+   <SourceLine>value.Type = Variant.TypeCurrency then</SourceLine>
    <SourceLine>output.Append Format( value, settings.DecimalFormat )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeNil then</SourceLine>
@@ -676,6 +680,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(inMB As MemoryBlock, ByRef pos As Integer)</SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
+   <SourceLine>dim commaFound as boolean</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>// Determine the type we are loading. If we get here,</SourceLine>
    <SourceLine>// it either has to match self, or this type hasn't been set yet</SourceLine>
@@ -683,19 +688,31 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// Loading array</SourceLine>
    <SourceLine>//</SourceLine>
+   <SourceLine>self.HasSetType = kHasSetArray</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then</SourceLine>
+   <SourceLine>if commaFound then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value", 10, pos )</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
    <SourceLine>self.Append value</SourceLine>
    <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>commaFound = false</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>commaFound = true</SourceLine>
+   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kCloseSquareBracket then</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
+   <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
@@ -703,6 +720,8 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// Loading object</SourceLine>
    <SourceLine>//</SourceLine>
+   <SourceLine>self.HasSetType = kHasSetObject</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
@@ -716,7 +735,7 @@
    <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kColon then</SourceLine>
    <SourceLine>// Something is wrong</SourceLine>
-   <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
+   <SourceLine>raise new JSONException( "Missing :", 5, pos + 1 )</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
@@ -1015,6 +1034,7 @@
    <SourceLine>if IsArray then</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>output.Append "["</SourceLine>
+   <SourceLine>if ArrayValues.Ubound &lt;&gt; -1 then</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
    <SourceLine>output.Append EndOfLine</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1025,7 +1045,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = ArrayValues( i )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, 0, output )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, output )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if i &lt; ArrayValues.Ubound then</SourceLine>
    <SourceLine>output.Append ","</SourceLine>
@@ -1039,16 +1059,21 @@
    <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>output.Append "]"</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim d as Dictionary = ObjectValues</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>output.Append "{"</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if d.Count &lt;&gt; 0 then</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
    <SourceLine>output.Append EndOfLine</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim d as Dictionary = ObjectValues</SourceLine>
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
    <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
@@ -1075,6 +1100,8 @@
    <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>output.Append "}"</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1120,6 +1147,8 @@
    <SourceLine>if not EnsureArray() then</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>Validate( value )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetArray</SourceLine>
    <SourceLine>if ArrayValues.Ubound &lt; index then</SourceLine>
@@ -1170,6 +1199,8 @@
    <SourceLine>if not EnsureObject then</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>Validate( value )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
    <SourceLine>name = EncodeName( name )</SourceLine>
@@ -1223,6 +1254,46 @@
   <ItemParams>name As String</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
+ <Method>
+  <ItemName>Validate</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub Validate(value As Variant)</SourceLine>
+   <SourceLine>dim isGood as boolean = true // Assume it is</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>select case value.Type</SourceLine>
+   <SourceLine>case Variant.TypeNil, Variant.TypeBoolean</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeString, Variant.TypeCString, Variant.TypePString</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeDouble, Variant.TypeSingle, Variant.TypeCurrency</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeInteger, Variant.TypeLong</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeObject</SourceLine>
+   <SourceLine>select case value</SourceLine>
+   <SourceLine>case IsA Dictionary</SourceLine>
+   <SourceLine>case IsA Date</SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>isGood = false</SourceLine>
+   <SourceLine>end</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not isGood then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value", 10 )</SourceLine>
+   <SourceLine>end</SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>value As Variant</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
  <Property>
   <ItemName>ArrayValues()</ItemName>
   <Compatibility></Compatibility>
@@ -1243,7 +1314,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Compact As Boolean = True</SourceLine>
+   <SourceLine>Compact As Boolean</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1257,7 +1328,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>DecimalFormat As String = "-0.0##############"</SourceLine>
+   <SourceLine>DecimalFormat As String</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1271,7 +1342,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EscapeSlashes As Boolean = True</SourceLine>
+   <SourceLine>EscapeSlashes As Boolean</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1299,7 +1370,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>IndentSpacing As Integer = 2</SourceLine>
+   <SourceLine>IndentSpacing As Integer</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
