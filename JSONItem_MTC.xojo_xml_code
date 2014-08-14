@@ -1274,6 +1274,7 @@
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeObject</SourceLine>
    <SourceLine>select case value</SourceLine>
+   <SourceLine>case IsA JSONItem_MTC</SourceLine>
    <SourceLine>case IsA Dictionary</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>raise new JSONException( "Unrecognized Object", 11 )</SourceLine>
