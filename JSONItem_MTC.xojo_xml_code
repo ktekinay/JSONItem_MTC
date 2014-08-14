@@ -296,7 +296,7 @@
    <SourceLine>dim char as string = Encodings.UTF8.Chr( uValue )</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, char.LenB ) = char</SourceLine>
    <SourceLine>outIndex = outIndex + char.LenB</SourceLine>
-   <SourceLine>pos = pos + 4</SourceLine>
+   <SourceLine>pos = pos + 5</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
    <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
