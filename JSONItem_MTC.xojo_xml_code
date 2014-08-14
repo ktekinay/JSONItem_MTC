@@ -51,6 +51,8 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>Validate( value )</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetArray</SourceLine>
    <SourceLine>ArrayValues.Append value</SourceLine>
    <SourceLine></SourceLine>
