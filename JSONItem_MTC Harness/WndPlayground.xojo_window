@@ -1,5 +1,5 @@
 #tag Window
-Begin Window Window1
+Begin Window WndPlayground
    BackColor       =   &cFFFFFF00
    Backdrop        =   0
    CloseButton     =   True
@@ -23,7 +23,7 @@ Begin Window Window1
    MinWidth        =   64
    Placement       =   0
    Resizeable      =   True
-   Title           =   "Untitled"
+   Title           =   "Playground"
    Visible         =   True
    Width           =   928
    Begin TextArea fldResult

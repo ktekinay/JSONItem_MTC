@@ -1,5 +1,5 @@
 #tag Window
-Begin Window AboutWindow
+Begin Window WndMenu
    BackColor       =   &cFFFFFF00
    Backdrop        =   0
    CloseButton     =   True
@@ -9,36 +9,68 @@ Begin Window AboutWindow
    FullScreen      =   False
    FullScreenButton=   False
    HasBackColor    =   False
-   Height          =   192
+   Height          =   200
    ImplicitInstance=   True
    LiveResize      =   True
    MacProcID       =   0
    MaxHeight       =   32000
-   MaximizeButton  =   False
+   MaximizeButton  =   True
    MaxWidth        =   32000
    MenuBar         =   0
    MenuBarVisible  =   True
    MinHeight       =   64
-   MinimizeButton  =   False
+   MinimizeButton  =   True
    MinWidth        =   64
    Placement       =   0
-   Resizeable      =   False
-   Title           =   "About XojoUnit"
+   Resizeable      =   True
+   Title           =   "JSONItem_MTC"
    Visible         =   True
-   Width           =   301
-   Begin Canvas AppIcon
-      AcceptFocus     =   False
-      AcceptTabs      =   False
+   Width           =   414
+   Begin PushButton btnPlayground
       AutoDeactivate  =   True
-      Backdrop        =   0
-      DoubleBuffer    =   False
+      Bold            =   False
+      ButtonStyle     =   "0"
+      Cancel          =   False
+      Caption         =   "Playground"
+      Default         =   False
       Enabled         =   True
-      EraseBackground =   True
-      Height          =   64
+      Height          =   20
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   118
+      Italic          =   False
+      Left            =   76
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   0
+      TabIndex        =   0
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   114
+      Underline       =   False
+      Visible         =   True
+      Width           =   102
+   End
+   Begin PushButton btnUnitTests
+      AutoDeactivate  =   True
+      Bold            =   False
+      ButtonStyle     =   "0"
+      Cancel          =   False
+      Caption         =   "Unit Tests"
+      Default         =   False
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   246
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -48,54 +80,21 @@ Begin Window AboutWindow
       TabIndex        =   1
       TabPanelIndex   =   0
       TabStop         =   True
-      Top             =   14
-      Transparent     =   True
-      UseFocusRing    =   True
-      Visible         =   True
-      Width           =   64
-   End
-   Begin Label AppNameLabel
-      AutoDeactivate  =   True
-      Bold            =   True
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   False
-      Left            =   20
-      LockBottom      =   False
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   False
-      LockTop         =   True
-      Multiline       =   False
-      Scope           =   0
-      Selectable      =   False
-      TabIndex        =   2
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Text            =   "XojoUnit"
-      TextAlign       =   1
-      TextColor       =   &c00000000
       TextFont        =   "System"
-      TextSize        =   14.0
+      TextSize        =   0.0
       TextUnit        =   0
-      Top             =   90
-      Transparent     =   False
+      Top             =   114
       Underline       =   False
       Visible         =   True
-      Width           =   261
+      Width           =   102
    End
-   Begin Label VersionLabel
+   Begin Label Label1
       AutoDeactivate  =   True
       Bold            =   False
       DataField       =   ""
       DataSource      =   ""
       Enabled         =   True
-      Height          =   20
+      Height          =   88
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
@@ -106,42 +105,49 @@ Begin Window AboutWindow
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   True
-      Multiline       =   False
+      Multiline       =   True
       Scope           =   0
       Selectable      =   False
-      TabIndex        =   3
+      TabIndex        =   2
       TabPanelIndex   =   0
-      TabStop         =   True
-      Text            =   "Version"
-      TextAlign       =   1
+      Text            =   "Press a button to open its window. The app quits if this window is closed."
+      TextAlign       =   0
       TextColor       =   &c00000000
-      TextFont        =   "SmallSystem"
+      TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   110
+      Top             =   14
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   261
+      Width           =   374
    End
 End
 #tag EndWindow
 
 #tag WindowCode
+	#tag Event
+		Sub Close()
+		  quit
+		  
+		End Sub
+	#tag EndEvent
+
+
 #tag EndWindowCode
 
-#tag Events AppIcon
+#tag Events btnPlayground
 	#tag Event
-		Sub Paint(g As Graphics, areas() As REALbasic.Rect)
-		  g.DrawPicture(bug, 0, 0, g.Width, g.Height, 0, 0, bug.Width, bug.Height)
+		Sub Action()
+		  WndPlayground.Show
+		  
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events VersionLabel
+#tag Events btnUnitTests
 	#tag Event
-		Sub Open()
-		  Me.Text = "Version " + Str(App.MajorVersion) + "." + Str(App.MinorVersion) + "." + Str(App.BugVersion) + " (" + Str(App.NonReleaseVersion) + ")"
-		  
+		Sub Action()
+		  TestWindow.Show
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -199,7 +205,6 @@ End
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="FullScreen"
-		Visible=true
 		Group="Appearance"
 		InitialValue="False"
 		Type="Boolean"
@@ -267,7 +272,7 @@ End
 		Name="MaximizeButton"
 		Visible=true
 		Group="Appearance"
-		InitialValue="False"
+		InitialValue="True"
 		Type="Boolean"
 		EditorType="Boolean"
 	#tag EndViewProperty
@@ -287,7 +292,6 @@ End
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="MenuBarVisible"
-		Visible=true
 		Group="Appearance"
 		InitialValue="True"
 		Type="Boolean"
