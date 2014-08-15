@@ -1298,6 +1298,21 @@
   <ItemParams>value As Variant</ItemParams>
   <ItemResult></ItemResult>
  </Method>
+ <Note>
+  <ItemName>About</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <NoteLine>About</NoteLine>
+   <NoteLine></NoteLine>
+   <NoteLine>JSONItem_MTC</NoteLine>
+   <NoteLine>©2014 by Kem Tekinay.</NoteLine>
+   <NoteLine></NoteLine>
+   <NoteLine></NoteLine>
+  </ItemSource>
+  <ItemFlags>0</ItemFlags>
+ </Note>
  <Property>
   <ItemName>ArrayValues()</ItemName>
   <Compatibility></Compatibility>
@@ -1527,6 +1542,11 @@
    <PropertyGroup>Position</PropertyGroup>
    <PropertyValue>0</PropertyValue>
    <ItemType>Integer</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>EncodeUnicode</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>Boolean</ItemType>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
