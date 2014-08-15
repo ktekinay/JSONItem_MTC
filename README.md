@@ -14,7 +14,7 @@ This class implements all the features and functions of its native twin and shou
 
 - Some error messages will be different within this class than the native class.
 
-- As of Xojo 2014r21, ToString is is significantly faster in this class than the native version.
+- As of Xojo 2014r21, ToString is significantly faster in this class than the native version.
 
 ##License
 

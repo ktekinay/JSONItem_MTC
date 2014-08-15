@@ -1344,7 +1344,7 @@
    <NoteLine></NoteLine>
    <NoteLine>- Some error messages will be different within this class than the native class.</NoteLine>
    <NoteLine></NoteLine>
-   <NoteLine>- As of Xojo 2014r21, ToString is is significantly faster in this class than the native version.</NoteLine>
+   <NoteLine>- As of Xojo 2014r21, ToString is significantly faster in this class than the native version.</NoteLine>
    <NoteLine></NoteLine>
    <NoteLine>See the Legal note for licensing information. If you do make useful modifications, please let me </NoteLine>
    <NoteLine>know so I can include them in future versions.</NoteLine>
