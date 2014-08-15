@@ -1359,6 +1359,20 @@
   </ItemSource>
   <ItemFlags>0</ItemFlags>
  </Note>
+ <Note>
+  <ItemName>Acknowledgements</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <NoteLine>Acknowledgements</NoteLine>
+   <NoteLine>With thanks to Jeremy Cowgar for his suggestions and adding the unit testing framework.</NoteLine>
+   <NoteLine></NoteLine>
+   <NoteLine>With thanks for Paul Lefebvre of Xojo, Inc., for creating the unit testing framework in the first place.</NoteLine>
+   <NoteLine></NoteLine>
+  </ItemSource>
+  <ItemFlags>0</ItemFlags>
+ </Note>
  <Property>
   <ItemName>ArrayValues()</ItemName>
   <Compatibility></Compatibility>
