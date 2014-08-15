@@ -423,6 +423,7 @@ End
 		Sub Action()
 		  dim j1 as new JSONItem
 		  dim j2 as new JSONItem_MTC
+		  dim j3 as JSONMBS = JSONMBS.NewObjectNode
 		  
 		  dim sw as new Stopwatch_MTC
 		  sw.Start
@@ -455,6 +456,20 @@ End
 		  sw.Reset
 		  sw.Start
 		  
+		  for i as integer = 1 to 1000
+		    dim j3Child as JSONMBS = JSONMBS.NewArrayNode
+		    for inner as integer = 1 to 10
+		      j3Child.AddItemToArray JSONMBS.NewNumberNode( inner )
+		    next
+		    j3.AddItemToObject( str( i ), j3Child )
+		  next i
+		  
+		  sw.Stop
+		  AddToResult "JSONMBS Create: " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
 		  dim s1 as string = j1.ToString
 		  
 		  sw.Stop
@@ -469,6 +484,18 @@ End
 		  AddToResult "JSONItem_MTC.ToString: " + format( sw.ElapsedMicroseconds, "#," )
 		  
 		  if StrComp( s1, s2, 0 ) <> 0 then
+		    AddToResult "... but they don't match"
+		  end if
+		  
+		  sw.Reset
+		  sw.Start
+		  
+		  dim s3 as string = j3.ToString( false )
+		  
+		  sw.Stop
+		  AddToResult "JSONMBS.ToString: " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  if StrComp( s1, s3, 0 ) <> 0 then
 		    AddToResult "... but they don't match"
 		  end if
 		  
@@ -500,12 +527,21 @@ End
 		  sw.Stop
 		  AddToResult "JSONItem_MTC.Load: " + format( sw.ElapsedMicroseconds, "#," )
 		  
+		  sw.Reset
+		  sw.Start
+		  
+		  j3 = new JSONMBS( s3 )
+		  
+		  sw.Stop
+		  AddToResult "JSONMBS.Load: " + format( sw.ElapsedMicroseconds, "#," )
+		  
 		  //
 		  // Stress test
 		  //
 		  
 		  j1 = new JSONItem
 		  j2 = new JSONItem_MTC
+		  j3 = JSONMBS.NewObjectNode
 		  
 		  sw.Reset
 		  sw.Start
@@ -530,6 +566,16 @@ End
 		  sw.Reset
 		  sw.Start
 		  
+		  for i as integer = 1 to 10000
+		    j3.AddItemToObject( str( i ), JSONMBS.NewStringNode( str( i ) + chr( 127 + i ) ) )
+		  next i
+		  
+		  sw.Stop
+		  AddToResult "JSONMBS.Create (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
 		  s1 = j1.ToString
 		  
 		  sw.Stop
@@ -542,6 +588,30 @@ End
 		  
 		  sw.Stop
 		  AddToResult "JSONItem_MTC.ToString (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  if StrComp( s1, s2, 0 ) <> 0 then
+		    AddToResult "... but they don't match"
+		    dim c as new Clipboard
+		    c.Text = "JSONItem:" + EndOfLine + s1 + EndOfLine + EndOfLine + "JSONItem_MTC:" + EndOfLine + s2
+		    c.Close
+		  end if
+		  
+		  sw.Reset
+		  sw.Start
+		  
+		  s3 = j3.ToString( false )
+		  
+		  sw.Stop
+		  AddToResult "JSONMBS.ToString (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  if StrComp( s1, s3, 0 ) <> 0 then
+		    AddToResult "... but it doesn't match JSONItem"
+		  end if
+		  
+		  if StrComp( s2, s3, 0 ) <> 0 then
+		    AddToResult "... but it doesn't match JSONItem_MTC"
+		  end if
+		  
 		  
 		  sw.Reset
 		  sw.Start
@@ -558,6 +628,14 @@ End
 		  
 		  sw.Stop
 		  AddToResult "JSONItem_MTC.Load (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
+		  j3 = new JSONMBS( s3 )
+		  
+		  sw.Stop
+		  AddToResult "JSONMBS.Load (big): " + format( sw.ElapsedMicroseconds, "#," )
 		  
 		  return
 		End Sub
