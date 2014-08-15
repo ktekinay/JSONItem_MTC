@@ -1,5 +1,5 @@
 #tag Class
-Protected Class BasicTests
+Protected Class BasicTests_JSONItem_MTC
 Inherits TestGroup
 	#tag Method, Flags = &h21
 		Private Sub CaseSensitiveKeyTest()
@@ -93,8 +93,45 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub UnicodeTest()
+		  dim j as new JSONItem_MTC
+		  
+		  j.Value( "a" + chr( 1 ) ) = "something" + chr( 2 )
+		  Assert.AreSame( "{""a\u0001"":""something\u0002""}", j.ToString )
+		  
+		  j = new JSONItem_MTC
+		  j.Append( "a" + chr( 1 ) )
+		  Assert.AreSame( "[""a\u0001""]", j.ToString )
+		  
+		  j = new JSONItem_MTC
+		  j.Append "©"
+		  
+		  j.EncodeUnicode = false
+		  Assert.AreEqual( "[""©""]", j.ToString )
+		  
+		  j.EncodeUnicode = true
+		  Assert.AreEqual( "[""\u00A9""]", j.ToString )
+		  
+		  j = new JSONItem_MTC( "[""Norm’s dog""]" )
+		  j.EncodeUnicode = true
+		  Assert.AreSame( "[""Norm\u2019s dog""]", j.ToString )
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="FailedTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IncludeGroup"
+			Group="Behavior"
+			InitialValue="True"
+			Type="Boolean"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
 			Visible=true
@@ -116,10 +153,30 @@ Inherits TestGroup
 			Type="String"
 		#tag EndViewProperty
 		#tag ViewProperty
+			Name="PassedTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="RunTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="SkippedTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
 			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TestCount"
+			Group="Behavior"
+			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
