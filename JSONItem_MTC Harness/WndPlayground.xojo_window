@@ -166,7 +166,7 @@ Begin Window WndPlayground
       TabIndex        =   4
       TabPanelIndex   =   0
       TabStop         =   True
-      Text            =   ""
+      Text            =   "{""name"":""something"",""properties"":{""prop1"":""value1"",""prop2"":true,""prop3"":[""item1"", ""item2"", null]}}"
       TextColor       =   &c00000000
       TextFont        =   "System"
       TextSize        =   0.0
