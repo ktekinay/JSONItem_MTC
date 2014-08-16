@@ -1753,7 +1753,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>1.0</ItemDef>
+  <ItemDef>1.1</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
 </block>
