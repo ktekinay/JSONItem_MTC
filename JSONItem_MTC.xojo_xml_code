@@ -299,9 +299,12 @@
    <SourceLine>pos = pos + 5</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
-   <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
-   <SourceLine>return ""</SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>'raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
+   <SourceLine>'return ""</SourceLine>
+   <SourceLine>// RFC says any character may be escaped, so just accept this</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>inBackslash = false</SourceLine>
