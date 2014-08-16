@@ -8,11 +8,13 @@ To use it, search for "JSONItem" within your project and replace it with "JSONIt
 
 This class implements all the features and functions of its native twin and should be indistinguishable except for the following:
 
-- You can add any object to JSONItem and it will throw an exception when you try to use ToString. This class will throw that exception when you try to add the bad object.
+- You can add any object to JSONItem and it will raise an exception when you try to use ToString. This class will raise that exception when you try to add the bad object.
 
 - This class has an extra property, EncodeUnicode. By default, it is False to emulate the native class. If set to True, it will encode all characters whose codepoints are greater than 127.
 
 - Some error messages will be different within this class than the native class.
+
+- The native class will raise an exception when loading a string that has an escaped character other than one of the "approved" characters. This class will accept any escaped character.
 
 - As of Xojo 2014r21, ToString is significantly faster in this class than the native version.
 
