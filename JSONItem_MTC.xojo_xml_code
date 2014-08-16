@@ -1080,7 +1080,6 @@
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1121,7 +1120,6 @@
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
