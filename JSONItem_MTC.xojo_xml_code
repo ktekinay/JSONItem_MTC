@@ -420,6 +420,13 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeString(s As String, escapeSlashes As Boolean, output() As String)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>const kBackSlashVal = 92</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if s = "" then</SourceLine>
@@ -552,6 +559,12 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, output() As String)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
    <SourceLine>JSONItem_MTC( value ).ToString( output, settings, level )</SourceLine>
    <SourceLine></SourceLine>
@@ -1022,6 +1035,12 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub ToString(output() As String, settings As JSONItem_MTC, level As Integer)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>level = level + 1</SourceLine>
    <SourceLine>dim notCompact as boolean = not( settings.Compact )</SourceLine>
    <SourceLine></SourceLine>
@@ -1061,7 +1080,6 @@
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1102,7 +1120,6 @@
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
