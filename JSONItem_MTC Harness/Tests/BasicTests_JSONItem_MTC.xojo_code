@@ -40,6 +40,20 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub EscapedCharactersTest()
+		  dim j as JSONItem_MTC
+		  dim jsonString() as string = Array( "\r", "\n", "\\", "\t", "\f", "\b", "\""", "\/", "\u0020", "\G" )
+		  dim expectedString() as string = Array( EndOfLine.Macintosh,  EndOfLine.UNIX, "\", chr( 9 ), chr( 12 ), chr( 8 ), """", "/", " ", "G" )
+		  
+		  for i as integer = 0 to jsonString.Ubound
+		    j = new JSONItem_MTC( "[""" + jsonString( i ) + """]" )
+		    Assert.AreEqual( expectedString( i ), j( 0 ) )
+		  next i
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub ObjectsTest()
 		  dim j as new JSONItem_MTC
 		  
