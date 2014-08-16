@@ -2,6 +2,60 @@
 Protected Class BasicTests_JSONItem
 Inherits TestGroup
 	#tag Method, Flags = &h21
+		Private Sub LoadEncodingTest()
+		  const kOriginal = "[""abc""]"
+		  
+		  dim testString as string
+		  dim j as JSONItem
+		  
+		  testString = kOriginal
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.DefineEncoding( nil )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
+		  testString = testString.DefineEncoding( nil )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
+		  testString = testString.DefineEncoding( nil )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
+		  testString = testString.DefineEncoding( nil )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
+		  testString = testString.DefineEncoding( nil )
+		  j = new JSONItem( testString )
+		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub UnicodeTest()
 		  dim j as new JSONItem
 		  
