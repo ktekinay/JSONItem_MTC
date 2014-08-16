@@ -14,6 +14,8 @@ This class implements all the features and functions of its native twin and shou
 
 - Some error messages will be different within this class than the native class.
 
+- The native class will raise an exception when loading a string that has an escaped character other than one of the "approved" characters. This class will accept any escaped character.
+
 - As of Xojo 2014r21, ToString is significantly faster in this class than the native version.
 
 ##License
