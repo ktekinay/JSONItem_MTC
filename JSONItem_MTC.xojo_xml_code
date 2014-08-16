@@ -420,6 +420,13 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeString(s As String, escapeSlashes As Boolean, output() As String)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>const kBackSlashVal = 92</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if s = "" then</SourceLine>
@@ -552,6 +559,12 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, output() As String)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
    <SourceLine>JSONItem_MTC( value ).ToString( output, settings, level )</SourceLine>
    <SourceLine></SourceLine>
@@ -775,7 +788,7 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>JSONString = JSONString.ConvertEncoding( Encodings.UTF8 ).Trim</SourceLine>
+   <SourceLine>JSONString = JSONStringToUTF8( JSONString ).Trim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim firstChar as string = JSONString.LeftB( 1 )</SourceLine>
    <SourceLine>if firstChar = "[" and IsObject then</SourceLine>
@@ -1022,6 +1035,12 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub ToString(output() As String, settings As JSONItem_MTC, level As Integer)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>level = level + 1</SourceLine>
    <SourceLine>dim notCompact as boolean = not( settings.Compact )</SourceLine>
    <SourceLine></SourceLine>
@@ -1061,7 +1080,6 @@
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1102,7 +1120,6 @@
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>'output.Append indenter</SourceLine>
    <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1300,6 +1317,93 @@
   <IsShared>0</IsShared>
   <ItemParams>value As Variant</ItemParams>
   <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>JSONStringToUTF8</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function JSONStringToUTF8(s As String) As String</SourceLine>
+   <SourceLine>// Ensures that the given string is converted to UTF8.</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// A string obtained from an unknown source might be nil or might </SourceLine>
+   <SourceLine>// be marked as the wrong encoding, so we won't trust it</SourceLine>
+   <SourceLine>// and will check ourselves.</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Since the string must start with characters in the ASCII range</SourceLine>
+   <SourceLine>// (whitespace, {, or [), we only need the first four bytes.</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static null as string = ChrB( 0 )</SourceLine>
+   <SourceLine>static doubleNull as string  = null + null</SourceLine>
+   <SourceLine>static tripleNull as string = null + null + null</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim firstFour as string = s.LeftB( 4 )</SourceLine>
+   <SourceLine>if firstFour.LenB &lt; 2 or firstFour.LenB = 3 then</SourceLine>
+   <SourceLine>return s.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// </SourceLine>
+   <SourceLine>// Check for BOM</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if true then // Scope</SourceLine>
+   <SourceLine>static bomArr() as string = Array( _</SourceLine>
+   <SourceLine>ChrB( &amp;hFF ) + ChrB( &amp;hFE ) + doubleNull, _</SourceLine>
+   <SourceLine>doubleNull + ChrB( &amp;hFE ) + ChrB( &amp;hFF ), _</SourceLine>
+   <SourceLine>ChrB( &amp;hEF ) + ChrB( &amp;hBB ) + ChrB( &amp;hBF ), _</SourceLine>
+   <SourceLine>ChrB( &amp;hFF ) + ChrB( &amp;hFE ), _</SourceLine>
+   <SourceLine>ChrB( &amp;hFE ) + ChrB( &amp;hFF ) _</SourceLine>
+   <SourceLine>)</SourceLine>
+   <SourceLine>&#32;</SourceLine>
+   <SourceLine>for i as integer = 0 to bomArr.Ubound</SourceLine>
+   <SourceLine>dim bom as string = bomArr( i )</SourceLine>
+   <SourceLine>dim bomLen as integer = bom.LenB</SourceLine>
+   <SourceLine>if firstFour.LeftB( bomLen ) = bom then</SourceLine>
+   <SourceLine>s = s.MidB( bomLen + 1 )</SourceLine>
+   <SourceLine>firstFour = s.LeftB( 4 )</SourceLine>
+   <SourceLine>exit</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// Check for UTF8</SourceLine>
+   <SourceLine>if firstFour.InStrB( null ) = 0 then</SourceLine>
+   <SourceLine>return s.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// UTF32?</SourceLine>
+   <SourceLine>if firstFour.LenB = 4 then</SourceLine>
+   <SourceLine>if firstFour.LeftB( 3 ) = tripleNull then</SourceLine>
+   <SourceLine>s = s.DefineEncoding( Encodings.UTF32BE )</SourceLine>
+   <SourceLine>return s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>if firstFour.RightB( 3 ) = tripleNull then</SourceLine>
+   <SourceLine>s = s.DefineEncoding( Encodings.UTF32LE )</SourceLine>
+   <SourceLine>return s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// UTF16?</SourceLine>
+   <SourceLine>if firstFour.LeftB( 1 ) = null then</SourceLine>
+   <SourceLine>s = s.DefineEncoding( Encodings.UTF16BE )</SourceLine>
+   <SourceLine>return s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>if firstFour.RightB( 1 ) = null then</SourceLine>
+   <SourceLine>s = s.DefineEncoding( Encodings.UTF16LE )</SourceLine>
+   <SourceLine>return s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// We don't know what the heck it is</SourceLine>
+   <SourceLine>return s</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>s As String</ItemParams>
+  <ItemResult>String</ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
@@ -1753,7 +1857,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>1.1</ItemDef>
+  <ItemDef>1.2</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
 </block>
