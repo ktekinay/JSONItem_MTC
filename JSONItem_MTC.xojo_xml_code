@@ -1376,6 +1376,20 @@
   </ItemSource>
   <ItemFlags>0</ItemFlags>
  </Note>
+ <Note>
+  <ItemName>Specs (RFC)</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <NoteLine>Specs (RFC)</NoteLine>
+   <NoteLine>This class follows the specs in RFC 7159 found, among other places, here:</NoteLine>
+   <NoteLine></NoteLine>
+   <NoteLine>http://tools.ietf.org/html/rfc7159</NoteLine>
+   <NoteLine></NoteLine>
+  </ItemSource>
+  <ItemFlags>0</ItemFlags>
+ </Note>
  <Property>
   <ItemName>ArrayValues()</ItemName>
   <Compatibility></Compatibility>
