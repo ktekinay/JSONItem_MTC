@@ -8,7 +8,7 @@ To use it, search for "JSONItem" within your project and replace it with "JSONIt
 
 This class implements all the features and functions of its native twin and should be indistinguishable except for the following:
 
-- You can add any object to JSONItem and it will throw an exception when you try to use ToString. This class will throw that exception when you try to add the bad object.
+- You can add any object to JSONItem and it will raise an exception when you try to use ToString. This class will raise that exception when you try to add the bad object.
 
 - This class has an extra property, EncodeUnicode. By default, it is False to emulate the native class. If set to True, it will encode all characters whose codepoints are greater than 127.
 
