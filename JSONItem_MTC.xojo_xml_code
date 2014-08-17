@@ -419,13 +419,42 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeString(s As String, escapeSlashes As Boolean, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
+   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
+   <SourceLine>// Encodes a string for output during ToString.</SourceLine>
+   <SourceLine>// Honors the EncodeUnicode setting, but some characters must ALWAYS be encoded for </SourceLine>
+   <SourceLine>// Javascript compatibility. These are</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>//  chr 127</SourceLine>
+   <SourceLine>//  &amp;h00ad</SourceLine>
+   <SourceLine>//  &amp;h0600 - &amp;h0604</SourceLine>
+   <SourceLine>//  &amp;h070f</SourceLine>
+   <SourceLine>//  &amp;h17b4 - &amp;h17b5</SourceLine>
+   <SourceLine>//  &amp;h200c - &amp;h200f</SourceLine>
+   <SourceLine>//  &amp;h2028 - &amp;h202f</SourceLine>
+   <SourceLine>//  &amp;h2060 - &amp;h206f</SourceLine>
+   <SourceLine>//  &amp;hfeff</SourceLine>
+   <SourceLine>//  &amp;hfff0 - &amp;hffff</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
    <SourceLine>#pragma NilObjectChecking false</SourceLine>
    <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static alwaysEncode() as integer = Array( _</SourceLine>
+   <SourceLine>127, &amp;hAD, _</SourceLine>
+   <SourceLine>&amp;h600, &amp;h601, &amp;h602, &amp;h603, &amp;h604, _</SourceLine>
+   <SourceLine>&amp;h70F, _</SourceLine>
+   <SourceLine>&amp;h17B4, &amp;h17B5, _</SourceLine>
+   <SourceLine>&amp;h200C, &amp;h200D, &amp;h200E, &amp;h200F, _</SourceLine>
+   <SourceLine>&amp;h2028, &amp;h2029, &amp;h202A, &amp;h202B, &amp;h202C, &amp;h202D, &amp;h202E, &amp;h202F, _</SourceLine>
+   <SourceLine>&amp;h2060, &amp;h2061, &amp;h2062, &amp;h2063, &amp;h2064, &amp;h2065, &amp;h2066, &amp;h2067, &amp;h2068, &amp;h2069, _</SourceLine>
+   <SourceLine>&amp;h206A, &amp;h206B, &amp;h206C, &amp;h206D, &amp;h206E, &amp;h206F, _</SourceLine>
+   <SourceLine>&amp;hFEFF, _</SourceLine>
+   <SourceLine>&amp;hFFF0, &amp;hFFF1, &amp;hFFF2, &amp;hFFF3, &amp;hFFF4, &amp;hFFF5, &amp;hFFF6, &amp;hFFF7, &amp;hfff8, &amp;hFFF9, _</SourceLine>
+   <SourceLine>&amp;hFFFA, &amp;hFFFB, &amp;hFFFC, &amp;hFFFD, &amp;hFFFE, &amp;hFFFF _</SourceLine>
+   <SourceLine>)</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
@@ -454,6 +483,8 @@
    <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
    <SourceLine>dim inIndex as integer = -1</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim encodeUnicode as boolean = settings.EncodeUnicode</SourceLine>
+   <SourceLine>dim escapeSlashes as boolean = settings.EscapeSlashes</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>inIndex = inIndex + 1</SourceLine>
@@ -516,23 +547,32 @@
    <SourceLine>outMB.StringValue( outIndex, 6 ) = insertValue</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif EncodeUnicode and thisByte &gt; 127 then // high-ascii</SourceLine>
+   <SourceLine>elseif thisByte &gt;= 127 then // high-ascii</SourceLine>
    <SourceLine>dim byteLength as integer</SourceLine>
    <SourceLine>if thisByte &gt; 240 then</SourceLine>
    <SourceLine>byteLength = 4</SourceLine>
    <SourceLine>elseif thisByte &gt; 224 then</SourceLine>
    <SourceLine>byteLength = 3</SourceLine>
-   <SourceLine>else</SourceLine>
+   <SourceLine>elseif thisByte &gt; 192 then</SourceLine>
    <SourceLine>byteLength = 2</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>byteLength = 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>dim thisChar as string = inMB.StringValue( inIndex, byteLength )</SourceLine>
    <SourceLine>thisChar = thisChar.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>if encodeUnicode or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 then</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, 6 ) = "\u" + Right( "000" + hex( thisChar.Asc ), 4 )</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>inIndex = inIndex + byteLength - 1</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, byteLength ) = thisChar</SourceLine>
+   <SourceLine>outIndex = outIndex + byteLength</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>else // thisByte &gt; 31 and thisByte &lt; 128  or not EncodeUnicode</SourceLine>
+   <SourceLine>inIndex = inIndex + byteLength - 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else // thisByte &gt; 31 and thisByte &lt; 127  </SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
@@ -557,7 +597,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>s As String, escapeSlashes As Boolean, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
+  <ItemParams>s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -582,7 +622,7 @@
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
-   <SourceLine>EncodeString( value.StringValue, settings.EscapeSlashes, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
@@ -1216,7 +1256,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
    <SourceLine>dim name as string = DecodeName( key )</SourceLine>
-   <SourceLine>EncodeString( name, settings.EscapeSlashes, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeString( name, settings, outMB, outIndex )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1 ) then</SourceLine>
