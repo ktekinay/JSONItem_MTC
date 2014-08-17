@@ -419,7 +419,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeString(s As String, escapeSlashes As Boolean, output() As String)</SourceLine>
+   <SourceLine>Sub EncodeString(s As String, escapeSlashes As Boolean, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -427,28 +427,33 @@
    <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>const kBackSlashVal = 92</SourceLine>
+   <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 12 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kQuote</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if s = "" then</SourceLine>
-   <SourceLine>output.Append """"""</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kQuote</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>s = s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim inMB as MemoryBlock = s</SourceLine>
-   <SourceLine>dim outSize as integer = inMB.Size</SourceLine>
-   <SourceLine>if outSize &lt; 32 then</SourceLine>
-   <SourceLine>outSize = 32</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( outSize )</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
-   <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
    <SourceLine>dim inIndex as integer = -1</SourceLine>
-   <SourceLine>dim outIndex as integer = 0</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>inIndex = inIndex + 1</SourceLine>
@@ -456,24 +461,24 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 6 ) then</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
    <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize * 2</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 6 )</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 12 )</SourceLine>
    <SourceLine>outMB.Size = outSize</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim thisByte as byte = inPtr.Byte( inIndex )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if thisByte = 34 or thisByte = kBackSlashVal then // quote or backslash</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>if thisByte = 34 or thisByte = kBackSlash then // quote or backslash</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = thisByte</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = 47 then // slash</SourceLine>
    <SourceLine>if escapeSlashes then</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = thisByte</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine>else</SourceLine>
@@ -482,27 +487,27 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = 8 then // backspace</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = 98 // b</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = 9 then // tab</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = 116 // t</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = 10 then // linefeed</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = 110 // n</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = 12 then // formfeed</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = 102 // f</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = 13 then // return</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = kBackSlashVal</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
    <SourceLine>outPtr.Byte( outIndex + 1 ) = 114 // r</SourceLine>
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
@@ -535,13 +540,16 @@
    <SourceLine></SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>s = outMB.StringValue( 0, outIndex )</SourceLine>
-   <SourceLine>s = s.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>output.Append """"</SourceLine>
-   <SourceLine>output.Append s</SourceLine>
-   <SourceLine>output.Append """"</SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kQuote</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
@@ -549,7 +557,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>s As String, escapeSlashes As Boolean, output() As String</ItemParams>
+  <ItemParams>s As String, escapeSlashes As Boolean, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -558,7 +566,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, output() As String)</SourceLine>
+   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -566,34 +574,50 @@
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
-   <SourceLine>JSONItem_MTC( value ).ToString( output, settings, level )</SourceLine>
+   <SourceLine>JSONItem_MTC( value ).ToString( outMB, outIndex, settings, level )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value IsA Dictionary then</SourceLine>
    <SourceLine>dim child as JSONItem_MTC = Dictionary( value )</SourceLine>
-   <SourceLine>child.ToString( output, settings, level )</SourceLine>
+   <SourceLine>child.ToString( outMB, outIndex, settings, level )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
-   <SourceLine>EncodeString( value, settings.EscapeSlashes, output )</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>elseif value.Type = Variant.TypeDouble or value.Type = Variant.TypeSingle or _</SourceLine>
-   <SourceLine>value.Type = Variant.TypeCurrency then</SourceLine>
-   <SourceLine>output.Append Format( value, settings.DecimalFormat )</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>elseif value.Type = Variant.TypeNil then</SourceLine>
-   <SourceLine>output.Append "null"</SourceLine>
+   <SourceLine>EncodeString( value.StringValue, settings.EscapeSlashes, outMB, outIndex )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>output.Append value.StringValue.Lowercase</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim insert as string</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value.Type = Variant.TypeDouble or value.Type = Variant.TypeSingle or _</SourceLine>
+   <SourceLine>value.Type = Variant.TypeCurrency then</SourceLine>
+   <SourceLine>insert = Format( value, settings.DecimalFormat )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif value.Type = Variant.TypeNil then</SourceLine>
+   <SourceLine>insert = "null"</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>insert = value.StringValue.Lowercase</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - insert.LenB ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - insert.LenB )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, insert.LenB ) = insert</SourceLine>
+   <SourceLine>outIndex = outIndex + insert.LenB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, output() As String</ItemParams>
+  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1012,11 +1036,13 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function ToString() As String</SourceLine>
-   <SourceLine>dim output() as string</SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
+   <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>ToString( output, self, 0 )</SourceLine>
+   <SourceLine>ToString( outMB, outIndex, self, 0 )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim r as string = join( output, "" )</SourceLine>
+   <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
@@ -1034,7 +1060,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub ToString(output() As String, settings As JSONItem_MTC, level As Integer)</SourceLine>
+   <SourceLine>Sub ToString(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -1042,7 +1068,7 @@
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>level = level + 1</SourceLine>
-   <SourceLine>dim notCompact as boolean = not( settings.Compact )</SourceLine>
+   <SourceLine>dim notCompact as boolean = not( settings.Compact ) and settings.IndentSpacing &gt; 0</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>static lotsOfSpaces as string = "        "</SourceLine>
    <SourceLine></SourceLine>
@@ -1055,76 +1081,205 @@
    <SourceLine>indenter = lotsOfSpaces.LeftB( targetLen )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Always keep at least a 1024 byte buffer at the end of the outMB</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if IsArray then</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>output.Append "["</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kOpenSquareBracket</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if ArrayValues.Ubound &lt;&gt; -1 then</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append EndOfLine</SourceLine>
+   <SourceLine>#if TargetWin32</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 10</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for i as integer = 0 to ArrayValues.Ubound</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append indenter</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, indenter.LenB ) = indenter</SourceLine>
+   <SourceLine>outIndex = outIndex + indenter.LenB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = ArrayValues( i )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, output )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if i &lt; ArrayValues.Ubound then</SourceLine>
-   <SourceLine>output.Append ","</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kComma</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append EndOfLine</SourceLine>
+   <SourceLine>#if TargetWin32</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 10</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - indenter.LenB ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - indenter.LenB )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, indenter.LenB - settings.IndentSpacing ) = indenter.LeftB( indenter.LenB - indentSpacing )</SourceLine>
+   <SourceLine>outIndex = outIndex + ( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>output.Append "]"</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kCloseSquareBracket</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim d as Dictionary = ObjectValues</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>output.Append "{"</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kOpenCurlyBrace</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if d.Count &lt;&gt; 0 then</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append EndOfLine</SourceLine>
+   <SourceLine>#if TargetWin32</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 10</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
    <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append indenter</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, indenter.LenB ) = indenter</SourceLine>
+   <SourceLine>outIndex = outIndex + indenter.LenB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
    <SourceLine>dim name as string = DecodeName( key )</SourceLine>
-   <SourceLine>EncodeString( name, settings.EscapeSlashes, output )</SourceLine>
-   <SourceLine>output.Append ":"</SourceLine>
+   <SourceLine>EncodeString( name, settings.EscapeSlashes, outMB, outIndex )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outSize  = outMB.Size</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kColon</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = d.Value( key )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, output )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outSize  = outMB.Size</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if i &lt; keys.Ubound then</SourceLine>
-   <SourceLine>output.Append ","</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kComma</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append EndOfLine</SourceLine>
+   <SourceLine>#if TargetWin32</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = 10</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
-   <SourceLine>output.Append indenter.LeftB( indenter.LenB - settings.IndentSpacing )</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - indenter.LenB ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - indenter.LenB )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, indenter.LenB - settings.IndentSpacing ) = indenter.LeftB( indenter.LenB - indentSpacing )</SourceLine>
+   <SourceLine>outIndex = outIndex + ( indenter.LenB - settings.IndentSpacing )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>output.Append "}"</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>outSize = outSize + outSize</SourceLine>
+   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
+   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kCloseCurlyBrace</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -1134,7 +1289,7 @@
   <AliasName></AliasName>
   <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>output() As String, settings As JSONItem_MTC, level As Integer</ItemParams>
+  <ItemParams>outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1857,7 +2012,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>1.2</ItemDef>
+  <ItemDef>1.3</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
 </block>
