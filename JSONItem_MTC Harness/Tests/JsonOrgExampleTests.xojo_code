@@ -9,7 +9,7 @@ Inherits TestGroup
 		  j2.Compact = false
 		  j1 = new JSONItem_MTC( j2.ToString )
 		  
-		  j1.EncodeUnicode = true
+		  j1.EncodeUnicode = JSONItem_MTC.EncodeType.All
 		  j2 = new JSONItem_MTC( j1.ToString )
 		  
 		  RecurseJSONItems( j1, j2 )
