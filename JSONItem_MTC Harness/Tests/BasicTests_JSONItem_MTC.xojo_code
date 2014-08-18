@@ -2,6 +2,48 @@
 Protected Class BasicTests_JSONItem_MTC
 Inherits TestGroup
 	#tag Method, Flags = &h21
+		Private Sub ArrayMethodsTest()
+		  dim items() as Variant = Array( "a", "A", true, 1.3, 2, nil )
+		  
+		  dim j as new JSONItem_MTC
+		  for i as integer = 0 to items.Ubound
+		    j.Append items( i )
+		  next
+		  
+		  Assert.IsTrue( j.IsArray )
+		  Assert.AreEqual( items.Ubound + 1, j.Count )
+		  
+		  for i as integer = 0 to items.Ubound
+		    Assert.IsTrue( items( i ) = j.Value( i ) )
+		  next 
+		  
+		  j = new JSONItem_MTC
+		  j.Value( 5 ) = "a"
+		  Assert.AreSame( "a", j.Value( 0 ).StringValue )
+		  
+		  j = new JSONItem_MTC
+		  j.Append true
+		  j.Append false
+		  j.Remove 0
+		  
+		  Assert.IsTrue( j.Value( 0 ) = false )
+		  
+		  j.Insert( 0, "a" )
+		  
+		  Assert.AreSame( "a", j( 0 ) )
+		  Assert.IsTrue( j( 1 ) = false )
+		  
+		  try
+		    j.Insert( 5, "c" )
+		    Assert.Fail( "Insert with an out of bounds index" )
+		  catch err as OutOfBoundsException
+		    // Worked
+		  end 
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub CaseSensitiveKeyTest()
 		  dim j as new JSONItem_MTC
 		  j.Value( "a" ) = 1
@@ -9,6 +51,36 @@ Inherits TestGroup
 		  
 		  Assert.AreEqual( 2, j.Count, "Should be 2 objects" )
 		  Assert.AreEqual( 1, j.Value( "a" ).IntegerValue )
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub DictionaryMethodsTest()
+		  dim j as new JSONItem_MTC
+		  
+		  j.Value( "a" ) = "a"
+		  j.Value( "A" ) = "A"
+		  
+		  Assert.IsFalse( j.IsArray )
+		  Assert.AreEqual( 2, j.Count )
+		  
+		  Assert.IsTrue( j.HasName( "a" ), "HasName 'a'" )
+		  Assert.IsTrue( j.HasName( "A" ), "HasName 'A'" )
+		  
+		  Assert.AreSame( "a", j.Value( "a" ) )
+		  Assert.AreSame( "A", j.Value( "A" ) )
+		  
+		  dim names() as string = j.Names
+		  Assert.AreEqual( 1, names.Ubound )
+		  Assert.AreSame( "a", names( 0 ), "First name is 'a'" )
+		  Assert.AreSame( "A", names( 1 ), "Second name is 'A'" )
+		  
+		  Assert.AreSame( "A", j.Lookup( "A", "" ), "Lookup 'A'" )
+		  Assert.AreSame( "", j.Lookup( "b", "" ), "Lookup 'b'" )
+		  
+		  Assert.AreSame( "a", j.Name( 0 ) )
+		  Assert.AreSame( "A", j.Name( 1 ) )
+		  
 		End Sub
 	#tag EndMethod
 
