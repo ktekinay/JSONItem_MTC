@@ -636,8 +636,6 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events mnuEncodeType
-#tag EndEvents
 #tag ViewBehavior
 	#tag ViewProperty
 		Name="BackColor"
