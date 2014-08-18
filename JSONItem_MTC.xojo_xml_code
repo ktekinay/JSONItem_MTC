@@ -483,7 +483,7 @@
    <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
    <SourceLine>dim inIndex as integer = -1</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim encodeUnicode as boolean = settings.EncodeUnicode</SourceLine>
+   <SourceLine>dim encodeUnicode as EncodeType = settings.EncodeUnicode</SourceLine>
    <SourceLine>dim escapeSlashes as boolean = settings.EscapeSlashes</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
@@ -547,7 +547,7 @@
    <SourceLine>outMB.StringValue( outIndex, 6 ) = insertValue</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif thisByte &gt;= 127 then // high-ascii</SourceLine>
+   <SourceLine>elseif encodeUnicode &lt;&gt; EncodeType.None and thisByte &gt;= 127 and thisByte &lt;= &amp;hFFFF then // high-ascii</SourceLine>
    <SourceLine>dim byteLength as integer</SourceLine>
    <SourceLine>if thisByte &gt; 240 then</SourceLine>
    <SourceLine>byteLength = 4</SourceLine>
@@ -560,7 +560,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>dim thisChar as string = inMB.StringValue( inIndex, byteLength )</SourceLine>
    <SourceLine>thisChar = thisChar.DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>if encodeUnicode or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 then</SourceLine>
+   <SourceLine>if encodeUnicode = EncodeType.All or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 then</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, 6 ) = "\u" + Right( "000" + hex( thisChar.Asc ), 4 )</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
@@ -1849,11 +1849,11 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EncodeUnicode As Boolean</SourceLine>
+   <SourceLine>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>EncodeUnicode As Boolean</ItemDeclaration>
+  <ItemDeclaration>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
@@ -2057,5 +2057,20 @@
   <ItemDef>1.4</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
+ <Enumeration>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>EncodeType</ItemName>
+  <ItemFlags>0</ItemFlags>
+  <ItemType>Integer</ItemType>
+  <ItemName>EncodeType</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>None = 0</SourceLine>
+   <SourceLine>JavaScriptCompatible = 1</SourceLine>
+   <SourceLine>All = 2</SourceLine>
+  </ItemSource>
+ </Enumeration>
 </block>
 </RBProject>
