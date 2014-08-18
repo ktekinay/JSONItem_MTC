@@ -15,7 +15,7 @@ Inherits TestGroup
 		  
 		  for i as integer = 0 to items.Ubound
 		    Assert.IsTrue( items( i ) = j.Value( i ) )
-		  next 
+		  next
 		  
 		  j = new JSONItem_MTC
 		  j.Value( 5 ) = "a"
@@ -38,7 +38,7 @@ Inherits TestGroup
 		    Assert.Fail( "Insert with an out of bounds index" )
 		  catch err as OutOfBoundsException
 		    // Worked
-		  end 
+		  end
 		  
 		End Sub
 	#tag EndMethod
@@ -262,17 +262,23 @@ Inherits TestGroup
 		  j = new JSONItem_MTC
 		  j.Append "©"
 		  
-		  j.EncodeUnicode = false
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.None
 		  Assert.AreEqual( "[""©""]", j.ToString )
 		  
-		  j.EncodeUnicode = true
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
 		  Assert.AreEqual( "[""\u00A9""]", j.ToString )
 		  
 		  j = new JSONItem_MTC( "[""Norm’s dog""]" )
-		  j.EncodeUnicode = true
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
 		  Assert.AreSame( "[""Norm\u2019s dog""]", j.ToString )
 		  
-		  
+		  j = new JSONItem_MTC( "[""this char \u00AD""]" )
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.None
+		  Assert.AreSame( "[""this char " + Chr( &hAD ) + """]", j.ToString )
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.JavaScriptCompatible
+		  Assert.AreSame( "[""this char \u00AD""]", j.ToString )
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
+		  Assert.AreSame( "[""this char \u00AD""]", j.ToString )
 		End Sub
 	#tag EndMethod
 
