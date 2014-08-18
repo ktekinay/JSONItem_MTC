@@ -2049,7 +2049,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>1.4</ItemDef>
+  <ItemDef>2.0</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Enumeration>
