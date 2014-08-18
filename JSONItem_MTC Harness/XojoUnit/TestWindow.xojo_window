@@ -799,7 +799,7 @@ End
 		  
 		  PopulateTestGroups
 		  
-		  If System.CommandLine.InStr("run-now") <> 0 or true Then
+		  If System.CommandLine.InStr("run-now") <> 0 Then
 		    RunTests
 		  End If
 		End Sub

@@ -38,7 +38,7 @@ Begin Window WndPlayground
       DataSource      =   ""
       Enabled         =   True
       Format          =   ""
-      Height          =   196
+      Height          =   189
       HelpTag         =   ""
       HideSelection   =   True
       Index           =   -2147483648
@@ -297,7 +297,7 @@ Begin Window WndPlayground
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   254
+      Top             =   247
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -371,10 +371,9 @@ Begin Window WndPlayground
       Visible         =   True
       Width           =   100
    End
-   Begin CheckBox cbEncodeUnicode
+   Begin PopupMenu mnuEncodeType
       AutoDeactivate  =   True
       Bold            =   False
-      Caption         =   "Encode Unicode"
       DataField       =   ""
       DataSource      =   ""
       Enabled         =   True
@@ -382,26 +381,60 @@ Begin Window WndPlayground
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
+      InitialValue    =   "None\nJavaScript Compatible\nAll"
       Italic          =   False
-      Left            =   646
+      Left            =   631
+      ListIndex       =   0
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   True
       Scope           =   0
-      State           =   0
       TabIndex        =   10
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   254
+      Top             =   246
       Underline       =   False
-      Value           =   False
       Visible         =   True
-      Width           =   143
+      Width           =   133
+   End
+   Begin Label Label1
+      AutoDeactivate  =   True
+      Bold            =   False
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   2
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   502
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Multiline       =   False
+      Scope           =   0
+      Selectable      =   False
+      TabIndex        =   11
+      TabPanelIndex   =   0
+      Text            =   "Encode Unicode:"
+      TextAlign       =   0
+      TextColor       =   &c00000000
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   246
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   117
    End
 End
 #tag EndWindow
@@ -588,7 +621,7 @@ End
 		    
 		    dim j2 as new JSONItem_MTC( fldJSON.Text )
 		    j2.Compact = cbCompact.Value
-		    j2.EncodeUnicode = cbEncodeUnicode.Value
+		    j2.EncodeUnicode = JSONItem_MTC.EncodeType( mnuEncodeType.ListIndex )
 		    fldJSONMTCOut.Text = j2.ToString
 		    
 		  catch err as RuntimeException

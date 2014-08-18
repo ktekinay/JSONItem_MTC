@@ -109,7 +109,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Child(name As String) As JSONItem_MTC</SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
+   <SourceLine>name = NameToKey( name )</SourceLine>
    <SourceLine>dim r as JSONItem_MTC = self.Value( name )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
@@ -129,7 +129,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Child(name As String, Assigns obj As JSONItem_MTC)</SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
+   <SourceLine>name = NameToKey( name )</SourceLine>
    <SourceLine>self.Value( name ) = obj</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -483,7 +483,7 @@
    <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
    <SourceLine>dim inIndex as integer = -1</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim encodeUnicode as boolean = settings.EncodeUnicode</SourceLine>
+   <SourceLine>dim encodeUnicode as EncodeType = settings.EncodeUnicode</SourceLine>
    <SourceLine>dim escapeSlashes as boolean = settings.EscapeSlashes</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
@@ -547,7 +547,7 @@
    <SourceLine>outMB.StringValue( outIndex, 6 ) = insertValue</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif thisByte &gt;= 127 then // high-ascii</SourceLine>
+   <SourceLine>elseif encodeUnicode &lt;&gt; EncodeType.None and thisByte &gt;= 127 and thisByte &lt;= &amp;hFFFF then // high-ascii</SourceLine>
    <SourceLine>dim byteLength as integer</SourceLine>
    <SourceLine>if thisByte &gt; 240 then</SourceLine>
    <SourceLine>byteLength = 4</SourceLine>
@@ -560,7 +560,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>dim thisChar as string = inMB.StringValue( inIndex, byteLength )</SourceLine>
    <SourceLine>thisChar = thisChar.DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>if encodeUnicode or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 then</SourceLine>
+   <SourceLine>if encodeUnicode = EncodeType.All or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 then</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, 6 ) = "\u" + Right( "000" + hex( thisChar.Asc ), 4 )</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
@@ -720,7 +720,8 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
-   <SourceLine>return ObjectValues.HasKey( name )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>return ObjectValues.HasKey( key )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -891,7 +892,8 @@
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>return ObjectValues.Lookup( name, defaultValue )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>return ObjectValues.Lookup( key, defaultValue )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -913,10 +915,10 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim r as string = ObjectValues.Key( index ).StringValue</SourceLine>
-   <SourceLine>r = DecodeName( r )</SourceLine>
+   <SourceLine>dim key as string = ObjectValues.Key( index ).StringValue</SourceLine>
+   <SourceLine>dim name as string = KeyToName( key )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>return name</SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -943,7 +945,7 @@
    <SourceLine>redim r( keys.Ubound )</SourceLine>
    <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
    <SourceLine>dim name as string = keys( i )</SourceLine>
-   <SourceLine>name = DecodeName( name )</SourceLine>
+   <SourceLine>name = KeyToName( name )</SourceLine>
    <SourceLine>r( i ) = name</SourceLine>
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
@@ -1076,7 +1078,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function ToString() As String</SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( 2048 )</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>ToString( outMB, outIndex, self, 0 )</SourceLine>
@@ -1255,7 +1257,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
-   <SourceLine>dim name as string = DecodeName( key )</SourceLine>
+   <SourceLine>dim name as string = KeyToName( key )</SourceLine>
    <SourceLine>EncodeString( name, settings, outMB, outIndex )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
@@ -1394,8 +1396,8 @@
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
-   <SourceLine>return ObjectValues.Value( name )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>return ObjectValues.Value( key )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -1420,8 +1422,8 @@
    <SourceLine>Validate( value )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
-   <SourceLine>ObjectValues.Value( name ) = value</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
@@ -1433,12 +1435,12 @@
   <ItemResult></ItemResult>
  </Method>
  <Method>
-  <ItemName>EncodeName</ItemName>
+  <ItemName>NameToKey</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function EncodeName(name As String) As String</SourceLine>
+   <SourceLine>Function NameToKey(name As String) As String</SourceLine>
    <SourceLine>dim r as string = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>r = EncodeHex( r )</SourceLine>
    <SourceLine>return r</SourceLine>
@@ -1453,12 +1455,12 @@
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
-  <ItemName>DecodeName</ItemName>
+  <ItemName>KeyToName</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function DecodeName(name As String) As String</SourceLine>
+   <SourceLine>Function KeyToName(name As String) As String</SourceLine>
    <SourceLine>dim r as string = DecodeHex( name )</SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>return r</SourceLine>
@@ -1847,11 +1849,11 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EncodeUnicode As Boolean</SourceLine>
+   <SourceLine>EncodeUnicode As EncodeType</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>EncodeUnicode As Boolean</ItemDeclaration>
+  <ItemDeclaration>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
@@ -1918,11 +1920,6 @@
    <PropertyGroup>Position</PropertyGroup>
    <PropertyValue>0</PropertyValue>
    <ItemType>Integer</ItemType>
-  </ViewProperty>
-  <ViewProperty>
-   <ObjName>EncodeUnicode</ObjName>
-   <PropertyGroup>Behavior</PropertyGroup>
-   <ItemType>Boolean</ItemType>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
@@ -2052,8 +2049,23 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>1.4</ItemDef>
+  <ItemDef>2.0</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
+ <Enumeration>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>EncodeType</ItemName>
+  <ItemFlags>0</ItemFlags>
+  <ItemType>Integer</ItemType>
+  <ItemName>EncodeType</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>None = 0</SourceLine>
+   <SourceLine>JavaScriptCompatible = 1</SourceLine>
+   <SourceLine>All = 2</SourceLine>
+  </ItemSource>
+ </Enumeration>
 </block>
 </RBProject>
