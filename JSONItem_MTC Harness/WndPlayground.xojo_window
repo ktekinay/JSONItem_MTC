@@ -458,6 +458,8 @@ End
 		  dim j2 as new JSONItem_MTC
 		  dim j3 as JSONMBS = JSONMBS.NewObjectNode
 		  
+		  j2.EncodeUnicode = JSONItem_MTC.EncodeType( mnuEncodeType.ListIndex )
+		  
 		  dim sw as new Stopwatch_MTC
 		  sw.Start
 		  
@@ -575,6 +577,8 @@ End
 		  j1 = new JSONItem
 		  j2 = new JSONItem_MTC
 		  j3 = JSONMBS.NewObjectNode
+		  
+		  j2.EncodeUnicode = JSONItem_MTC.EncodeType( mnuEncodeType.ListIndex )
 		  
 		  sw.Reset
 		  sw.Start
@@ -713,8 +717,6 @@ End
 		  
 		End Sub
 	#tag EndEvent
-#tag EndEvents
-#tag Events mnuEncodeType
 #tag EndEvents
 #tag ViewBehavior
 	#tag ViewProperty
