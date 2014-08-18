@@ -1078,7 +1078,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function ToString() As String</SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( 2048 )</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>ToString( outMB, outIndex, self, 0 )</SourceLine>
@@ -1849,7 +1849,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</SourceLine>
+   <SourceLine>EncodeUnicode As EncodeType</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1920,11 +1920,6 @@
    <PropertyGroup>Position</PropertyGroup>
    <PropertyValue>0</PropertyValue>
    <ItemType>Integer</ItemType>
-  </ViewProperty>
-  <ViewProperty>
-   <ObjName>EncodeUnicode</ObjName>
-   <PropertyGroup>Behavior</PropertyGroup>
-   <ItemType>Boolean</ItemType>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
