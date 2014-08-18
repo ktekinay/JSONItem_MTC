@@ -200,21 +200,7 @@ Inherits TestGroup
 		  j.EncodeUnicode = true
 		  Assert.AreSame( "[""Norm\u2019s dog""]", j.ToString )
 		  
-		  dim native as JSONItem
-		  for i as integer = 0 to &hFFFF
-		    native = new JSONItem
-		    native.Append chr( i )
-		    j = new JSONItem_MTC
-		    j.Append chr( i )
-		    
-		    dim sNative as string = native.ToString
-		    dim sMine as string = j.ToString
-		    if sNative <> sMine then
-		      sMine = j.ToString // Landing spot to break and trace
-		    end if
-		    
-		    Assert.AreEqual( sNative, sMine, str( i ) )
-		  next i
+		  
 		End Sub
 	#tag EndMethod
 
