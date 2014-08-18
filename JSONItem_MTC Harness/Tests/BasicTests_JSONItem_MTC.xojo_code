@@ -272,7 +272,13 @@ Inherits TestGroup
 		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
 		  Assert.AreSame( "[""Norm\u2019s dog""]", j.ToString )
 		  
-		  
+		  j = new JSONItem_MTC( "[""this char \u00AD""]" )
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.None
+		  Assert.AreSame( "[""this char " + Chr( &hAD ) + """]", j.ToString )
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.JavaScriptCompatible
+		  Assert.AreSame( "[""this char \u00AD""]", j.ToString )
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
+		  Assert.AreSame( "[""this char \u00AD""]", j.ToString )
 		End Sub
 	#tag EndMethod
 
