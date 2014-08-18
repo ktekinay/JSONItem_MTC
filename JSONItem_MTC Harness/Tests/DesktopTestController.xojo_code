@@ -11,6 +11,7 @@ Inherits TestController
 		  group = New BasicTests_JSONItem(Self, "Basic JSONItem Tests")
 		  group = New BasicTests_JSONItem_MTC(Self, "Basic JSONItem_MTC Tests")
 		  group = New JsonOrgExampleTests(Self, "Example Documents from json.org/example")
+		  group = new CompareTests( Self, "Compare JSONItem_MTC to JSONItem" )
 		End Sub
 	#tag EndEvent
 

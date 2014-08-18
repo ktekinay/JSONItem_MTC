@@ -109,7 +109,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Child(name As String) As JSONItem_MTC</SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
+   <SourceLine>name = NameToKey( name )</SourceLine>
    <SourceLine>dim r as JSONItem_MTC = self.Value( name )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
@@ -129,7 +129,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Child(name As String, Assigns obj As JSONItem_MTC)</SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
+   <SourceLine>name = NameToKey( name )</SourceLine>
    <SourceLine>self.Value( name ) = obj</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -720,7 +720,8 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
-   <SourceLine>return ObjectValues.HasKey( name )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>return ObjectValues.HasKey( key )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -891,7 +892,8 @@
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>return ObjectValues.Lookup( name, defaultValue )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>return ObjectValues.Lookup( key, defaultValue )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -913,10 +915,10 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim r as string = ObjectValues.Key( index ).StringValue</SourceLine>
-   <SourceLine>r = DecodeName( r )</SourceLine>
+   <SourceLine>dim key as string = ObjectValues.Key( index ).StringValue</SourceLine>
+   <SourceLine>dim name as string = KeyToName( key )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>return name</SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -943,7 +945,7 @@
    <SourceLine>redim r( keys.Ubound )</SourceLine>
    <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
    <SourceLine>dim name as string = keys( i )</SourceLine>
-   <SourceLine>name = DecodeName( name )</SourceLine>
+   <SourceLine>name = KeyToName( name )</SourceLine>
    <SourceLine>r( i ) = name</SourceLine>
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
@@ -1255,7 +1257,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
-   <SourceLine>dim name as string = DecodeName( key )</SourceLine>
+   <SourceLine>dim name as string = KeyToName( key )</SourceLine>
    <SourceLine>EncodeString( name, settings, outMB, outIndex )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
@@ -1394,8 +1396,8 @@
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
-   <SourceLine>return ObjectValues.Value( name )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>return ObjectValues.Value( key )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -1420,8 +1422,8 @@
    <SourceLine>Validate( value )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
-   <SourceLine>name = EncodeName( name )</SourceLine>
-   <SourceLine>ObjectValues.Value( name ) = value</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
@@ -1433,12 +1435,12 @@
   <ItemResult></ItemResult>
  </Method>
  <Method>
-  <ItemName>EncodeName</ItemName>
+  <ItemName>NameToKey</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function EncodeName(name As String) As String</SourceLine>
+   <SourceLine>Function NameToKey(name As String) As String</SourceLine>
    <SourceLine>dim r as string = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>r = EncodeHex( r )</SourceLine>
    <SourceLine>return r</SourceLine>
@@ -1453,12 +1455,12 @@
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
-  <ItemName>DecodeName</ItemName>
+  <ItemName>KeyToName</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function DecodeName(name As String) As String</SourceLine>
+   <SourceLine>Function KeyToName(name As String) As String</SourceLine>
    <SourceLine>dim r as string = DecodeHex( name )</SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>return r</SourceLine>
