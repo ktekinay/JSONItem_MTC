@@ -168,6 +168,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
    <SourceLine>ObjectValues = new Dictionary</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>DecimalFormat = kDefaultDecimalFormat</SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
@@ -869,7 +870,6 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(inMB As MemoryBlock, ByRef pos As Integer)</SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
-   <SourceLine>dim commaFound as boolean</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>// Determine the type we are loading. If we get here,</SourceLine>
    <SourceLine>// it either has to match self, or this type hasn't been set yet</SourceLine>
@@ -877,66 +877,13 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// Loading array</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>self.HasSetType = kHasSetArray</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then</SourceLine>
-   <SourceLine>if commaFound then</SourceLine>
-   <SourceLine>raise new JSONException( "Illegal Value", 10, pos )</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
-   <SourceLine>self.Append value</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>commaFound = false</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>commaFound = true</SourceLine>
-   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kCloseSquareBracket then</SourceLine>
-   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>loop</SourceLine>
+   <SourceLine>LoadArray( inMB, pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Loading object</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>self.HasSetType = kHasSetObject</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kCloseCurlyBrace then</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>dim name as string = DecodeString( inMB, pos )</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kColon then</SourceLine>
-   <SourceLine>// Something is wrong</SourceLine>
-   <SourceLine>raise new JSONException( "Missing :", 5, pos + 1 )</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMb, pos )</SourceLine>
-   <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
-   <SourceLine>self.Value( name ) = value</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>loop</SourceLine>
+   <SourceLine>LoadObject( inMB, pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -1681,6 +1628,139 @@
   <IsShared>0</IsShared>
   <ItemParams>s As String</ItemParams>
   <ItemResult>String</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>LoadObject</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>self.HasSetType = kHasSetObject</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim name as string</SourceLine>
+   <SourceLine>dim key as string</SourceLine>
+   <SourceLine>dim value as variant</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kCloseCurlyBrace then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>name = DecodeString( inMB, pos )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kColon then</SourceLine>
+   <SourceLine>// Something is wrong</SourceLine>
+   <SourceLine>raise new JSONException( "Missing :", 5, pos + 1 )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos )</SourceLine>
+   <SourceLine>key = NameToKey( name )</SourceLine>
+   <SourceLine>ObjectValues.Value( key ) = value</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>LoadArray</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>self.HasSetType = kHasSetArray</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim commaFound as boolean</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then</SourceLine>
+   <SourceLine>if commaFound then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value", 10, pos )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
+   <SourceLine>ArrayValues.Append value</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>commaFound = false</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>commaFound = true</SourceLine>
+   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kCloseSquareBracket then</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
+  <ItemResult></ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
