@@ -205,6 +205,13 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer) As String</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -318,6 +325,12 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer) As Variant</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
