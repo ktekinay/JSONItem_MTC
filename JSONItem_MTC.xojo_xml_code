@@ -388,7 +388,6 @@
    <SourceLine>if firstByte = 102 and inPtr.Byte( startPos + 1 ) = 97 and inPtr.Byte( startPos + 2 ) = 108 and _</SourceLine>
    <SourceLine>inPtr.Byte( startPos + 3 ) = 115 and inPtr.Byte( startPos + 4 ) = 101 then</SourceLine>
    <SourceLine>value = false</SourceLine>
-   <SourceLineBreakpoint>57</SourceLineBreakpoint>
    <SourceLine>keepChecking = false</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -396,7 +395,6 @@
    <SourceLine>if keepChecking and valueLen = 4 then // true or null?</SourceLine>
    <SourceLine>if  firstByte = 116 and inPtr.Byte( startPos + 1 ) = 114 and inPtr.Byte( startPos + 2 ) = 117 and inPtr.Byte( startPos + 3 ) = 101 then</SourceLine>
    <SourceLine>value = true</SourceLine>
-   <SourceLineBreakpoint>64</SourceLineBreakpoint>
    <SourceLine>keepChecking = false</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -441,7 +439,6 @@
    <SourceLine>total = 0 - total</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>value = total</SourceLine>
-   <SourceLineBreakpoint>108</SourceLineBreakpoint>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -491,7 +488,6 @@
    <SourceLine>total = 0.0 - total</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>value = total</SourceLine>
-   <SourceLineBreakpoint>157</SourceLineBreakpoint>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
