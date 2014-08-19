@@ -1700,9 +1700,9 @@
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>value = DecodeValue( inMB, pos )</SourceLine>
-   <SourceLine>key = NameToKey( name )</SourceLine>
-   <SourceLine>ObjectValues.Value( key ) = value</SourceLine>
+   <SourceLine>value = self.DecodeValue( inMB, pos )</SourceLine>
+   <SourceLine>key = EncodeHex( name )</SourceLine>
+   <SourceLine>self.ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
