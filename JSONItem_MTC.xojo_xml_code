@@ -199,28 +199,6 @@
   <ItemResult></ItemResult>
  </Method>
  <Method>
-  <ItemName>Count</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function Count() As Integer</SourceLine>
-   <SourceLine>if IsArray then</SourceLine>
-   <SourceLine>return ArrayValues.Ubound + 1</SourceLine>
-   <SourceLine>else</SourceLine>
-   <SourceLine>return ObjectValues.Count</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>End Function</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>0</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams></ItemParams>
-  <ItemResult>Integer</ItemResult>
- </Method>
- <Method>
   <ItemName>DecodeString</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
@@ -1949,6 +1927,39 @@
   <ItemDeclaration>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>Count</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Property Count As Integer</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Count As Integer</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>if IsArray then</SourceLine>
+   <SourceLine>return ArrayValues.Ubound + 1</SourceLine>
+   <SourceLine>elseif ObjectValues &lt;&gt; nil then</SourceLine>
+   <SourceLine>return ObjectValues.Count</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return 0</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
  </Property>
  <ViewBehavior>
   <ViewProperty>
