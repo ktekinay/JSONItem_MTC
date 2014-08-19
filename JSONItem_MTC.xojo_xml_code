@@ -168,6 +168,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
    <SourceLine>ObjectValues = new Dictionary</SourceLine>
+   <SourceLine>DecimalFormat = kDefaultDecimalFormat</SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1705,7 +1706,7 @@
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>DecimalFormat As String = "-0.0##############"</ItemDeclaration>
+  <ItemDeclaration>DecimalFormat As String</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
@@ -2026,6 +2027,16 @@
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>2.0</ItemDef>
+  <ItemFlags>0</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kDefaultDecimalFormat</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kDefaultDecimalFormat</ItemName>
+  <ItemType>0</ItemType>
+  <ItemDef>-0.0##############</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Enumeration>
