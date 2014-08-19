@@ -23,7 +23,7 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim thisByte as byte = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
    <SourceLine>select case thisByte</SourceLine>
    <SourceLine>case 9, 10, 13, 32</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
