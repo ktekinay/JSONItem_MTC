@@ -148,7 +148,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Clear()</SourceLine>
-   <SourceLine>mObjectValues = nil</SourceLine>
+   <SourceLine>ObjectValues = new Dictionary</SourceLine>
    <SourceLine>redim ArrayValues( -1 )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -167,7 +167,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>ObjectValues = new Dictionary</SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -961,32 +961,6 @@
   <IsShared>0</IsShared>
   <ItemParams></ItemParams>
   <ItemResult>String()</ItemResult>
- </Method>
- <Method>
-  <ItemName>ObjectValues</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function ObjectValues() As Dictionary</SourceLine>
-   <SourceLine>if not EnsureObject() then</SourceLine>
-   <SourceLine>return nil</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if mObjectValues is nil then</SourceLine>
-   <SourceLine>mObjectValues = new Dictionary</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>return mObjectValues</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>End Function</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams></ItemParams>
-  <ItemResult>Dictionary</ItemResult>
  </Method>
  <Method>
   <ItemName>Operator_Convert</ItemName>
@@ -1832,16 +1806,16 @@
   </GetAccessor>
  </Property>
  <Property>
-  <ItemName>mObjectValues</ItemName>
+  <ItemName>ObjectValues</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>mObjectValues As Dictionary</SourceLine>
+   <SourceLine>ObjectValues As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>mObjectValues As Dictionary</ItemDeclaration>
+  <ItemDeclaration>ObjectValues As Dictionary</ItemDeclaration>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
