@@ -184,6 +184,8 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor(JSONString As String)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>self.Load JSONString</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
