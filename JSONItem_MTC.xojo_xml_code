@@ -923,11 +923,11 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(JSONString As String)</SourceLine>
+   <SourceLine>JSONString = JSONStringToUTF8( JSONString ).Trim</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if JSONString = "" then</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>JSONString = JSONStringToUTF8( JSONString ).Trim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim firstChar as string = JSONString.LeftB( 1 )</SourceLine>
    <SourceLine>if firstChar = "[" and IsObject then</SourceLine>
