@@ -330,6 +330,7 @@
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
    <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
