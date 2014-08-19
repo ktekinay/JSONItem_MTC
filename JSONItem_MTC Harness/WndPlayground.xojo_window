@@ -691,6 +691,13 @@ End
 		  sw.Stop
 		  
 		  AddToResult( "Load: " + format( sw.ElapsedMicroseconds, "#," ) )
+		  
+		  j.Compact = false
+		  dim s1 as string = j.ToString
+		  
+		  if StrComp( s, s1, 0 ) <> 0 then
+		    AddToResult "... but they don't match"
+		  end if
 		End Sub
 	#tag EndEvent
 #tag EndEvents
