@@ -544,7 +544,12 @@ End
 		  sw.Start
 		  
 		  for i as integer = 1 to 10000
-		    j1.Value( str( i ) ) = str( i ) + chr( 127 + i )
+		    dim jChild as new JSONItem
+		    jChild.Append i
+		    jChild.Append chr( 127 + i )
+		    jChild.Append true
+		    jChild.Append CType( i, double )
+		    j1.Value( str( i ) ) = jChild
 		  next i
 		  
 		  sw.Stop
@@ -554,7 +559,12 @@ End
 		  sw.Start
 		  
 		  for i as integer = 1 to 10000
-		    j2.Value( str( i ) ) = str( i ) + chr( 127 + i )
+		    dim jChild as new JSONItem_MTC
+		    jChild.Append i
+		    jChild.Append chr( 127 + i )
+		    jChild.Append true
+		    jChild.Append CType( i, double )
+		    j2.Value( str( i ) ) = jChild
 		  next i
 		  
 		  sw.Stop
