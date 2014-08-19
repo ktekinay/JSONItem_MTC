@@ -898,13 +898,13 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// Loading array</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>LoadArray( inMB, pos )</SourceLine>
+   <SourceLine>self.LoadArray( inMB, pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Loading object</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>LoadObject( inMB, pos )</SourceLine>
+   <SourceLine>self.LoadObject( inMB, pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -1675,7 +1675,7 @@
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kCloseCurlyBrace then</SourceLine>
@@ -1686,7 +1686,7 @@
    <SourceLine>name = DecodeString( inMB, pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kColon then</SourceLine>
@@ -1697,7 +1697,7 @@
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>value = DecodeValue( inMB, pos )</SourceLine>
@@ -1705,7 +1705,7 @@
    <SourceLine>ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
@@ -1745,7 +1745,7 @@
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then</SourceLine>
@@ -1757,11 +1757,12 @@
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
-   <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
-   <SourceLine>ArrayValues.Append value</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>value = self.DecodeValue( inMB, pos )</SourceLine>
+   <SourceLine>self.ArrayValues.Append value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>commaFound = false</SourceLine>
