@@ -2030,6 +2030,36 @@
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
+  <ItemName>kHyphen</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kHyphen</ItemName>
+  <ItemType>2</ItemType>
+  <ItemDef>45</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kPlus</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kPlus</ItemName>
+  <ItemType>2</ItemType>
+  <ItemDef>43</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kDot</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kDot</ItemName>
+  <ItemType>2</ItemType>
+  <ItemDef>46</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
   <ItemName>kDefaultDecimalFormat</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
