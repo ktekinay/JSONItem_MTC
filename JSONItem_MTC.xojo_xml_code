@@ -205,7 +205,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer) As String</SourceLine>
+   <SourceLine>Shared Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC) As String</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -233,7 +233,7 @@
    <SourceLine>dim inBackslash as boolean</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>dim msg as string = if( self.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
+   <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
    <SourceLine>raise new JSONException( msg, 6, pos )</SourceLine>
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -315,8 +315,8 @@
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
+  <IsShared>1</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
@@ -325,7 +325,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer) As Variant</SourceLine>
+   <SourceLine>Shared Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC) As Variant</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -364,7 +364,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
    <SourceLine>if thisByte = kQuote then</SourceLine>
-   <SourceLine>return DecodeString( inMB, pos )</SourceLine>
+   <SourceLine>return DecodeString( inMB, pos, current )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = kOpenCurlyBrace then</SourceLine>
    <SourceLine>dim child as new JSONItem_MTC</SourceLine>
@@ -386,7 +386,7 @@
    <SourceLine>dim endPos as integer = pos + 1</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if endPos &gt; lastPos then</SourceLine>
-   <SourceLine>dim msg as string = if( self.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
+   <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
    <SourceLine>raise new JSONException( msg, 6, endPos + 1 )</SourceLine>
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -495,8 +495,8 @@
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
+  <IsShared>1</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC</ItemParams>
   <ItemResult>Variant</ItemResult>
  </Method>
  <Method>
@@ -1693,7 +1693,7 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>name = DecodeString( inMB, pos )</SourceLine>
+   <SourceLine>name = DecodeString( inMB, pos, current )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
@@ -1710,7 +1710,7 @@
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>value = self.DecodeValue( inMB, pos )</SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos, current )</SourceLine>
    <SourceLine>key = EncodeHex( name )</SourceLine>
    <SourceLine>current.ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
@@ -1779,7 +1779,7 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>value = self.DecodeValue( inMB, pos )</SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos, current )</SourceLine>
    <SourceLine>current.ArrayValues.Append value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
