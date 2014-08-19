@@ -2047,7 +2047,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property Count As Integer</SourceLine>
+   <SourceLine>Count As Integer</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2136,6 +2136,11 @@
    <Visible>1</Visible>
    <PropertyGroup>Position</PropertyGroup>
    <PropertyValue>0</PropertyValue>
+   <ItemType>Integer</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Count</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
    <ItemType>Integer</ItemType>
   </ViewProperty>
  </ViewBehavior>
