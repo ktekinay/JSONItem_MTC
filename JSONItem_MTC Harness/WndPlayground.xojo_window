@@ -325,7 +325,6 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   8
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "JSONItem"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -360,7 +359,6 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   9
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "JSONItem_MTC"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -426,7 +424,6 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   11
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "Encode Unicode:"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -438,6 +435,37 @@ Begin Window WndPlayground
       Underline       =   False
       Visible         =   True
       Width           =   117
+   End
+   Begin PushButton btnSpeedTests
+      AutoDeactivate  =   True
+      Bold            =   False
+      ButtonStyle     =   "0"
+      Cancel          =   False
+      Caption         =   "Speed Tests"
+      Default         =   False
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   793
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   0
+      TabIndex        =   12
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   14
+      Underline       =   False
+      Visible         =   True
+      Width           =   108
    End
 End
 #tag EndWindow
@@ -646,6 +674,23 @@ End
 		    
 		  end try
 		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events btnSpeedTests
+	#tag Event
+		Sub Action()
+		  dim s as string = json_sample
+		  s = s.DefineEncoding( Encodings.UTF8 )
+		  
+		  dim sw as new Stopwatch_MTC
+		  sw.Start
+		  
+		  dim j as new JSONItem_MTC( s )
+		  
+		  sw.Stop
+		  
+		  AddToResult( "Load: " + format( sw.ElapsedMicroseconds, "#," ) )
 		End Sub
 	#tag EndEvent
 #tag EndEvents
