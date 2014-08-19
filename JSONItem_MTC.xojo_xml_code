@@ -874,7 +874,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim inMB as MemoryBlock = JSONString</SourceLine>
    <SourceLine>dim pos as integer</SourceLine>
-   <SourceLine>Load( inMB,pos )</SourceLine>
+   <SourceLine>Load( inMB, pos )</SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
