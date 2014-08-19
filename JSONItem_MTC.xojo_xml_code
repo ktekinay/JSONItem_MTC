@@ -333,6 +333,27 @@
    <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>static trueValue as Int32</SourceLine>
+   <SourceLine>if trueValue = 0 then</SourceLine>
+   <SourceLine>dim mb as MemoryBlock = "true"</SourceLine>
+   <SourceLine>mb.LittleEndian = inMB.LittleEndian</SourceLine>
+   <SourceLine>trueValue = mb.Int32Value( 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static nullValue as Int32</SourceLine>
+   <SourceLine>if nullValue = 0 then</SourceLine>
+   <SourceLine>dim mb as MemoryBlock = "null"</SourceLine>
+   <SourceLine>mb.LittleEndian = inMB.LittleEndian</SourceLine>
+   <SourceLine>nullValue = mb.Int32Value( 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static falsValue as Int32</SourceLine>
+   <SourceLine>if falsValue = 0 then</SourceLine>
+   <SourceLine>dim mb as MemoryBlock = "fals"</SourceLine>
+   <SourceLine>mb.LittleEndian = inMB.LittleEndian</SourceLine>
+   <SourceLine>falsValue = mb.Int32Value( 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
@@ -379,7 +400,7 @@
    <SourceLine>dim valueLen as integer = endPos - startPos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant</SourceLine>
-   <SourceLine>dim keepChecking as boolean = valueLen &gt; 0</SourceLine>
+   <SourceLine>dim keepChecking as boolean = valueLen &lt;&gt; 0</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim firstByte as integer = inPtr.Byte( startPos )</SourceLine>
    <SourceLine></SourceLine>
@@ -387,20 +408,19 @@
    <SourceLine>// See if it's true, false, or null first</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>if keepChecking and valueLen = 5 then // false?</SourceLine>
-   <SourceLine>if firstByte = 102 and inPtr.Byte( startPos + 1 ) = 97 and inPtr.Byte( startPos + 2 ) = 108 and _</SourceLine>
-   <SourceLine>inPtr.Byte( startPos + 3 ) = 115 and inPtr.Byte( startPos + 4 ) = 101 then</SourceLine>
+   <SourceLine>if firstByte = 102 and inPtr.Byte( startPos + 4 ) = 101 and inMB.Int32Value( startPos ) = falsValue then</SourceLine>
    <SourceLine>value = false</SourceLine>
    <SourceLine>keepChecking = false</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if keepChecking and valueLen = 4 then // true or null?</SourceLine>
-   <SourceLine>if  firstByte = 116 and inPtr.Byte( startPos + 1 ) = 114 and inPtr.Byte( startPos + 2 ) = 117 and inPtr.Byte( startPos + 3 ) = 101 then</SourceLine>
+   <SourceLine>if  firstByte = 116 and inMB.Int32Value( startPos ) = trueValue then</SourceLine>
    <SourceLine>value = true</SourceLine>
    <SourceLine>keepChecking = false</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if keepChecking and firstByte = 110 and inPtr.Byte( startPos + 1 ) = 117 and inPtr.Byte( startPos + 2 ) = 108 and inPtr.Byte( startPos + 3 ) = 108 then</SourceLine>
+   <SourceLine>if keepChecking and firstByte = 110 and inMB.Int32Value( startPos ) = nullValue then</SourceLine>
    <SourceLine>value = nil</SourceLine>
    <SourceLine>keepChecking = false</SourceLine>
    <SourceLine>end if</SourceLine>
