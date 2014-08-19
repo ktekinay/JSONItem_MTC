@@ -346,12 +346,6 @@
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>static rxInteger as RegEx</SourceLine>
-   <SourceLine>if rxInteger is nil then</SourceLine>
-   <SourceLine>rxInteger = new RegEx</SourceLine>
-   <SourceLine>rxInteger.SearchPattern = "\A[-+]?\d+\z"</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
@@ -388,22 +382,144 @@
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = endPos</SourceLine>
+   <SourceLine>endPos = endPos - 1</SourceLine>
+   <SourceLine>dim valueLen as integer = endPos - startPos + 1</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim valueString as string = inMB.StringValue( startPos, endPos - startPos ).DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>dim value as variant</SourceLine>
+   <SourceLine>dim keepChecking as boolean = valueLen &gt; 0</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim firstByte as integer = inPtr.Byte( startPos )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// See if it's true, false, or null first</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking and valueLen = 5 then // false?</SourceLine>
+   <SourceLine>if firstByte = 102 and inPtr.Byte( startPos + 1 ) = 97 and inPtr.Byte( startPos + 2 ) = 108 and _</SourceLine>
+   <SourceLine>inPtr.Byte( startPos + 3 ) = 115 and inPtr.Byte( startPos + 4 ) = 101 then</SourceLine>
+   <SourceLine>value = false</SourceLine>
+   <SourceLineBreakpoint>57</SourceLineBreakpoint>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking and valueLen = 4 then // true or null?</SourceLine>
+   <SourceLine>if  firstByte = 116 and inPtr.Byte( startPos + 1 ) = 114 and inPtr.Byte( startPos + 2 ) = 117 and inPtr.Byte( startPos + 3 ) = 101 then</SourceLine>
+   <SourceLine>value = true</SourceLine>
+   <SourceLineBreakpoint>64</SourceLineBreakpoint>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking and firstByte = 110 and inPtr.Byte( startPos + 1 ) = 117 and inPtr.Byte( startPos + 2 ) = 108 and inPtr.Byte( startPos + 3 ) = 108 then</SourceLine>
+   <SourceLine>value = nil</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Is it an integer?</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking and valueLen = 1 and firstByte &gt;= 48 and firstByte &lt;= 57 then // Single digit</SourceLine>
+   <SourceLine>value = firstByte - 48</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking then </SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>dim startIndex as integer = startPos</SourceLine>
+   <SourceLine>dim isNegative as boolean</SourceLine>
+   <SourceLine>if firstByte = kHyphen then</SourceLine>
+   <SourceLine>isNegative = true</SourceLine>
+   <SourceLine>startIndex = startIndex + 1</SourceLine>
+   <SourceLine>elseif firstByte = kPlus then</SourceLine>
+   <SourceLine>startIndex = startIndex + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim total as Int64</SourceLine>
+   <SourceLine>for i as integer = startIndex to endPos</SourceLine>
+   <SourceLine>thisByte = inPtr.Byte( i )</SourceLine>
+   <SourceLine>if thisByte &lt; 48 or thisByte &gt; 57 then</SourceLine>
+   <SourceLine>keepChecking = true</SourceLine>
+   <SourceLine>exit for i</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>total = ( total * 10 ) + ( thisByte - 48 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not keepChecking then</SourceLine>
+   <SourceLine>if isNegative then</SourceLine>
+   <SourceLine>total = 0 - total</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>value = total</SourceLine>
+   <SourceLineBreakpoint>108</SourceLineBreakpoint>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Is it a double?</SourceLine>
+   <SourceLine>// (only if it's a straight double, not xEy, INF, or NAN)</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking then</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim startIndex as integer = startPos</SourceLine>
+   <SourceLine>dim isNegative as boolean</SourceLine>
+   <SourceLine>if firstByte = kHyphen then</SourceLine>
+   <SourceLine>isNegative = true</SourceLine>
+   <SourceLine>startIndex = startIndex + 1</SourceLine>
+   <SourceLine>elseif firstByte = kPlus then</SourceLine>
+   <SourceLine>startIndex = startIndex + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim dotFound as boolean</SourceLine>
+   <SourceLine>dim total as double</SourceLine>
+   <SourceLine>dim decimalDivider as double = 10.0</SourceLine>
+   <SourceLine>for i as integer = startIndex to endPos</SourceLine>
+   <SourceLine>thisByte = inPtr.Byte( i )</SourceLine>
+   <SourceLine>if thisByte = kDot then</SourceLine>
+   <SourceLine>if dotFound then</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, i + 1 )</SourceLine>
+   <SourceLine>return nil</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>dotFound = true</SourceLine>
+   <SourceLine>continue for i</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>if thisByte &lt; 48 or thisByte &gt; 57 then</SourceLine>
+   <SourceLine>keepChecking = true</SourceLine>
+   <SourceLine>exit for i</SourceLine>
+   <SourceLine>elseif dotFound then</SourceLine>
+   <SourceLine>total = total + ( ( thisByte - 48 ) / decimalDivider )</SourceLine>
+   <SourceLine>decimalDivider = decimalDivider * 10.0</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>total = total * 10.0 + ( thisByte - 48 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not keepChecking then</SourceLine>
+   <SourceLine>if isNegative then</SourceLine>
+   <SourceLine>total = 0.0 - total</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>value = total</SourceLine>
+   <SourceLineBreakpoint>157</SourceLineBreakpoint>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Hail Mary</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking then</SourceLine>
+   <SourceLine>dim valueString as string = inMB.StringValue( startPos, valueLen ).DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>if valueString = "true" then</SourceLine>
    <SourceLine>value = true</SourceLine>
    <SourceLine>elseif valueString = "false" then</SourceLine>
    <SourceLine>value = false</SourceLine>
    <SourceLine>elseif valueString = "null" then</SourceLine>
    <SourceLine>value = nil</SourceLine>
-   <SourceLine>elseif rxInteger.Search( valueString ) &lt;&gt; nil then</SourceLine>
-   <SourceLine>dim i as Int64 = val( valueString )</SourceLine>
-   <SourceLine>value = i</SourceLine>
    <SourceLine>elseif IsNumeric( valueString ) then</SourceLine>
    <SourceLine>value = val( valueString )</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>raise new JSONException( "Illegal Value", 10, startPos )</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return value</SourceLine>
