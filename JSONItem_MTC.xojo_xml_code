@@ -1743,6 +1743,8 @@
    <SourceLine></SourceLine>
    <SourceLine>dim commaFound as boolean</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim value as variant</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
