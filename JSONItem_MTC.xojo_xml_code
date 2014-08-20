@@ -230,7 +230,9 @@
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim inBackslash as boolean</SourceLine>
+   <SourceLine>dim thisByte as integer</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
@@ -238,16 +240,8 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>thisByte = inPtr.Byte( pos )</SourceLine>
    <SourceLine>select case true</SourceLine>
-   <SourceLine>case not inBackSlash and thisByte = kBackSlash</SourceLine>
-   <SourceLine>inBackslash = true</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>case not inBackslash and thisByte = kQuote // End</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>case inBackslash</SourceLine>
    <SourceLine>select case thisByte</SourceLine>
    <SourceLine>case kBackSlash, kQuote, kForwardSlash</SourceLine>
@@ -297,6 +291,14 @@
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>inBackslash = false</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case thisByte = kQuote // End</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case thisByte = kBackSlash</SourceLine>
+   <SourceLine>inBackslash = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
