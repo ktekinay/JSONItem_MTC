@@ -234,7 +234,6 @@
    <SourceLine>dim flushEnd as integer = -1</SourceLine>
    <SourceLine>dim hasBackSlash as boolean</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim thisByte as integer</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
