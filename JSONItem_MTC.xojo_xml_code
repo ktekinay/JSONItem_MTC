@@ -231,7 +231,6 @@
    <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim inBackslash as boolean</SourceLine>
    <SourceLine>dim thisByte as integer</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
@@ -240,14 +239,14 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>thisByte = inPtr.Byte( pos )</SourceLine>
-   <SourceLine>select case true</SourceLine>
-   <SourceLine>case inBackslash</SourceLine>
-   <SourceLine>select case thisByte</SourceLine>
-   <SourceLine>case kBackSlash, kQuote, kForwardSlash</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
-   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
+   <SourceLine>case kBackSlash</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if pos &gt; lastPos then</SourceLine>
+   <SourceLine>continue do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
    <SourceLine>case 114 // r</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
@@ -285,23 +284,17 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// RFC says any character may be escaped, so just accept this byte</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>inBackslash = false</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>case thisByte = kQuote // End</SourceLine>
+   <SourceLine>case kQuote // End</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>case thisByte = kBackSlash</SourceLine>
-   <SourceLine>inBackslash = true</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>exit </SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
