@@ -230,6 +230,9 @@
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>dim flushStart as integer = pos</SourceLine>
+   <SourceLine>dim flushEnd as integer = -1</SourceLine>
+   <SourceLine>dim hasBackSlash as boolean</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim thisByte as integer</SourceLine>
    <SourceLine>do</SourceLine>
@@ -241,6 +244,14 @@
    <SourceLine></SourceLine>
    <SourceLine>select case inPtr.Byte( pos )</SourceLine>
    <SourceLine>case kBackSlash</SourceLine>
+   <SourceLine>hasBackSlash = true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if flushEnd &lt;&gt; -1 then</SourceLine>
+   <SourceLine>dim flushLen as integer = flushEnd - flushStart + 1</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, flushLen ) = inMB.StringValue( flushStart, flushLen )</SourceLine>
+   <SourceLine>outIndex = outIndex + flushLen</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>continue do</SourceLine>
@@ -289,19 +300,35 @@
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>flushStart = pos</SourceLine>
+   <SourceLine>flushEnd = -1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>case kQuote // End</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>exit </SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
-   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>'outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>'outIndex = outIndex + 1</SourceLine>
+   <SourceLine>flushEnd = pos</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine>if hasBackSlash and flushEnd &lt;&gt; -1 then</SourceLine>
+   <SourceLine>dim flushLen as integer = flushEnd - flushStart + 1</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, flushLen ) = inMB.StringValue( flushStart, flushLen )</SourceLine>
+   <SourceLine>outIndex = outIndex + flushLen</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim r as string </SourceLine>
+   <SourceLine>if hasBackSlash then</SourceLine>
+   <SourceLine>r = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine>elseif flushEnd &lt;&gt; -1 then</SourceLine>
+   <SourceLine>r = inMB.StringValue( flushStart, flushEnd - flushStart + 1 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
