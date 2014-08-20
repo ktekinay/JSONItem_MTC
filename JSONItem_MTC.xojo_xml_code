@@ -205,7 +205,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Shared Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC) As String</SourceLine>
+   <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As String</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -225,7 +225,10 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( inMB.Size )</SourceLine>
+   <SourceLine>if outMB.Size &lt; inMB.Size then</SourceLine>
+   <SourceLine>outMB.Size = inMB.Size</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
@@ -336,8 +339,8 @@
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
-  <IsShared>1</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC</ItemParams>
+  <IsShared>0</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
@@ -346,7 +349,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Shared Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC) As Variant</SourceLine>
+   <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As Variant</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -385,7 +388,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
    <SourceLine>if thisByte = kQuote then</SourceLine>
-   <SourceLine>return DecodeString( inMB, pos, current )</SourceLine>
+   <SourceLine>return DecodeString( inMB, pos, current, outMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte = kOpenCurlyBrace then</SourceLine>
    <SourceLine>dim child as new JSONItem_MTC</SourceLine>
@@ -516,8 +519,8 @@
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
-  <IsShared>1</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC</ItemParams>
+  <IsShared>0</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult>Variant</ItemResult>
  </Method>
  <Method>
@@ -526,7 +529,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
+   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>// Encodes a string for output during ToString.</SourceLine>
    <SourceLine>// Honors the EncodeUnicode setting, but some characters must ALWAYS be encoded for </SourceLine>
    <SourceLine>// Javascript compatibility. These are</SourceLine>
@@ -584,10 +587,15 @@
    <SourceLine></SourceLine>
    <SourceLine>s = s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim inMB as MemoryBlock = s</SourceLine>
+   <SourceLine>dim inSize as integer = s.LenB</SourceLine>
+   <SourceLine>if inMB.Size &lt; inSize then</SourceLine>
+   <SourceLine>inMB.Size = inSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>inMB.StringValue( 0, inSize ) = s</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
+   <SourceLine>dim lastIndex as integer = inSize - 1</SourceLine>
    <SourceLine>dim inIndex as integer = -1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim encodeUnicode as EncodeType = settings.EncodeUnicode</SourceLine>
@@ -704,7 +712,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
+  <ItemParams>s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -713,7 +721,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
+   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -721,15 +729,15 @@
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
-   <SourceLine>JSONItem_MTC( value ).ToString( outMB, outIndex, settings, level )</SourceLine>
+   <SourceLine>JSONItem_MTC( value ).ToString( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value IsA Dictionary then</SourceLine>
    <SourceLine>dim child as JSONItem_MTC = Dictionary( value )</SourceLine>
-   <SourceLine>child.ToString( outMB, outIndex, settings, level )</SourceLine>
+   <SourceLine>child.ToString( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
-   <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
@@ -764,7 +772,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
+  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -902,6 +910,8 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>dim stack() as JSONItem_MTC </SourceLine>
    <SourceLine>dim current as JSONItem_MTC = self</SourceLine>
@@ -922,7 +932,7 @@
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>LoadArray( inMB, pos, current, stack )</SourceLine>
+   <SourceLine>LoadArray( inMB, pos, current, stack, outMB )</SourceLine>
    <SourceLine>if pos &lt;= lastIndex and inPtr.Byte( pos ) &lt; 33 then</SourceLine>
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -944,7 +954,7 @@
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>LoadObject( inMB, pos, current, stack )</SourceLine>
+   <SourceLine>LoadObject( inMB, pos, current, stack, outMB )</SourceLine>
    <SourceLine>if pos &lt;= lastIndex and inPtr.Byte( pos ) &lt; 33 then</SourceLine>
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1156,7 +1166,9 @@
    <SourceLine>dim outMB as new MemoryBlock( 2048 )</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>ToString( outMB, outIndex, self, 0 )</SourceLine>
+   <SourceLine>dim inMB as new MemoryBlock( 2048 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>ToString( outMB, outIndex, self, 0, inMB)</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
@@ -1177,7 +1189,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub ToString(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer)</SourceLine>
+   <SourceLine>Sub ToString(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -1241,7 +1253,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = ArrayValues( i )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
@@ -1333,7 +1345,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
    <SourceLine>dim name as string = KeyToName( key )</SourceLine>
-   <SourceLine>EncodeString( name, settings, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeString( name, settings, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1 ) then</SourceLine>
@@ -1348,7 +1360,7 @@
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = d.Value( key )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
@@ -1406,7 +1418,7 @@
   <AliasName></AliasName>
   <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer</ItemParams>
+  <ItemParams>outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1683,7 +1695,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC)</SourceLine>
+   <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -1714,7 +1726,7 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>name = DecodeString( inMB, pos, current )</SourceLine>
+   <SourceLine>name = DecodeString( inMB, pos, current, outMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
@@ -1731,7 +1743,7 @@
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>value = DecodeValue( inMB, pos, current )</SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
    <SourceLine>key = EncodeHex( name )</SourceLine>
    <SourceLine>current.ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
@@ -1756,7 +1768,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC</ItemParams>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1765,7 +1777,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC)</SourceLine>
+   <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -1800,7 +1812,7 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>value = DecodeValue( inMB, pos, current )</SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
    <SourceLine>current.ArrayValues.Append value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
@@ -1829,7 +1841,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC</ItemParams>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Note>
