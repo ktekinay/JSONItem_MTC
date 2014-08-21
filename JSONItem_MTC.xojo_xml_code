@@ -456,7 +456,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>// Is it an integer?</SourceLine>
+   <SourceLine>// Is it an number?</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>if keepChecking and valueLen = 1 and firstByte &gt;= 48 and firstByte &lt;= 57 then // Single digit</SourceLine>
    <SourceLine>value = firstByte - 48</SourceLine>
@@ -464,32 +464,8 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if keepChecking then </SourceLine>
+   <SourceLine>if ParseNumber( inMB, startPos, endPos, value ) then</SourceLine>
    <SourceLine>keepChecking = false</SourceLine>
-   <SourceLine>dim startIndex as integer = startPos</SourceLine>
-   <SourceLine>dim isNegative as boolean</SourceLine>
-   <SourceLine>if firstByte = kHyphen then</SourceLine>
-   <SourceLine>isNegative = true</SourceLine>
-   <SourceLine>startIndex = startIndex + 1</SourceLine>
-   <SourceLine>elseif firstByte = kPlus then</SourceLine>
-   <SourceLine>startIndex = startIndex + 1</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>dim total as Int64</SourceLine>
-   <SourceLine>for i as integer = startIndex to endPos</SourceLine>
-   <SourceLine>thisByte = inPtr.Byte( i )</SourceLine>
-   <SourceLine>if thisByte &lt; 48 or thisByte &gt; 57 then</SourceLine>
-   <SourceLine>keepChecking = true</SourceLine>
-   <SourceLine>exit for i</SourceLine>
-   <SourceLine>else</SourceLine>
-   <SourceLine>total = ( total * 10 ) + ( thisByte - 48 )</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>next i</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if not keepChecking then</SourceLine>
-   <SourceLine>if isNegative then</SourceLine>
-   <SourceLine>total = 0 - total</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>value = total</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -498,14 +474,14 @@
    <SourceLine>//</SourceLine>
    <SourceLine>if keepChecking then</SourceLine>
    <SourceLine>dim valueString as string = inMB.StringValue( startPos, valueLen ).DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>if IsNumeric( valueString ) then</SourceLine>
-   <SourceLine>value = val( valueString )</SourceLine>
-   <SourceLine>elseif valueString = "true" then</SourceLine>
+   <SourceLine>if valueString = "true" then</SourceLine>
    <SourceLine>value = true</SourceLine>
    <SourceLine>elseif valueString = "false" then</SourceLine>
    <SourceLine>value = false</SourceLine>
    <SourceLine>elseif valueString = "null" then</SourceLine>
    <SourceLine>value = nil</SourceLine>
+   <SourceLine>elseif IsNumeric( valueString ) then</SourceLine>
+   <SourceLine>value = val( valueString )</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>raise new JSONException( "Illegal Value", 10, startPos )</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1841,6 +1817,114 @@
   <IsShared>0</IsShared>
   <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>ParseNumber</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function ParseNumber(mb As MemoryBlock, startPos As Integer, endPos As Integer, ByRef result As Variant) As Boolean</SourceLine>
+   <SourceLine>if endPos &gt;= mb.Size then</SourceLine>
+   <SourceLine>endPos = mb.Size - 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if endPos &lt;= startPos then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim p as Ptr = mb</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim dotFound as boolean</SourceLine>
+   <SourceLine>dim inExponent as boolean</SourceLine>
+   <SourceLine>dim r as boolean = true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim pos as integer = startPos</SourceLine>
+   <SourceLine>dim thisByte as integer = p.Byte( pos )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim isNegative as boolean</SourceLine>
+   <SourceLine>if thisByte = 45 then</SourceLine>
+   <SourceLine>isNegative = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>elseif thisByte = 43 then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim total as Int64</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>thisByte = p.Byte( pos )</SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
+   <SourceLine>case 46</SourceLine>
+   <SourceLine>if dotFound or inExponent then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>dotFound = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case 48 to 57</SourceLine>
+   <SourceLine>if not dotFound and not inExponent then</SourceLine>
+   <SourceLine>total = ( total * 10 ) + ( thisByte - 48 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case 101, 69 // e, E</SourceLine>
+   <SourceLine>if inExponent then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>inExponent = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if pos &gt; endPos then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>thisByte = p.Byte( pos )</SourceLine>
+   <SourceLine>if thisByte = 45 or thisByte = 43 then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if pos &gt; endPos then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end  if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine>loop until pos &gt; endPos</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if r then</SourceLine>
+   <SourceLine>if not dotFound and not inExponent then // Integer</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if isNegative then</SourceLine>
+   <SourceLine>total = 0 - total</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>result = total</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim s as string = mb.StringValue( startPos, endPos - startPos + 1 )</SourceLine>
+   <SourceLine>result = Val( s )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return r</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>mb As MemoryBlock, startPos As Integer, endPos As Integer, ByRef result As Variant</ItemParams>
+  <ItemResult>Boolean</ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
