@@ -109,7 +109,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Child(name As String) As JSONItem_MTC</SourceLine>
-   <SourceLine>name = NameToKey( name )</SourceLine>
    <SourceLine>dim r as JSONItem_MTC = self.Value( name )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
@@ -129,7 +128,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Child(name As String, Assigns obj As JSONItem_MTC)</SourceLine>
-   <SourceLine>name = NameToKey( name )</SourceLine>
    <SourceLine>self.Value( name ) = obj</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
