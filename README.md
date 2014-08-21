@@ -10,15 +10,17 @@ This class implements all the features and functions of its native twin and shou
 
 - You can add any object to JSONItem and it will raise an exception when you try to use ToString. This class will raise that exception when you try to add the bad object.
 
-- This class has an extra property, EncodeUnicode. By default, it is False to emulate the native class. If set to True, it will encode all characters whose codepoints are greater than 127.
+- This class has an extra enum property, EncodeUnicode. By default, it is EncodeType.JavascriptCompatible to emulate the native class. If set to EncodeType.All, it will encode all characters whose codepoints are greater than or equal to 127. In all cases (EncodeType.All, .JavascriptCompatible, .None), code points 0 - 31 will be encoded.
 
 - Some error messages will be different within this class than the native class.
 
 - The native class will raise an exception when loading a string that has an escaped character other than one of the "approved" characters. This class will accept any escaped character.
 
+- This class is more tolerant when loading values that aren't valid according to the specs. For example, the value `TRUE` is considered invalid according to the RFC as is the value `+1`, but both will be accepted by this class. As such, it should not be used as a validator. (Nor should the native class as it too will accept some values that should not be accepted according to the JSON specs.) JSON string generation will meet always meet specs.
+
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
-- As of Xojo 2014r21, ToString is significantly faster in this class than the native version.
+- As of Xojo 2014r21, ToString and Load are significantly faster in this class than the native version.
 
 ##License
 
