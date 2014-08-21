@@ -310,8 +310,6 @@
    <SourceLine>exit </SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>'outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
-   <SourceLine>'outIndex = outIndex + 1</SourceLine>
    <SourceLine>flushEnd = pos</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
