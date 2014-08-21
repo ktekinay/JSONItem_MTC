@@ -81,6 +81,9 @@ Inherits TestGroup
 		  Assert.AreSame( "a", j.Name( 0 ) )
 		  Assert.AreSame( "A", j.Name( 1 ) )
 		  
+		  dim child as new JSONItem_MTC( "[1]" )
+		  j.Child( "c" ) = child
+		  Assert.AreEqual( 1, j.Child( "c" ).Value( 0 ).IntegerValue )
 		End Sub
 	#tag EndMethod
 
