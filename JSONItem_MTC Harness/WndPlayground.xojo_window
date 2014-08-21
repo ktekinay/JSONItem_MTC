@@ -325,6 +325,7 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   8
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "JSONItem"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -359,6 +360,7 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   9
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "JSONItem_MTC"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -424,6 +426,7 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   11
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Encode Unicode:"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -435,6 +438,37 @@ Begin Window WndPlayground
       Underline       =   False
       Visible         =   True
       Width           =   117
+   End
+   Begin PushButton btnSpeedTests
+      AutoDeactivate  =   True
+      Bold            =   False
+      ButtonStyle     =   "0"
+      Cancel          =   False
+      Caption         =   "Speed Tests"
+      Default         =   False
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   793
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   0
+      TabIndex        =   12
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   14
+      Underline       =   False
+      Visible         =   True
+      Width           =   108
    End
 End
 #tag EndWindow
@@ -584,7 +618,12 @@ End
 		  sw.Start
 		  
 		  for i as integer = 1 to 10000
-		    j1.Value( str( i ) ) = str( i ) + chr( 127 + i )
+		    dim jChild as new JSONItem
+		    jChild.Append i
+		    jChild.Append chr( 127 + i )
+		    jChild.Append true
+		    jChild.Append CType( i, double )
+		    j1.Value( str( i ) ) = jChild
 		  next i
 		  
 		  sw.Stop
@@ -594,7 +633,12 @@ End
 		  sw.Start
 		  
 		  for i as integer = 1 to 10000
-		    j2.Value( str( i ) ) = str( i ) + chr( 127 + i )
+		    dim jChild as new JSONItem_MTC
+		    jChild.Append i
+		    jChild.Append chr( 127 + i )
+		    jChild.Append true
+		    jChild.Append CType( i, double )
+		    j2.Value( str( i ) ) = jChild
 		  next i
 		  
 		  sw.Stop
@@ -714,6 +758,45 @@ End
 		    fldJSONMTCOut.AppendText str( err.ErrorNumber )
 		    
 		  end try
+		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events btnSpeedTests
+	#tag Event
+		Sub Action()
+		  dim s as string = json_sample
+		  s = s.DefineEncoding( Encodings.UTF8 )
+		  
+		  dim sw as new Stopwatch_MTC
+		  sw.Start
+		  
+		  dim j as new JSONItem_MTC( s )
+		  
+		  sw.Stop
+		  
+		  AddToResult( "Load: " + format( sw.ElapsedMicroseconds, "#," ) )
+		  
+		  j.Compact = false
+		  dim s1 as string = j.ToString
+		  
+		  if StrComp( s, s1, 0 ) <> 0 then
+		    AddToResult "... but they don't match"
+		  end if
+		  
+		  'sw.Reset
+		  'sw.Start
+		  'dim j1 as new JSONMBS( s )
+		  'sw.Stop
+		  '
+		  'AddToResult( "Load MBS: " + format( sw.ElapsedMicroseconds, "#," ) )
+		  
+		  sw.Reset
+		  sw.Start
+		  dim j2 as new JSONItem( s )
+		  sw.Stop
+		  
+		  AddToResult( "Load Native: " + format( sw.ElapsedMicroseconds, "#," ) )
 		  
 		End Sub
 	#tag EndEvent
