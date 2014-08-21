@@ -23,7 +23,7 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim thisByte as byte = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
    <SourceLine>select case thisByte</SourceLine>
    <SourceLine>case 9, 10, 13, 32</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
@@ -148,7 +148,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Clear()</SourceLine>
-   <SourceLine>mObjectValues = nil</SourceLine>
+   <SourceLine>ObjectValues = new Dictionary</SourceLine>
    <SourceLine>redim ArrayValues( -1 )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -167,7 +167,9 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
+   <SourceLine>ObjectValues = new Dictionary</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>DecimalFormat = kDefaultDecimalFormat</SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -184,6 +186,8 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor(JSONString As String)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>self.Load JSONString</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -196,34 +200,19 @@
   <ItemResult></ItemResult>
  </Method>
  <Method>
-  <ItemName>Count</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function Count() As Integer</SourceLine>
-   <SourceLine>if IsArray then</SourceLine>
-   <SourceLine>return ArrayValues.Ubound + 1</SourceLine>
-   <SourceLine>else</SourceLine>
-   <SourceLine>return ObjectValues.Count</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>End Function</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>0</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams></ItemParams>
-  <ItemResult>Integer</ItemResult>
- </Method>
- <Method>
   <ItemName>DecodeString</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer) As String</SourceLine>
+   <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As String</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -236,35 +225,41 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( inMB.Size )</SourceLine>
+   <SourceLine>if outMB.Size &lt; inMB.Size then</SourceLine>
+   <SourceLine>outMB.Size = inMB.Size</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>dim inBackslash as boolean</SourceLine>
+   <SourceLine>dim flushStart as integer = pos</SourceLine>
+   <SourceLine>dim flushEnd as integer = -1</SourceLine>
+   <SourceLine>dim hasBackSlash as boolean</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>dim msg as string = if( self.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
+   <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
    <SourceLine>raise new JSONException( msg, 6, pos )</SourceLine>
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
-   <SourceLine>select case true</SourceLine>
-   <SourceLine>case not inBackSlash and thisByte = kBackSlash</SourceLine>
-   <SourceLine>inBackslash = true</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
+   <SourceLine>case kBackSlash</SourceLine>
+   <SourceLine>hasBackSlash = true</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case not inBackslash and thisByte = kQuote // End</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
+   <SourceLine>if flushEnd &lt;&gt; -1 then</SourceLine>
+   <SourceLine>dim flushLen as integer = flushEnd - flushStart + 1</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, flushLen ) = inMB.StringValue( flushStart, flushLen )</SourceLine>
+   <SourceLine>outIndex = outIndex + flushLen</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case inBackslash</SourceLine>
-   <SourceLine>select case thisByte</SourceLine>
-   <SourceLine>case kBackSlash, kQuote, kForwardSlash</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
-   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if pos &gt; lastPos then</SourceLine>
+   <SourceLine>continue do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
    <SourceLine>case 114 // r</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
@@ -299,25 +294,41 @@
    <SourceLine>pos = pos + 5</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
-   <SourceLine>'raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
-   <SourceLine>'return ""</SourceLine>
-   <SourceLine>// RFC says any character may be escaped, so just accept this</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// RFC says any character may be escaped, so just accept this byte</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>inBackslash = false</SourceLine>
+   <SourceLine>flushStart = pos</SourceLine>
+   <SourceLine>flushEnd = -1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case kQuote // End</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>exit </SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
-   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>flushEnd = pos</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine>if hasBackSlash and flushEnd &lt;&gt; -1 then</SourceLine>
+   <SourceLine>dim flushLen as integer = flushEnd - flushStart + 1</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, flushLen ) = inMB.StringValue( flushStart, flushLen )</SourceLine>
+   <SourceLine>outIndex = outIndex + flushLen</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim r as string </SourceLine>
+   <SourceLine>if hasBackSlash then</SourceLine>
+   <SourceLine>r = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine>elseif flushEnd &lt;&gt; -1 then</SourceLine>
+   <SourceLine>r = inMB.StringValue( flushStart, flushEnd - flushStart + 1 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
@@ -327,7 +338,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
@@ -336,28 +347,57 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer) As Variant</SourceLine>
+   <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As Variant</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static trueValue as Int32</SourceLine>
+   <SourceLine>if trueValue = 0 then</SourceLine>
+   <SourceLine>dim mb as MemoryBlock = "true"</SourceLine>
+   <SourceLine>mb.LittleEndian = inMB.LittleEndian</SourceLine>
+   <SourceLine>trueValue = mb.Int32Value( 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static nullValue as Int32</SourceLine>
+   <SourceLine>if nullValue = 0 then</SourceLine>
+   <SourceLine>dim mb as MemoryBlock = "null"</SourceLine>
+   <SourceLine>mb.LittleEndian = inMB.LittleEndian</SourceLine>
+   <SourceLine>nullValue = mb.Int32Value( 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static falsValue as Int32</SourceLine>
+   <SourceLine>if falsValue = 0 then</SourceLine>
+   <SourceLine>dim mb as MemoryBlock = "fals"</SourceLine>
+   <SourceLine>mb.LittleEndian = inMB.LittleEndian</SourceLine>
+   <SourceLine>falsValue = mb.Int32Value( 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>static rxInteger as RegEx</SourceLine>
-   <SourceLine>if rxInteger is nil then</SourceLine>
-   <SourceLine>rxInteger = new RegEx</SourceLine>
-   <SourceLine>rxInteger.SearchPattern = "\A[-+]?\d+\z"</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
    <SourceLine>if thisByte = kQuote then</SourceLine>
-   <SourceLine>return DecodeString( inMB, pos )</SourceLine>
+   <SourceLine>return DecodeString( inMB, pos, current, outMB )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif thisByte = kOpenCurlyBrace or thisByte = kOpenSquareBracket then</SourceLine>
+   <SourceLine>elseif thisByte = kOpenCurlyBrace then</SourceLine>
    <SourceLine>dim child as new JSONItem_MTC</SourceLine>
-   <SourceLine>child.Load( inMB, pos )</SourceLine>
+   <SourceLine>child.HasSetType = kHasSetObject</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>return child</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif thisByte = kOpenSquareBracket then</SourceLine>
+   <SourceLine>dim child as new JSONItem_MTC</SourceLine>
+   <SourceLine>child.HasSetType = kHasSetArray</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>return child</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
@@ -368,7 +408,7 @@
    <SourceLine>dim endPos as integer = pos + 1</SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if endPos &gt; lastPos then</SourceLine>
-   <SourceLine>dim msg as string = if( self.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
+   <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
    <SourceLine>raise new JSONException( msg, 6, endPos + 1 )</SourceLine>
    <SourceLine>return nil</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -385,22 +425,66 @@
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = endPos</SourceLine>
+   <SourceLine>endPos = endPos - 1</SourceLine>
+   <SourceLine>dim valueLen as integer = endPos - startPos + 1</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim valueString as string = inMB.StringValue( startPos, endPos - startPos ).DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>dim value as variant</SourceLine>
+   <SourceLine>dim keepChecking as boolean = valueLen &lt;&gt; 0</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim firstByte as integer = inPtr.Byte( startPos )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// See if it's true, false, or null first</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking and valueLen = 5 then // false?</SourceLine>
+   <SourceLine>if firstByte = 102 and inPtr.Byte( startPos + 4 ) = 101 and inMB.Int32Value( startPos ) = falsValue then</SourceLine>
+   <SourceLine>value = false</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking and valueLen = 4 then // true or null?</SourceLine>
+   <SourceLine>if  firstByte = 116 and inMB.Int32Value( startPos ) = trueValue then</SourceLine>
+   <SourceLine>value = true</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking and firstByte = 110 and inMB.Int32Value( startPos ) = nullValue then</SourceLine>
+   <SourceLine>value = nil</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Is it an number?</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking and valueLen = 1 and firstByte &gt;= 48 and firstByte &lt;= 57 then // Single digit</SourceLine>
+   <SourceLine>value = firstByte - 48</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking then </SourceLine>
+   <SourceLine>if ParseNumber( inMB, startPos, endPos, value ) then</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Hail Mary</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if keepChecking then</SourceLine>
+   <SourceLine>dim valueString as string = inMB.StringValue( startPos, valueLen ).DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>if valueString = "true" then</SourceLine>
    <SourceLine>value = true</SourceLine>
    <SourceLine>elseif valueString = "false" then</SourceLine>
    <SourceLine>value = false</SourceLine>
    <SourceLine>elseif valueString = "null" then</SourceLine>
    <SourceLine>value = nil</SourceLine>
-   <SourceLine>elseif rxInteger.Search( valueString ) &lt;&gt; nil then</SourceLine>
-   <SourceLine>dim i as Int64 = val( valueString )</SourceLine>
-   <SourceLine>value = i</SourceLine>
    <SourceLine>elseif IsNumeric( valueString ) then</SourceLine>
    <SourceLine>value = val( valueString )</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>raise new JSONException( "Illegal Value", 10, startPos )</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return value</SourceLine>
@@ -410,7 +494,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
   <ItemResult>Variant</ItemResult>
  </Method>
  <Method>
@@ -419,7 +503,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
+   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>// Encodes a string for output during ToString.</SourceLine>
    <SourceLine>// Honors the EncodeUnicode setting, but some characters must ALWAYS be encoded for </SourceLine>
    <SourceLine>// Javascript compatibility. These are</SourceLine>
@@ -477,10 +561,15 @@
    <SourceLine></SourceLine>
    <SourceLine>s = s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim inMB as MemoryBlock = s</SourceLine>
+   <SourceLine>dim inSize as integer = s.LenB</SourceLine>
+   <SourceLine>if inMB.Size &lt; inSize then</SourceLine>
+   <SourceLine>inMB.Size = inSize</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>inMB.StringValue( 0, inSize ) = s</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
+   <SourceLine>dim lastIndex as integer = inSize - 1</SourceLine>
    <SourceLine>dim inIndex as integer = -1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim encodeUnicode as EncodeType = settings.EncodeUnicode</SourceLine>
@@ -597,7 +686,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
+  <ItemParams>s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -606,7 +695,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer)</SourceLine>
+   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -614,15 +703,15 @@
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
-   <SourceLine>JSONItem_MTC( value ).ToString( outMB, outIndex, settings, level )</SourceLine>
+   <SourceLine>JSONItem_MTC( value ).ToString( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value IsA Dictionary then</SourceLine>
    <SourceLine>dim child as JSONItem_MTC = Dictionary( value )</SourceLine>
-   <SourceLine>child.ToString( outMB, outIndex, settings, level )</SourceLine>
+   <SourceLine>child.ToString( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
-   <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
@@ -657,7 +746,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer</ItemParams>
+  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -761,117 +850,113 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Load(inMB As MemoryBlock, ByRef pos As Integer)</SourceLine>
-   <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
-   <SourceLine>dim commaFound as boolean</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>// Determine the type we are loading. If we get here,</SourceLine>
-   <SourceLine>// it either has to match self, or this type hasn't been set yet</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kOpenSquareBracket then</SourceLine>
-   <SourceLine>//</SourceLine>
-   <SourceLine>// Loading array</SourceLine>
-   <SourceLine>//</SourceLine>
-   <SourceLine>self.HasSetType = kHasSetArray</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then</SourceLine>
-   <SourceLine>if commaFound then</SourceLine>
-   <SourceLine>raise new JSONException( "Illegal Value", 10, pos )</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
-   <SourceLine>self.Append value</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>commaFound = false</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>commaFound = true</SourceLine>
-   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kCloseSquareBracket then</SourceLine>
-   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>loop</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>else</SourceLine>
-   <SourceLine>//</SourceLine>
-   <SourceLine>// Loading object</SourceLine>
-   <SourceLine>//</SourceLine>
-   <SourceLine>self.HasSetType = kHasSetObject</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kCloseCurlyBrace then</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>exit do</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>dim name as string = DecodeString( inMB, pos )</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kColon then</SourceLine>
-   <SourceLine>// Something is wrong</SourceLine>
-   <SourceLine>raise new JSONException( "Missing :", 5, pos + 1 )</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMb, pos )</SourceLine>
-   <SourceLine>dim value as variant = DecodeValue( inMB, pos )</SourceLine>
-   <SourceLine>self.Value( name ) = value</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>AdvancePastWhiteSpace( inMB, pos )</SourceLine>
-   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
-   <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>loop</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>End Sub</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>1</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer</ItemParams>
-  <ItemResult></ItemResult>
- </Method>
- <Method>
-  <ItemName>Load</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(JSONString As String)</SourceLine>
+   <SourceLine>JSONString = JSONStringToUTF8( JSONString ).RTrim</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if JSONString = "" then</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>JSONString = JSONStringToUTF8( JSONString ).Trim</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>dim firstChar as string = JSONString.LeftB( 1 )</SourceLine>
-   <SourceLine>if firstChar = "[" and IsObject then</SourceLine>
-   <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>elseif firstChar = "{" and IsArray then</SourceLine>
-   <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>elseif firstChar &lt;&gt; "[" and firstChar &lt;&gt; "{" then</SourceLine>
-   <SourceLine>// Do nothing</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim inMB as MemoryBlock = JSONString</SourceLine>
    <SourceLine>dim pos as integer</SourceLine>
-   <SourceLine>Load( inMB,pos )</SourceLine>
+   <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kOpenSquareBracket then</SourceLine>
+   <SourceLine>if IsObject then</SourceLine>
+   <SourceLine>// Do nothing</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>HasSetType = kHasSetArray</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif inPtr.Byte( pos ) = kOpenCurlyBrace then</SourceLine>
+   <SourceLine>if IsArray then</SourceLine>
+   <SourceLine>// Do nothing</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>HasSetType = kHasSetObject</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>// Do nothing</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>dim stack() as JSONItem_MTC </SourceLine>
+   <SourceLine>dim current as JSONItem_MTC = self</SourceLine>
+   <SourceLine>dim lastIndex as integer = inMB.Size - 1</SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>if current.IsArray then</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if pos &lt;= lastIndex and inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then // Empty array</SourceLine>
+   <SourceLine>if stack.Ubound &lt;&gt; -1 then</SourceLine>
+   <SourceLine>current = stack.Pop</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>current = nil</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>LoadArray( inMB, pos, current, stack, outMB )</SourceLine>
+   <SourceLine>if pos &lt;= lastIndex and inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if pos &lt;= lastIndex and inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kCloseCurlyBrace then // Empty object</SourceLine>
+   <SourceLine>if stack.Ubound &lt;&gt; -1 then</SourceLine>
+   <SourceLine>current = stack.Pop</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>current = nil</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>LoadObject( inMB, pos, current, stack, outMB )</SourceLine>
+   <SourceLine>if pos &lt;= lastIndex and inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if current is nil then</SourceLine>
+   <SourceLine>if pos &lt;= lastIndex then</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif pos &gt; lastIndex then</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt;  33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -959,32 +1044,6 @@
   <IsShared>0</IsShared>
   <ItemParams></ItemParams>
   <ItemResult>String()</ItemResult>
- </Method>
- <Method>
-  <ItemName>ObjectValues</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function ObjectValues() As Dictionary</SourceLine>
-   <SourceLine>if not EnsureObject() then</SourceLine>
-   <SourceLine>return nil</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if mObjectValues is nil then</SourceLine>
-   <SourceLine>mObjectValues = new Dictionary</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>return mObjectValues</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>End Function</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams></ItemParams>
-  <ItemResult>Dictionary</ItemResult>
  </Method>
  <Method>
   <ItemName>Operator_Convert</ItemName>
@@ -1081,7 +1140,9 @@
    <SourceLine>dim outMB as new MemoryBlock( 2048 )</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>ToString( outMB, outIndex, self, 0 )</SourceLine>
+   <SourceLine>dim inMB as new MemoryBlock( 2048 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>ToString( outMB, outIndex, self, 0, inMB)</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
@@ -1102,7 +1163,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub ToString(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer)</SourceLine>
+   <SourceLine>Sub ToString(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -1166,7 +1227,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = ArrayValues( i )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
@@ -1258,7 +1319,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
    <SourceLine>dim name as string = KeyToName( key )</SourceLine>
-   <SourceLine>EncodeString( name, settings, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeString( name, settings, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1 ) then</SourceLine>
@@ -1273,7 +1334,7 @@
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = d.Value( key )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
@@ -1331,7 +1392,7 @@
   <AliasName></AliasName>
   <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer</ItemParams>
+  <ItemParams>outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1602,6 +1663,269 @@
   <ItemParams>s As String</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
+ <Method>
+  <ItemName>LoadObject</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim name as string</SourceLine>
+   <SourceLine>dim key as string</SourceLine>
+   <SourceLine>dim value as variant</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if </SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kCloseCurlyBrace then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if stack.Ubound &lt;&gt; -1 then</SourceLine>
+   <SourceLine>current = stack.Pop</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>current = nil</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>name = DecodeString( inMB, pos, current, outMB )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt;&gt; kColon then</SourceLine>
+   <SourceLine>// Something is wrong</SourceLine>
+   <SourceLine>raise new JSONException( "Missing :", 5, pos + 1 )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
+   <SourceLine>key = EncodeHex( name )</SourceLine>
+   <SourceLine>current.ObjectValues.Value( key ) = value</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
+   <SourceLine>stack.Append current</SourceLine>
+   <SourceLine>current = value</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>LoadArray</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
+   <SourceLine>#if not DebugBuild</SourceLine>
+   <SourceLine>#pragma BackgroundTasks false</SourceLine>
+   <SourceLine>#pragma BoundsChecking false</SourceLine>
+   <SourceLine>#pragma NilObjectChecking false</SourceLine>
+   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim commaFound as boolean</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim value as variant</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kCloseSquareBracket then</SourceLine>
+   <SourceLine>if commaFound then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value", 10, pos )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if stack.Ubound &lt;&gt; -1 then</SourceLine>
+   <SourceLine>current = stack.Pop</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>current = nil</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
+   <SourceLine>current.ArrayValues.Append value</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
+   <SourceLine>stack.Append current</SourceLine>
+   <SourceLine>current = value</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) &lt; 33 then</SourceLine>
+   <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>commaFound = false</SourceLine>
+   <SourceLine>if inPtr.Byte( pos ) = kComma then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>commaFound = true</SourceLine>
+   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kCloseSquareBracket then</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos + 1 )</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>ParseNumber</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function ParseNumber(mb As MemoryBlock, startPos As Integer, endPos As Integer, ByRef result As Variant) As Boolean</SourceLine>
+   <SourceLine>if endPos &gt;= mb.Size then</SourceLine>
+   <SourceLine>endPos = mb.Size - 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if endPos &lt;= startPos then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim p as Ptr = mb</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim dotFound as boolean</SourceLine>
+   <SourceLine>dim inExponent as boolean</SourceLine>
+   <SourceLine>dim r as boolean = true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim pos as integer = startPos</SourceLine>
+   <SourceLine>dim thisByte as integer = p.Byte( pos )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim isNegative as boolean</SourceLine>
+   <SourceLine>if thisByte = 45 then</SourceLine>
+   <SourceLine>isNegative = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>elseif thisByte = 43 then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim total as Int64</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>do</SourceLine>
+   <SourceLine>thisByte = p.Byte( pos )</SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
+   <SourceLine>case 46</SourceLine>
+   <SourceLine>if dotFound or inExponent then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>dotFound = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case 48 to 57</SourceLine>
+   <SourceLine>if not dotFound and not inExponent then</SourceLine>
+   <SourceLine>total = ( total * 10 ) + ( thisByte - 48 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case 101, 69 // e, E</SourceLine>
+   <SourceLine>if inExponent then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>inExponent = true</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if pos &gt; endPos then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>thisByte = p.Byte( pos )</SourceLine>
+   <SourceLine>if thisByte = 45 or thisByte = 43 then</SourceLine>
+   <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine>if pos &gt; endPos then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end  if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine>loop until pos &gt; endPos</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if r then</SourceLine>
+   <SourceLine>if not dotFound and not inExponent then // Integer</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if isNegative then</SourceLine>
+   <SourceLine>total = 0 - total</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>result = total</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim s as string = mb.StringValue( startPos, endPos - startPos + 1 )</SourceLine>
+   <SourceLine>result = Val( s )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return r</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>mb As MemoryBlock, startPos As Integer, endPos As Integer, ByRef result As Variant</ItemParams>
+  <ItemResult>Boolean</ItemResult>
+ </Method>
  <Note>
   <ItemName>Legal</ItemName>
   <Compatibility></Compatibility>
@@ -1702,7 +2026,7 @@
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
   <ItemDeclaration>ArrayValues() As Variant</ItemDeclaration>
-  <ItemFlags>33</ItemFlags>
+  <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
  <Property>
@@ -1729,7 +2053,7 @@
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>DecimalFormat As String = "-0.0##############"</ItemDeclaration>
+  <ItemDeclaration>DecimalFormat As String</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
@@ -1758,7 +2082,7 @@
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
   <ItemDeclaration>HasSetType As Integer</ItemDeclaration>
-  <ItemFlags>33</ItemFlags>
+  <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
  <Property>
@@ -1830,17 +2154,17 @@
   </GetAccessor>
  </Property>
  <Property>
-  <ItemName>mObjectValues</ItemName>
+  <ItemName>ObjectValues</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>mObjectValues As Dictionary</SourceLine>
+   <SourceLine>ObjectValues As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>mObjectValues As Dictionary</ItemDeclaration>
-  <ItemFlags>33</ItemFlags>
+  <ItemDeclaration>ObjectValues As Dictionary</ItemDeclaration>
+  <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
  <Property>
@@ -1856,6 +2180,39 @@
   <ItemDeclaration>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>Count</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Count As Integer</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Count As Integer</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>if IsArray then</SourceLine>
+   <SourceLine>return ArrayValues.Ubound + 1</SourceLine>
+   <SourceLine>elseif ObjectValues &lt;&gt; nil then</SourceLine>
+   <SourceLine>return ObjectValues.Count</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return 0</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
  </Property>
  <ViewBehavior>
   <ViewProperty>
@@ -1919,6 +2276,11 @@
    <Visible>1</Visible>
    <PropertyGroup>Position</PropertyGroup>
    <PropertyValue>0</PropertyValue>
+   <ItemType>Integer</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Count</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
    <ItemType>Integer</ItemType>
   </ViewProperty>
  </ViewBehavior>
@@ -2050,6 +2412,46 @@
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>2.0</ItemDef>
+  <ItemFlags>0</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kHyphen</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kHyphen</ItemName>
+  <ItemType>2</ItemType>
+  <ItemDef>45</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kPlus</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kPlus</ItemName>
+  <ItemType>2</ItemType>
+  <ItemDef>43</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kDot</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kDot</ItemName>
+  <ItemType>2</ItemType>
+  <ItemDef>46</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kDefaultDecimalFormat</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemName>kDefaultDecimalFormat</ItemName>
+  <ItemType>0</ItemType>
+  <ItemDef>-0.0##############</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Enumeration>
