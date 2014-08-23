@@ -22,6 +22,8 @@ This class implements all the features and functions of its native twin and shou
 
 - This class has a Strict property. When set to `True`, it will strictly interpret JSON string according to JSON specs (values like `TRUE` and `+1` will be rejected), and will raise an exception rather than outputting `inf` or `nan`.
 
+- This class will properly handle characters with code points > &hFFFF when both encoding and decoding. The native class does not.
+
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
 - As of Xojo 2014r21, ToString and Load are significantly faster in this class than the native version.
