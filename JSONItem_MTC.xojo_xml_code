@@ -183,9 +183,10 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Constructor(JSONString As String)</SourceLine>
+   <SourceLine>Sub Constructor(JSONString As String, isStrict As Boolean = False)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>self.Strict = isStrict</SourceLine>
    <SourceLine>self.Load JSONString</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -194,7 +195,7 @@
   <AliasName></AliasName>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>JSONString As String</ItemParams>
+  <ItemParams>JSONString As String, isStrict As Boolean = False</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -2218,6 +2219,20 @@
    <SourceLine></SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>Strict</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Strict As Boolean</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Strict As Boolean</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
  </Property>
  <ViewBehavior>
   <ViewProperty>
