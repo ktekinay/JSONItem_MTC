@@ -2416,7 +2416,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.1</ItemDef>
+  <ItemDef>2.2</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
