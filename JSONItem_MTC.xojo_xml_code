@@ -183,9 +183,10 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Constructor(JSONString As String)</SourceLine>
+   <SourceLine>Sub Constructor(JSONString As String, isStrict As Boolean = False)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>self.Strict = isStrict</SourceLine>
    <SourceLine>self.Load JSONString</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -194,7 +195,7 @@
   <AliasName></AliasName>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>JSONString As String</ItemParams>
+  <ItemParams>JSONString As String, isStrict As Boolean = False</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -462,15 +463,21 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if keepChecking then </SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>//  Only send it to ParseNumber if it's not Strict, or if the firstByte meets strict criteria</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if not Strict or ( firstByte = kHyphen or ( firstByte &gt;= 48 and firstByte &lt;= 57 ) ) then</SourceLine>
    <SourceLine>if ParseNumber( inMB, startPos, endPos, value ) then</SourceLine>
    <SourceLine>keepChecking = false</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Hail Mary</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>if keepChecking then</SourceLine>
+   <SourceLine>if keepChecking and not Strict then</SourceLine>
+   <SourceLine>keepChecking = false</SourceLine>
    <SourceLine>dim valueString as string = inMB.StringValue( startPos, valueLen ).DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>if valueString = "true" then</SourceLine>
    <SourceLine>value = true</SourceLine>
@@ -481,8 +488,12 @@
    <SourceLine>elseif IsNumeric( valueString ) then</SourceLine>
    <SourceLine>value = val( valueString )</SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>raise new JSONException( "Illegal Value", 10, startPos )</SourceLine>
+   <SourceLine>keepChecking = true</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if keepChecking then // Never found it</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value", 10, startPos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return value</SourceLine>
@@ -719,9 +730,17 @@
    <SourceLine>value.Type = Variant.TypeCurrency then</SourceLine>
    <SourceLine>dim s as string = value.StringValue</SourceLine>
    <SourceLine>if s.InStr( "inf" ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>if settings.Strict then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value 'inf'", 10 )</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>insert = "inf"</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>elseif s.InStr( "nan" ) &lt;&gt; 0 then </SourceLine>
+   <SourceLine>if settings.Strict then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value 'nan'", 10 )</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>insert = "nan"</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>insert = Format( value, settings.DecimalFormat )</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -2218,6 +2237,20 @@
    <SourceLine></SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>Strict</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Strict As Boolean</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Strict As Boolean</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
  </Property>
  <ViewBehavior>
   <ViewProperty>
