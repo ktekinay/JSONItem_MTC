@@ -66,6 +66,12 @@ Inherits TestGroup
 		  j.Append( "a" + chr( 1 ) )
 		  Assert.AreSame( "[""a\u0001""]", j.ToString )
 		  
+		  dim highChar as string = Chr( &h10149 )
+		  dim asEncoded as string = "[""\uD800\uDD49""]"
+		  
+		  j = new JSONItem( asEncoded )
+		  Assert.AreEqual( EncodeHex( highChar, true ), EncodeHex( j( 0 ).StringValue, true ) )
+		  
 		End Sub
 	#tag EndMethod
 
