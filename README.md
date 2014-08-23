@@ -18,6 +18,8 @@ This class implements all the features and functions of its native twin and shou
 
 - This class is more tolerant when loading values that aren't valid according to the specs. For example, the value `TRUE` is considered invalid according to the RFC as is the value `+1`, but both will be accepted by this class. As such, it should not be used as a validator. (Nor should the native class as it too will accept some values that should not be accepted according to the JSON specs.) JSON string generation will meet always meet specs.
 
+- This class will accept `inf` and `nan` as doubles, and will output the same. This is the only case where the output will not strictly meet JSON guidelines when using ToString.
+
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
 - As of Xojo 2014r21, ToString and Load are significantly faster in this class than the native version.
