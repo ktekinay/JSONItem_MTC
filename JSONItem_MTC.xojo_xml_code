@@ -235,12 +235,18 @@
    <SourceLine>dim flushStart as integer = pos</SourceLine>
    <SourceLine>dim flushEnd as integer = -1</SourceLine>
    <SourceLine>dim hasBackSlash as boolean</SourceLine>
+   <SourceLine>dim surrogatePairValue as integer</SourceLine>
+   <SourceLine>dim expectingSurrogate as boolean</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>dim msg as string = if( current.IsArray, "Missing , or ]", "Missing , or }" )</SourceLine>
    <SourceLine>raise new JSONException( msg, 6, pos )</SourceLine>
    <SourceLine>return ""</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if expectingSurrogate and ( inPtr.Byte( pos ) &lt;&gt; kBackSlash or ( pos + 1 ) &gt; lastPos or inPtr.Byte( pos + 1 ) &lt;&gt; 117 ) then</SourceLine>
+   <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>select case inPtr.Byte( pos )</SourceLine>
@@ -285,11 +291,34 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim asString as string = inMB.StringValue( pos + 1, 4 ).DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>dim asString as string = inMB.StringValue( pos + 1, 4 )</SourceLine>
    <SourceLine>dim uValue as integer = val( "&amp;h" + asString )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// See if this is part of a surrogate pair</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if expectingSurrogate then</SourceLine>
+   <SourceLine>dim char as string = Encodings.UTF16BE.Chr( surrogatePairValue ) + Encodings.UTF16BE.Chr( uValue )</SourceLine>
+   <SourceLine>char = char.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, char.LenB ) = char</SourceLine>
+   <SourceLine>outIndex = outIndex + char.LenB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>expectingSurrogate = false</SourceLine>
+   <SourceLine>surrogatePairValue = 0</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif uValue &lt; &amp;hD800 or uValue &gt; &amp;hDFFF then</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim char as string = Encodings.UTF8.Chr( uValue )</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, char.LenB ) = char</SourceLine>
    <SourceLine>outIndex = outIndex + char.LenB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else // Surrogate pair</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>surrogatePairValue = uValue</SourceLine>
+   <SourceLine>expectingSurrogate = true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>pos = pos + 5</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
