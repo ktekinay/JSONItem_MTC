@@ -717,7 +717,14 @@
    <SourceLine></SourceLine>
    <SourceLine>if value.Type = Variant.TypeDouble or value.Type = Variant.TypeSingle or _</SourceLine>
    <SourceLine>value.Type = Variant.TypeCurrency then</SourceLine>
+   <SourceLine>dim s as string = value.StringValue</SourceLine>
+   <SourceLine>if s.InStr( "inf" ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>insert = "inf"</SourceLine>
+   <SourceLine>elseif s.InStr( "nan" ) &lt;&gt; 0 then </SourceLine>
+   <SourceLine>insert = "nan"</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>insert = Format( value, settings.DecimalFormat )</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeNil then</SourceLine>
    <SourceLine>insert = "null"</SourceLine>
@@ -2409,7 +2416,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.1</ItemDef>
+  <ItemDef>2.2</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
