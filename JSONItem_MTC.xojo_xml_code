@@ -720,9 +720,17 @@
    <SourceLine>value.Type = Variant.TypeCurrency then</SourceLine>
    <SourceLine>dim s as string = value.StringValue</SourceLine>
    <SourceLine>if s.InStr( "inf" ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>if settings.Strict then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value 'inf'", 10 )</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>insert = "inf"</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>elseif s.InStr( "nan" ) &lt;&gt; 0 then </SourceLine>
+   <SourceLine>if settings.Strict then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Value 'nan'", 10 )</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>insert = "nan"</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>insert = Format( value, settings.DecimalFormat )</SourceLine>
    <SourceLine>end if</SourceLine>
