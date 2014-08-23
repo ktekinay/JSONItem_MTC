@@ -674,30 +674,43 @@
    <SourceLine>outMB.StringValue( outIndex, 6 ) = insertValue</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif encodeUnicode &lt;&gt; EncodeType.None and thisByte &gt;= 127 and thisByte &lt;= &amp;hFFFF then // high-ascii</SourceLine>
+   <SourceLine>elseif encodeUnicode &lt;&gt; EncodeType.None and thisByte &gt;= 127 then // high-ascii</SourceLine>
    <SourceLine>dim byteLength as integer</SourceLine>
-   <SourceLine>if thisByte &gt; 240 then</SourceLine>
+   <SourceLine>if thisByte &gt;= 240 then</SourceLine>
    <SourceLine>byteLength = 4</SourceLine>
-   <SourceLine>elseif thisByte &gt; 224 then</SourceLine>
+   <SourceLine>elseif thisByte &gt;= 224 then</SourceLine>
    <SourceLine>byteLength = 3</SourceLine>
-   <SourceLine>elseif thisByte &gt; 192 then</SourceLine>
+   <SourceLine>elseif thisByte &gt;= 192 then</SourceLine>
    <SourceLine>byteLength = 2</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>byteLength = 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>dim thisChar as string = inMB.StringValue( inIndex, byteLength )</SourceLine>
    <SourceLine>thisChar = thisChar.DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>if encodeUnicode = EncodeType.All or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 then</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// See if we have to use a surrogate pair</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if thisChar.Asc &gt; &amp;hFFFF and encodeUnicode = EncodeType.All then</SourceLine>
+   <SourceLine>thisChar = thisChar.ConvertEncoding( Encodings.UTF16BE )</SourceLine>
+   <SourceLine>dim firstHalf as string = thisChar.LeftB( 2 )</SourceLine>
+   <SourceLine>dim secondHalf as string = thisChar.RightB( 2 )</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex,  6 ) = "\u" + Right( "000" + EncodeHex( firstHalf ), 4 )</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex + 6, 6 ) = "\u" + Right( "000" + EncodeHex( secondHalf ), 4 )</SourceLine>
+   <SourceLine>outIndex = outIndex + 12</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif thisChar.Asc &lt;= &amp;hFFFF and ( encodeUnicode = EncodeType.All or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 ) then</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, 6 ) = "\u" + Right( "000" + hex( thisChar.Asc ), 4 )</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>inIndex = inIndex + byteLength - 1</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, byteLength ) = thisChar</SourceLine>
    <SourceLine>outIndex = outIndex + byteLength</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>inIndex = inIndex + byteLength - 1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>inIndex = inIndex + byteLength - 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // thisByte &gt; 31 and thisByte &lt; 127  </SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
