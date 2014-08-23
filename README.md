@@ -18,7 +18,9 @@ This class implements all the features and functions of its native twin and shou
 
 - This class is more tolerant when loading values that aren't valid according to the specs. For example, the value `TRUE` is considered invalid according to the RFC as is the value `+1`, but both will be accepted by this class. As such, it should not be used as a validator. (Nor should the native class as it too will accept some values that should not be accepted according to the JSON specs.) JSON string generation will meet always meet specs.
 
-- This class will accept `inf` and `nan` as doubles, and will output the same. This is the only case where the output will not strictly meet JSON guidelines when using ToString.
+- This class will accept `inf` and `nan` as doubles, and will output the same. This is the only case where the output will not strictly meet JSON guidelines when using ToString, unless...
+
+- This class has a Strict property. When set to `True`, it will strictly interpret JSON string according to JSON specs (values like `TRUE` and `+1` will be rejected), and will raise an exception rather than outputting `inf` or `nan`.
 
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
