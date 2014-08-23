@@ -2321,6 +2321,11 @@
    <PropertyGroup>Behavior</PropertyGroup>
    <ItemType>Integer</ItemType>
   </ViewProperty>
+  <ViewProperty>
+   <ObjName>Strict</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>Boolean</ItemType>
+  </ViewProperty>
  </ViewBehavior>
  <Constant>
   <ItemName>kBackSlash</ItemName>
@@ -2449,7 +2454,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.2</ItemDef>
+  <ItemDef>2.3</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
