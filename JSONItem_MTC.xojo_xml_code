@@ -212,6 +212,12 @@
    <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>static rxValidateHex as RegEx</SourceLine>
+   <SourceLine>if rxValidateHex is nil then</SourceLine>
+   <SourceLine>rxValidateHex = new RegEx</SourceLine>
+   <SourceLine>rxValidateHex.SearchPattern = "\A[[:xdigit:]]+\z"</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -292,6 +298,10 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim asString as string = inMB.StringValue( pos + 1, 4 )</SourceLine>
+   <SourceLine>if rxValidateHex.Search( asString ) is nil then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal value", 10, pos )</SourceLine>
+   <SourceLine>return ""</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>dim uValue as integer = val( "&amp;h" + asString )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
