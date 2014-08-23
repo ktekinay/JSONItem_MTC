@@ -39,6 +39,19 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub UnicodeTest()
+		  dim j as JSONMBS
+		  
+		  dim highChar as string = Chr( &h10149 )
+		  dim asEncoded as string = "[""\uD800\uDD49""]"
+		  
+		  j = new JSONMBS( asEncoded )
+		  Assert.AreEqual( EncodeHex( highChar, true ), EncodeHex( j.ChildNode.ValueString, true ) )
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
