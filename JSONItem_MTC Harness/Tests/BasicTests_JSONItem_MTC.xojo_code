@@ -252,6 +252,42 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub StrictTest()
+		  dim j as new JSONItem_MTC
+		  
+		  dim d as double = val( "inf" )
+		  j.Append d
+		  
+		  Assert.AreSame( "[inf]", j.ToString )
+		  
+		  j.Strict = true
+		  try
+		    dim s as string = j.ToString
+		    Assert.Fail( "ToString should have failed" )
+		  catch err as JSONException
+		  end
+		  
+		  j = new JSONItem_MTC( "[nan]" )
+		  Assert.AreEqual( val( "nan" ), j( 0 ).DoubleValue )
+		  
+		  try
+		    j = new JSONItem_MTC( "[TRUE]", true )
+		    Assert.Fail( "Load shoudl have failed with [TRUE]" )
+		  catch err as JSONException
+		  end
+		  
+		  try
+		    j = new JSONItem_MTC( "[+1]", true )
+		    Assert.Fail( "Load should have failed with [+1]" )
+		  catch err as JSONException
+		  end 
+		  
+		  j = new JSONItem_MTC( "[+1]" )
+		  Assert.AreEqual( 1, j( 0 ).IntegerValue )
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub UnicodeTest()
 		  dim j as new JSONItem_MTC
 		  
