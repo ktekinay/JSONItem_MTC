@@ -280,7 +280,7 @@ Inherits TestGroup
 		    j = new JSONItem_MTC( "[+1]", true )
 		    Assert.Fail( "Load should have failed with [+1]" )
 		  catch err as JSONException
-		  end 
+		  end
 		  
 		  j = new JSONItem_MTC( "[+1]" )
 		  Assert.AreEqual( 1, j( 0 ).IntegerValue )
@@ -318,6 +318,20 @@ Inherits TestGroup
 		  Assert.AreSame( "[""this char \u00AD""]", j.ToString )
 		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
 		  Assert.AreSame( "[""this char \u00AD""]", j.ToString )
+		  
+		  dim highChar as string = Chr( &h10149 )
+		  dim asEncoded as string = "[""\uD800\uDD49""]"
+		  
+		  j = new JSONItem_MTC
+		  j.Append highChar
+		  Assert.AreEqual( "[""" + highChar + """]", j.ToString )
+		  
+		  j.EncodeUnicode = JSONItem_MTC.EncodeType.All
+		  Assert.AreEqual( asEncoded, j.ToString )
+		  
+		  j = new JSONItem_MTC( asEncoded )
+		  Assert.AreSame( j( 0 ).StringValue, highChar )
+		  
 		End Sub
 	#tag EndMethod
 
