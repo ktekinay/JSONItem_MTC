@@ -383,7 +383,7 @@ Begin Window WndPlayground
       InitialParent   =   ""
       InitialValue    =   "None\nJavaScript Compatible\nAll"
       Italic          =   False
-      Left            =   631
+      Left            =   149
       ListIndex       =   0
       LockBottom      =   False
       LockedInPosition=   False
@@ -397,7 +397,7 @@ Begin Window WndPlayground
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   246
+      Top             =   247
       Underline       =   False
       Visible         =   True
       Width           =   133
@@ -413,7 +413,7 @@ Begin Window WndPlayground
       Index           =   2
       InitialParent   =   ""
       Italic          =   False
-      Left            =   502
+      Left            =   20
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -430,7 +430,7 @@ Begin Window WndPlayground
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   246
+      Top             =   247
       Transparent     =   False
       Underline       =   False
       Visible         =   True
@@ -466,6 +466,38 @@ Begin Window WndPlayground
       Underline       =   False
       Visible         =   True
       Width           =   108
+   End
+   Begin CheckBox cbStrict
+      AutoDeactivate  =   True
+      Bold            =   False
+      Caption         =   "Strict"
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   708
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Scope           =   0
+      State           =   0
+      TabIndex        =   13
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   247
+      Underline       =   False
+      Value           =   False
+      Visible         =   True
+      Width           =   73
    End
 End
 #tag EndWindow
@@ -660,7 +692,7 @@ End
 		  
 		  try
 		    
-		    dim j2 as new JSONItem_MTC( fldJSON.Text )
+		    dim j2 as new JSONItem_MTC( fldJSON.Text, cbStrict.Value )
 		    j2.Compact = cbCompact.Value
 		    j2.EncodeUnicode = JSONItem_MTC.EncodeType( mnuEncodeType.ListIndex )
 		    fldJSONMTCOut.Text = j2.ToString
