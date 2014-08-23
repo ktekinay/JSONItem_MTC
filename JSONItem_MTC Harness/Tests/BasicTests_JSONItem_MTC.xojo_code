@@ -330,7 +330,7 @@ Inherits TestGroup
 		  Assert.AreEqual( asEncoded, j.ToString )
 		  
 		  j = new JSONItem_MTC( asEncoded )
-		  Assert.AreSame( j( 0 ).StringValue, highChar )
+		  Assert.AreEqual( EncodeHex( highChar, true ), EncodeHex( j( 0 ).StringValue, true ) )
 		  
 		End Sub
 	#tag EndMethod
