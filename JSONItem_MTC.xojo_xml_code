@@ -302,7 +302,7 @@
    <SourceLine>for byteAdder as integer = 1 to 4</SourceLine>
    <SourceLine>dim thisByte as integer = inPtr.Byte( pos + byteAdder )</SourceLine>
    <SourceLine>select case thisByte</SourceLine>
-   <SourceLine>case 48 to 57</SourceLine>
+   <SourceLine>case 48 to 57 // 0 - 9</SourceLine>
    <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 48 )</SourceLine>
    <SourceLine>case 65 to 70 // A - F</SourceLine>
    <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 55 )</SourceLine>
