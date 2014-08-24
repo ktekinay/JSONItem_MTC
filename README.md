@@ -24,13 +24,15 @@ This class implements all the features and functions of its native twin and shou
 
 - This class will properly handle characters with code points > &hFFFF when both encoding and decoding. The native class does not.
 
+- This class will properly reject invalid hex in a "\uNNNN" structure. 
+
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
 - As of Xojo 2014r21, ToString and Load are significantly faster in this class than the native version.
 
 ##License
 
-This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2014 by Kem Tekinay, all rights reserved.
+This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright Â©2014 by Kem Tekinay, all rights reserved.
 
 This project is distributed AS-IS and no warranty of fitness for any particular purpose is expressed or implied. The author disavows any responsibility for bad design, poor execution, or any other faults.
 
