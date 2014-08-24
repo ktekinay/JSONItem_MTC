@@ -338,6 +338,36 @@ Inherits TestGroup
 		    Assert.Fail( "Loading '\ujohn' should have failed" )
 		  catch err as JSONException
 		  end
+		  
+		  j = new JSONItem_MTC
+		  try
+		    j.Load( "[""\uDC01\uDC02""]" )
+		    Assert.Fail( "Loading '\uDC01\uDC02' should have failed" )
+		  catch err as JSONException
+		  end
+		  
+		  j = new JSONItem_MTC
+		  try
+		    j.Load( "[""\uD801\uD802""]" )
+		    Assert.Fail( "Loading '\uD801\uD802' should have failed" )
+		  catch err as JSONException
+		  end
+		  
+		  j = new JSONItem_MTC
+		  try
+		    j.Load( "[""\uD801\u0020""]" )
+		    Assert.Fail( "Loading '\uD801\u0020' should have failed" )
+		  catch err as JSONException
+		  end
+		  
+		  j = new JSONItem_MTC
+		  try
+		    j.Load( "[""\uD801A""]" )
+		    Assert.Fail( "Loading '\uD801A' should have failed" )
+		  catch err as JSONException
+		  end
+		  
+		  
 		End Sub
 	#tag EndMethod
 
