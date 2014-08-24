@@ -726,44 +726,68 @@
    <SourceLine>outIndex = outIndex + 2</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif thisByte &lt; 32 then // control character</SourceLine>
-   <SourceLine>dim insertValue as string = "\u" + Right( "000" + hex( thisByte ), 4 )</SourceLine>
-   <SourceLine>outMB.StringValue( outIndex, 6 ) = insertValue</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 1 ) = 117 // u</SourceLine>
+   <SourceLine>dim insertValue as string = Right( "000" + hex( thisByte ), 4 )</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex + 2, 4 ) = insertValue</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif encodeUnicode &lt;&gt; EncodeType.None and thisByte &gt;= 127 then // high-ascii</SourceLine>
+   <SourceLine>elseif thisByte &gt; 127 and thisByte &lt; 192 then // Continuation byte that wasn't encoded, so just add it</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif encodeUnicode &lt;&gt; EncodeType.None and ( thisByte = 127 or thisByte &gt;= 192 ) then // Leading byte</SourceLine>
+   <SourceLine>dim codepoint as integer</SourceLine>
    <SourceLine>dim byteLength as integer</SourceLine>
    <SourceLine>if thisByte &gt;= 240 then</SourceLine>
    <SourceLine>byteLength = 4</SourceLine>
+   <SourceLine>codepoint = Bitwise.ShiftLeft( thisByte and &amp;b00000111, 18, 21 )</SourceLine>
+   <SourceLine>codepoint = codepoint + ( Bitwise.ShiftLeft( inPtr.Byte( inIndex + 1 ) and &amp;b00111111, 12, 21 ) )</SourceLine>
+   <SourceLine>codepoint = codepoint + ( Bitwise.ShiftLeft( inPtr.Byte( inIndex + 2 ) and &amp;b00111111 , 6, 21 ) )</SourceLine>
+   <SourceLine>codepoint = codepoint + ( inPtr.Byte( inIndex + 3 ) and &amp;b00111111 )</SourceLine>
    <SourceLine>elseif thisByte &gt;= 224 then</SourceLine>
    <SourceLine>byteLength = 3</SourceLine>
+   <SourceLine>codepoint = Bitwise.ShiftLeft( thisByte and &amp;b00001111, 12, 18 )</SourceLine>
+   <SourceLine>codepoint = codepoint + ( Bitwise.ShiftLeft( inPtr.Byte( inIndex + 1 ) and &amp;b00111111, 6, 18 ) )</SourceLine>
+   <SourceLine>codepoint = codepoint + ( inPtr.Byte( inIndex + 2 ) and &amp;b00111111 )</SourceLine>
    <SourceLine>elseif thisByte &gt;= 192 then</SourceLine>
    <SourceLine>byteLength = 2</SourceLine>
+   <SourceLine>codepoint = Bitwise.ShiftLeft( thisByte and &amp;b00011111, 6, 18 )</SourceLine>
+   <SourceLine>codepoint = codepoint + ( inPtr.Byte( inIndex + 1 ) and &amp;b00111111 )</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>byteLength = 1</SourceLine>
+   <SourceLine>codepoint = thisByte</SourceLine>
    <SourceLine>end if</SourceLine>
-   <SourceLine>dim thisChar as string = inMB.StringValue( inIndex, byteLength )</SourceLine>
-   <SourceLine>thisChar = thisChar.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// See if we have to use a surrogate pair</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>if thisChar.Asc &gt; &amp;hFFFF and encodeUnicode = EncodeType.All then</SourceLine>
-   <SourceLine>thisChar = thisChar.ConvertEncoding( Encodings.UTF16BE )</SourceLine>
-   <SourceLine>dim firstHalf as string = thisChar.LeftB( 2 )</SourceLine>
-   <SourceLine>dim secondHalf as string = thisChar.RightB( 2 )</SourceLine>
-   <SourceLine>outMB.StringValue( outIndex,  6 ) = "\u" + Right( "000" + EncodeHex( firstHalf ), 4 )</SourceLine>
-   <SourceLine>outMB.StringValue( outIndex + 6, 6 ) = "\u" + Right( "000" + EncodeHex( secondHalf ), 4 )</SourceLine>
+   <SourceLine>if codepoint &gt; &amp;hFFFF and encodeUnicode = EncodeType.All then</SourceLine>
+   <SourceLine>codepoint = codepoint - &amp;h10000</SourceLine>
+   <SourceLine>dim surrogateFirst as integer = &amp;hD800 + Bitwise.ShiftRight( codepoint, 10, 21 )</SourceLine>
+   <SourceLine>dim surrogateLast as integer = &amp;hDC00 + ( codepoint and &amp;b1111111111 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 1 ) = 117 // u</SourceLine>
+   <SourceLine>EncodeCodepoint( surrogateFirst, outPtr, outIndex + 2 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 6 ) = kBackSlash</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 7 ) = 117 // u</SourceLine>
+   <SourceLine>EncodeCodepoint( surrogateLast, outPtr, outIndex + 8 )</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>outIndex = outIndex + 12</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif thisChar.Asc &lt;= &amp;hFFFF and ( encodeUnicode = EncodeType.All or alwaysEncode.IndexOf( thisChar.Asc ) &lt;&gt; -1 ) then</SourceLine>
-   <SourceLine>outMB.StringValue( outIndex, 6 ) = "\u" + Right( "000" + hex( thisChar.Asc ), 4 )</SourceLine>
+   <SourceLine>elseif codepoint &lt;= &amp;hFFFF and ( encodeUnicode = EncodeType.All or alwaysEncode.IndexOf( codepoint ) &lt;&gt; -1 ) then</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = kBackSlash</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 1 ) = 117 // u</SourceLine>
+   <SourceLine>EncodeCodepoint( codepoint, outPtr, outIndex + 2 )</SourceLine>
    <SourceLine>outIndex = outIndex + 6</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>outMB.StringValue( outIndex, byteLength ) = thisChar</SourceLine>
-   <SourceLine>outIndex = outIndex + byteLength</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = thisByte</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
+   <SourceLine>byteLength = 1 // Doesn't matter what it really is, only need to advance one byte</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>inIndex = inIndex + byteLength - 1</SourceLine>
