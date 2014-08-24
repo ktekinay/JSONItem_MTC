@@ -2048,6 +2048,30 @@
   <ItemParams>mb As MemoryBlock, startPos As Integer, endPos As Integer, ByRef result As Variant</ItemParams>
   <ItemResult>Boolean</ItemResult>
  </Method>
+ <Method>
+  <ItemName>EncodeCodepoint</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub EncodeCodepoint(value As Integer, outPtr As Ptr, pos As Integer)</SourceLine>
+   <SourceLine>// WARNING: Assumption is that the destination has enough room</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>static hexByteArr() as integer = Array( 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70 ) // 0-9, A- F</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outPtr.Byte( pos + 3 ) = hexByteArr( value and &amp;h0F )</SourceLine>
+   <SourceLine>outPtr.Byte( pos + 2 ) = hexByteArr( Bitwise.ShiftRight( value, 4, 32 ) and &amp;h0F )</SourceLine>
+   <SourceLine>outPtr.Byte( pos + 1 ) = hexByteArr( Bitwise.ShiftRight( value, 8, 32 ) and &amp;h0F )</SourceLine>
+   <SourceLine>outPtr.Byte( pos ) = hexByteArr( Bitwise.ShiftRight( value, 12, 32 ) and &amp;h0F )</SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>value As Integer, outPtr As Ptr, pos As Integer</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
  <Note>
   <ItemName>Legal</ItemName>
   <Compatibility></Compatibility>
