@@ -67,6 +67,9 @@ Inherits TestGroup
 		      return
 		    end if
 		  next i
+		  
+		  Assert.Pass( "Pass" )
+		  
 		End Sub
 	#tag EndMethod
 
