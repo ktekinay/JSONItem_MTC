@@ -332,6 +332,12 @@ Inherits TestGroup
 		  j = new JSONItem_MTC( asEncoded )
 		  Assert.AreEqual( EncodeHex( highChar, true ), EncodeHex( j( 0 ).StringValue, true ) )
 		  
+		  j = new JSONItem_MTC
+		  try
+		    j.Load( "[""\ujohn""]" )
+		    Assert.Fail( "Loading '\ujohn' should have failed" )
+		  catch err as JSONException
+		  end
 		End Sub
 	#tag EndMethod
 

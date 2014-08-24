@@ -212,6 +212,12 @@
    <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>static rxValidateHex as RegEx</SourceLine>
+   <SourceLine>if rxValidateHex is nil then</SourceLine>
+   <SourceLine>rxValidateHex = new RegEx</SourceLine>
+   <SourceLine>rxValidateHex.SearchPattern = "\A[[:xdigit:]]+\z"</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -291,14 +297,27 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim asString as string = inMB.StringValue( pos + 1, 4 )</SourceLine>
-   <SourceLine>dim uValue as integer = val( "&amp;h" + asString )</SourceLine>
+   <SourceLine>dim codepoint as integer</SourceLine>
+   <SourceLine>for byteAdder as integer = 1 to 4</SourceLine>
+   <SourceLine>dim thisByte as integer = inPtr.Byte( pos + byteAdder )</SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
+   <SourceLine>case 48 to 57</SourceLine>
+   <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 48 )</SourceLine>
+   <SourceLine>case 65 to 70 // A - F</SourceLine>
+   <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 55 )</SourceLine>
+   <SourceLine>case 97 to 102 // a - f</SourceLine>
+   <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 87 )</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal value", 10, pos )</SourceLine>
+   <SourceLine>return ""</SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// See if this is part of a surrogate pair</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>if expectingSurrogate then</SourceLine>
-   <SourceLine>dim char as string = Encodings.UTF16BE.Chr( surrogatePairValue ) + Encodings.UTF16BE.Chr( uValue )</SourceLine>
+   <SourceLine>dim char as string = Encodings.UTF16BE.Chr( surrogatePairValue ) + Encodings.UTF16BE.Chr( codepoint )</SourceLine>
    <SourceLine>char = char.ConvertEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, char.LenB ) = char</SourceLine>
    <SourceLine>outIndex = outIndex + char.LenB</SourceLine>
@@ -306,15 +325,29 @@
    <SourceLine>expectingSurrogate = false</SourceLine>
    <SourceLine>surrogatePairValue = 0</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>elseif uValue &lt; &amp;hD800 or uValue &gt; &amp;hDFFF then</SourceLine>
+   <SourceLine>elseif codepoint &lt; 128 then</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = codepoint</SourceLine>
+   <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim char as string = Encodings.UTF8.Chr( uValue )</SourceLine>
-   <SourceLine>outMB.StringValue( outIndex, char.LenB ) = char</SourceLine>
-   <SourceLine>outIndex = outIndex + char.LenB</SourceLine>
+   <SourceLine>elseif codepoint &lt; &amp;hD800 or codepoint &gt; &amp;hDFFF then</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if codepoint &gt; &amp;b11111111111  then // Three bytes</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = &amp;b11100000 or Bitwise.ShiftRight( codepoint, 12, 16 )</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 1 ) = &amp;b10000000 or ( BitWise.ShiftRight( codepoint, 6, 16 ) and &amp;b0000000000111111 )</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 2 ) = &amp;b10000000 or ( codepoint and &amp;b0000000000111111 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outIndex = outIndex + 3</SourceLine>
+   <SourceLine>else // two bytes</SourceLine>
+   <SourceLine>outPtr.Byte( outIndex ) = &amp;b11000000 or Bitwise.ShiftRight( codepoint, 6, 16 ) </SourceLine>
+   <SourceLine>outPtr.Byte( outIndex + 1 ) = &amp;b10000000 or ( codepoint and &amp;b0000000000111111 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outIndex = outIndex + 2</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Surrogate pair</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>surrogatePairValue = uValue</SourceLine>
+   <SourceLine>surrogatePairValue = codepoint</SourceLine>
    <SourceLine>expectingSurrogate = true</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
@@ -2496,7 +2529,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.4</ItemDef>
+  <ItemDef>2.5</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
