@@ -2529,7 +2529,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.4</ItemDef>
+  <ItemDef>2.5</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
