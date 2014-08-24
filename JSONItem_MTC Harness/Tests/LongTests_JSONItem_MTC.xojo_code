@@ -17,6 +17,10 @@ Inherits TestGroup
 		    end if
 		    
 		    dim char as string = Encodings.UTF8.Chr( i )
+		    if char.Len <> 1 then
+		      continue for i
+		    end if
+		    
 		    dim encoded as string = "[""\u" + Right( "0000" + Hex( i ), 4 ) + """]"
 		    
 		    j = new JSONItem_MTC( encoded )
@@ -27,6 +31,10 @@ Inherits TestGroup
 		  
 		  for i as integer = &h10000 to &h10FFFF
 		    dim char as string = Encodings.UTF8.Chr( i )
+		    if char.Len <> 1 then
+		      continue for i
+		    end if
+		    
 		    dim char16 as string = char.ConvertEncoding( Encodings.UTF16BE )
 		    dim encoded as string = "[""\u" + Right( "0000" + EncodeHex( char16.LeftB( 2 ) ), 4 ) + "\u" + Right( "0000" + EncodeHex( char16.RightB( 2 ) ), 4 ) + """]"
 		    
