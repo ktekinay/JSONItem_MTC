@@ -253,6 +253,7 @@
    <SourceLine></SourceLine>
    <SourceLine>if expectingSurrogate and ( inPtr.Byte( pos ) &lt;&gt; kBackSlash or ( pos + 1 ) &gt; lastPos or inPtr.Byte( pos + 1 ) &lt;&gt; 117 ) then</SourceLine>
    <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
+   <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>select case inPtr.Byte( pos )</SourceLine>
