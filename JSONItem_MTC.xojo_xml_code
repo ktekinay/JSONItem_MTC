@@ -165,6 +165,8 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
+   <SourceLine>LoadCS = new CriticalSection</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>ObjectValues = new Dictionary</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>DecimalFormat = kDefaultDecimalFormat</SourceLine>
@@ -1006,17 +1008,30 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(JSONString As String)</SourceLine>
+   <SourceLine>const kNeverStarted = -1000</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim originalSetType as integer = kNeverStarted</SourceLine>
+   <SourceLine>dim originalValue as variant</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not LoadCS.TryEnter then</SourceLine>
+   <SourceLine>raise new JSONException( "This object is currently loading", 0 )</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>JSONString = JSONStringToUTF8( JSONString ).RTrim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if JSONString = "" then</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// Do nothing</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mIsLoading = true</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Save original values</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>dim originalSetType as integer = self.HasSetType</SourceLine>
-   <SourceLine>dim originalValue as variant</SourceLine>
+   <SourceLine>originalSetType = self.HasSetType</SourceLine>
    <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
    <SourceLine>dim values() as variant</SourceLine>
    <SourceLine>redim values( ArrayValues.Ubound )</SourceLine>
@@ -1042,24 +1057,30 @@
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim proceed as boolean = true</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kOpenSquareBracket then</SourceLine>
    <SourceLine>if IsObject then</SourceLine>
    <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>proceed = false</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>HasSetType = kHasSetArray</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif inPtr.Byte( pos ) = kOpenCurlyBrace then</SourceLine>
    <SourceLine>if IsArray then</SourceLine>
    <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine>HasSetType = kHasSetObject</SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>proceed = false</SourceLine>
    <SourceLine>else</SourceLine>
-   <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
+   <SourceLine>HasSetType = kHasSetObject</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kOpenCurlyBrace and inPtr.Byte( pos ) &lt;&gt; kOpenSquareBracket then</SourceLine>
+   <SourceLine>raise new JSONException( "Parse Error: Expecting '{' or '['", 1 )</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if proceed then</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
    <SourceLine></SourceLine>
@@ -1134,10 +1155,18 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>end if // proceed</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if // JSONString = ""</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mIsLoading = false</SourceLine>
+   <SourceLine>LoadCS.Leave</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>Exception err as RuntimeException</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Restore original values</SourceLine>
    <SourceLine>//</SourceLine>
+   <SourceLine>if originalSetType &lt;&gt; kNeverStarted then</SourceLine>
    <SourceLine>self.Clear</SourceLine>
    <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
    <SourceLine>ArrayValues = originalValue</SourceLine>
@@ -1146,6 +1175,11 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = originalSetType</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mIsLoading = False</SourceLine>
+   <SourceLine>LoadCS.Leave</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>raise err</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -2034,10 +2068,10 @@
    <SourceLine>dim thisByte as integer = p.Byte( pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim isNegative as boolean</SourceLine>
-   <SourceLine>if thisByte = 45 then</SourceLine>
+   <SourceLine>if thisByte = kHyphen then</SourceLine>
    <SourceLine>isNegative = true</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>elseif thisByte = 43 then</SourceLine>
+   <SourceLine>elseif thisByte = kPlus then</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -2046,7 +2080,7 @@
    <SourceLine>do</SourceLine>
    <SourceLine>thisByte = p.Byte( pos )</SourceLine>
    <SourceLine>select case thisByte</SourceLine>
-   <SourceLine>case 46</SourceLine>
+   <SourceLine>case kDot</SourceLine>
    <SourceLine>if dotFound or inExponent then</SourceLine>
    <SourceLine>r = false</SourceLine>
    <SourceLine>exit do</SourceLine>
@@ -2063,6 +2097,9 @@
    <SourceLine></SourceLine>
    <SourceLine>case 101, 69 // e, E</SourceLine>
    <SourceLine>if inExponent then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
+   <SourceLine>elseif Strict and dotFound and p.Byte( pos - 1 ) = kDot then</SourceLine>
    <SourceLine>r = false</SourceLine>
    <SourceLine>exit do</SourceLine>
    <SourceLine>else</SourceLine>
@@ -2089,6 +2126,10 @@
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine>loop until pos &gt; endPos</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if r and Strict and dotFound and ( p.Byte( endPos ) &lt; 48 or p.Byte( endPos ) &gt; 57 ) then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if r then</SourceLine>
    <SourceLine>if not dotFound and not inExponent then // Integer</SourceLine>
@@ -2140,6 +2181,24 @@
   <IsShared>0</IsShared>
   <ItemParams>value As Integer, outPtr As Ptr, pos As Integer</ItemParams>
   <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>IsLoading</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function IsLoading() As Boolean</SourceLine>
+   <SourceLine>return mIsLoading</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams></ItemParams>
+  <ItemResult>Boolean</ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
@@ -2441,6 +2500,34 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemDeclaration>Strict As Boolean</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>LoadCS</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadCS As CriticalSection</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadCS As CriticalSection</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>mIsLoading</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>mIsLoading As Boolean</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>mIsLoading As Boolean</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
  <ViewBehavior>
