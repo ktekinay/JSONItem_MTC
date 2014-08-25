@@ -271,6 +271,10 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>thisByte = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>if Strict and thisByte &lt; 32 then</SourceLine>
+   <SourceLine>continue do // Deal on the next pass</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>select case thisByte</SourceLine>
    <SourceLine>case 114 // r</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
@@ -392,6 +396,11 @@
    <SourceLine>exit </SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
+   <SourceLine>if self.Strict and thisByte &lt; 32 then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
+   <SourceLine>return ""</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>flushEnd = pos</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
