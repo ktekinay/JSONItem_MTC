@@ -212,12 +212,6 @@
    <SourceLine>#pragma StackOverflowChecking false</SourceLine>
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>static rxValidateHex as RegEx</SourceLine>
-   <SourceLine>if rxValidateHex is nil then</SourceLine>
-   <SourceLine>rxValidateHex = new RegEx</SourceLine>
-   <SourceLine>rxValidateHex.SearchPattern = "\A[[:xdigit:]]+\z"</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -238,6 +232,7 @@
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim flushStart as integer = pos</SourceLine>
    <SourceLine>dim flushEnd as integer = -1</SourceLine>
    <SourceLine>dim hasBackSlash as boolean</SourceLine>
@@ -258,7 +253,9 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
+   <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>case kBackSlash</SourceLine>
    <SourceLine>hasBackSlash = true</SourceLine>
    <SourceLine></SourceLine>
@@ -273,7 +270,12 @@
    <SourceLine>continue do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
+   <SourceLine>thisByte = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>if Strict and thisByte &lt; 32 then</SourceLine>
+   <SourceLine>continue do // Deal on the next pass</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
    <SourceLine>case 114 // r</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
@@ -302,14 +304,14 @@
    <SourceLine></SourceLine>
    <SourceLine>dim codepoint as integer</SourceLine>
    <SourceLine>for byteAdder as integer = 1 to 4</SourceLine>
-   <SourceLine>dim thisByte as integer = inPtr.Byte( pos + byteAdder )</SourceLine>
-   <SourceLine>select case thisByte</SourceLine>
+   <SourceLine>dim hexDigit as integer = inPtr.Byte( pos + byteAdder )</SourceLine>
+   <SourceLine>select case hexDigit</SourceLine>
    <SourceLine>case 48 to 57 // 0 - 9</SourceLine>
-   <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 48 )</SourceLine>
+   <SourceLine>codepoint = ( codepoint * 16 ) + ( hexDigit - 48 )</SourceLine>
    <SourceLine>case 65 to 70 // A - F</SourceLine>
-   <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 55 )</SourceLine>
+   <SourceLine>codepoint = ( codepoint * 16 ) + ( hexDigit - 55 )</SourceLine>
    <SourceLine>case 97 to 102 // a - f</SourceLine>
-   <SourceLine>codepoint = ( codepoint * 16 ) + ( thisByte - 87 )</SourceLine>
+   <SourceLine>codepoint = ( codepoint * 16 ) + ( hexDigit - 87 )</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>raise new JSONException( "Illegal value", 10, pos )</SourceLine>
    <SourceLine>return ""</SourceLine>
@@ -378,9 +380,11 @@
    <SourceLine>pos = pos + 5</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
-   <SourceLine>//</SourceLine>
-   <SourceLine>// RFC says any character may be escaped, so just accept this byte</SourceLine>
-   <SourceLine>//</SourceLine>
+   <SourceLine>if Strict then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
+   <SourceLine>return ""</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
@@ -394,6 +398,11 @@
    <SourceLine>exit </SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
+   <SourceLine>if self.Strict and thisByte &lt; 32 then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
+   <SourceLine>return ""</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>flushEnd = pos</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine></SourceLine>
@@ -1003,6 +1012,28 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Save original values</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim originalSetType as integer = self.HasSetType</SourceLine>
+   <SourceLine>dim originalValue as variant</SourceLine>
+   <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
+   <SourceLine>dim values() as variant</SourceLine>
+   <SourceLine>redim values( ArrayValues.Ubound )</SourceLine>
+   <SourceLine>for i as integer = 0  to ArrayValues.Ubound</SourceLine>
+   <SourceLine>values( i ) = ArrayValues( i )</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine>originalValue = values</SourceLine>
+   <SourceLine>elseif originalSetType = kHasSetObject then</SourceLine>
+   <SourceLine>dim d as new Dictionary</SourceLine>
+   <SourceLine>dim keys() as Variant = ObjectValues.Keys</SourceLine>
+   <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
+   <SourceLine>dim k as variant = keys( i )</SourceLine>
+   <SourceLine>d.Value( k ) = ObjectValues.Value( k )</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine>originalValue = d</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim inMB as MemoryBlock = JSONString</SourceLine>
    <SourceLine>dim pos as integer</SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
@@ -1102,6 +1133,20 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>Exception err as RuntimeException</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Restore original values</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>self.Clear</SourceLine>
+   <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
+   <SourceLine>ArrayValues = originalValue</SourceLine>
+   <SourceLine>elseif originalSetType = kHasSetObject then</SourceLine>
+   <SourceLine>ObjectValues = originalValue</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>HasSetType = originalSetType</SourceLine>
+   <SourceLine>raise err</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
