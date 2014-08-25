@@ -13,6 +13,7 @@ Inherits TestController
 		  group = new LongTests_JSONItem_MTC( self, "Long JSONItem_MTC Tests" )
 		  group = New JsonOrgExampleTests(Self, "Example Documents from json.org/example")
 		  group = new CompareTests( Self, "Compare JSONItem_MTC to JSONItem" )
+		  group = new XojoJSONItemTests( self, "Xojo's Unit Tests" )
 		End Sub
 	#tag EndEvent
 
