@@ -1012,6 +1012,28 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Save original values</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim originalSetType as integer = self.HasSetType</SourceLine>
+   <SourceLine>dim originalValue as variant</SourceLine>
+   <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
+   <SourceLine>dim values() as variant</SourceLine>
+   <SourceLine>redim values( ArrayValues.Ubound )</SourceLine>
+   <SourceLine>for i as integer = 0  to ArrayValues.Ubound</SourceLine>
+   <SourceLine>values( i ) = ArrayValues( i )</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine>originalValue = values</SourceLine>
+   <SourceLine>elseif originalSetType = kHasSetObject then</SourceLine>
+   <SourceLine>dim d as new Dictionary</SourceLine>
+   <SourceLine>dim keys() as Variant = ObjectValues.Keys</SourceLine>
+   <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
+   <SourceLine>dim k as variant = keys( i )</SourceLine>
+   <SourceLine>d.Value( k ) = ObjectValues.Value( k )</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine>originalValue = d</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim inMB as MemoryBlock = JSONString</SourceLine>
    <SourceLine>dim pos as integer</SourceLine>
    <SourceLine>dim inPtr as Ptr = inMB</SourceLine>
@@ -1111,6 +1133,20 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>loop</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>Exception err as RuntimeException</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Restore original values</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>self.Clear</SourceLine>
+   <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
+   <SourceLine>ArrayValues = originalValue</SourceLine>
+   <SourceLine>elseif originalSetType = kHasSetObject then</SourceLine>
+   <SourceLine>ObjectValues = originalValue</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>HasSetType = originalSetType</SourceLine>
+   <SourceLine>raise err</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
