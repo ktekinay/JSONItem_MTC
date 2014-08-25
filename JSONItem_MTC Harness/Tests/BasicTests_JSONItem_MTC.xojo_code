@@ -130,6 +130,71 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub IllegalStringTest()
+		  Assert.Pass( "Running tests" )
+		  
+		  dim j as JSONItem_MTC
+		  
+		  dim badStrings() as string = Array( Chr( 13 ), Chr( 9 ), Chr( 8 ), Chr( 5 ), Chr( 29 ) )
+		  
+		  for each s as string in badStrings
+		    dim load as string = "[""this" + s + "that""]"
+		    
+		    #pragma BreakOnExceptions false
+		    
+		    try
+		      j = new JSONItem_MTC( load )
+		    catch err as JSONException
+		      Assert.Fail( EncodeHex( s ) + " should not have failed" )
+		      return
+		    end try
+		    
+		    try
+		      j = new JSONItem_MTC( load, true )
+		      Assert.Fail( EncodeHex( s ) + " should have failed with Strict" )
+		      return
+		    catch err as JSONException
+		    end try
+		    
+		    load = "[""this\" + s + "that""]"
+		    
+		    try
+		      j = new JSONItem_MTC( load, true )
+		      Assert.Fail( "\" + EncodeHex( s ) + " should have failed with Strict" )
+		      return
+		    catch err as JSONException
+		    end try
+		    
+		    #pragma BreakOnExceptions true
+		    
+		  next
+		  
+		  dim load as string = "[""\w""]"
+		  j = new JSONItem_MTC( load )
+		  Assert.AreEqual( "w", j( 0 ) )
+		  
+		  #pragma BreakOnExceptions false
+		  try
+		    j = new JSONItem_MTC( load, true )
+		    Assert.Fail( load + " should have failed with strict" )
+		  catch err as JSONException
+		  end try
+		  #pragma BreakOnExceptions true
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub LoadAdditionalTest()
+		  dim j as new JSONItem_MTC
+		  j.Value( "one" ) = 1.0
+		  
+		  j.Load( "{""one"" : ""that"", ""two"": ""this""}" )
+		  Assert.AreEqual( "that", j.Value( "one" ).StringValue )
+		  Assert.AreEqual( "this", j.Value( "two" ).StringValue )
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub LoadEncodingTest()
 		  const kOriginal = "[""abc""]"
 		  
@@ -194,6 +259,60 @@ Inherits TestGroup
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
 		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub LoadInterruptionTest()
+		  dim j as JSONItem_MTC
+		  dim load as string = "{""first"" : 1.0, ""second"" : interrupt}"
+		  
+		  #pragma BreakOnExceptions false
+		  
+		  try
+		    j = new JSONItem_MTC( load )
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end 
+		  
+		  Assert.IsTrue( j is nil, "An interrupted load in the Constructor should lead to a nil object" )
+		  
+		  j = new JSONItem_MTC
+		  try
+		    j.Load load
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end
+		  
+		  Assert.IsTrue( j.Count = 0, "Interrupted load should not have a value" )
+		  
+		  j = new JSONItem_MTC
+		  j.Value( "zero" ) = true
+		  
+		  try
+		    j.Load load
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end
+		  
+		  Assert.IsTrue( j.Count = 1 and j.Value( "zero" ) = true, "Interrupted load should not have replaced value" )
+		  
+		  j = new JSONItem_MTC
+		  j.Append "zero"
+		  load = "[""one"", interrupt]"
+		  
+		  try
+		    j.Load load
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end
+		  
+		  Assert.IsTrue( j.Count = 1 and j( 0 ) = "zero", "Interrupted load should not have replaced value" )
 		  
 		End Sub
 	#tag EndMethod
