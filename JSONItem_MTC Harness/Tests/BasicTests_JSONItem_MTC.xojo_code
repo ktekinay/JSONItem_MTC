@@ -45,6 +45,26 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub BadlyFormedJSONLoadTest()
+		  dim j as JSONItem_MTC
+		  dim loads() as string = Array( """""", "12", "[1", "2]", "[bad]" )
+		  
+		  Assert.Pass "Running tests"
+		  
+		  for each load as string in loads
+		    #pragma BreakOnExceptions false
+		    try
+		      j = new JSONItem_MTC( load )
+		      Assert.Fail "Loading '" + load + " should have failed"
+		      return
+		    catch err as JSONException
+		    end
+		    #pragma BreakOnExceptions true
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub CaseSensitiveKeyTest()
 		  dim j as new JSONItem_MTC
 		  j.Value( "a" ) = 1
@@ -275,7 +295,7 @@ Inherits TestGroup
 		    Assert.Fail( "That load should have failed" )
 		    return
 		  catch err as JSONException
-		  end 
+		  end
 		  
 		  Assert.IsTrue( j is nil, "An interrupted load in the Constructor should lead to a nil object" )
 		  
