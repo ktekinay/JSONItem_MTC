@@ -253,7 +253,9 @@
    <SourceLine>return ""</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
+   <SourceLine>dim thisByte as integer = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>case kBackSlash</SourceLine>
    <SourceLine>hasBackSlash = true</SourceLine>
    <SourceLine></SourceLine>
@@ -268,7 +270,8 @@
    <SourceLine>continue do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>select case inPtr.Byte( pos )</SourceLine>
+   <SourceLine>thisByte = inPtr.Byte( pos )</SourceLine>
+   <SourceLine>select case thisByte</SourceLine>
    <SourceLine>case 114 // r</SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = 13</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
