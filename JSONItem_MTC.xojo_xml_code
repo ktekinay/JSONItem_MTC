@@ -1056,9 +1056,10 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>else</SourceLine>
-   <SourceLine>// Do nothing</SourceLine>
+   <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kOpenCurlyBrace and inPtr.Byte( pos ) &lt;&gt; kOpenSquareBracket then</SourceLine>
+   <SourceLine>raise new JSONException( "Parse Error: Expecting '{' or '['", 1 )</SourceLine>
    <SourceLine>return</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
