@@ -1008,6 +1008,11 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(JSONString As String)</SourceLine>
+   <SourceLine>const kNeverStarted = -1000</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim originalSetType as integer = kNeverStarted</SourceLine>
+   <SourceLine>dim originalValue as variant</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>if not LoadCS.TryEnter then</SourceLine>
    <SourceLine>raise new JSONException( "This object is currently loading", 0 )</SourceLine>
    <SourceLine>return</SourceLine>
@@ -1016,14 +1021,17 @@
    <SourceLine>JSONString = JSONStringToUTF8( JSONString ).RTrim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if JSONString = "" then</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>// Do nothing</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mIsLoading = true</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Save original values</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>dim originalSetType as integer = self.HasSetType</SourceLine>
-   <SourceLine>dim originalValue as variant</SourceLine>
+   <SourceLine>originalSetType = self.HasSetType</SourceLine>
    <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
    <SourceLine>dim values() as variant</SourceLine>
    <SourceLine>redim values( ArrayValues.Ubound )</SourceLine>
@@ -1049,25 +1057,30 @@
    <SourceLine>self.AdvancePastWhiteSpace( inMB, pos )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim proceed as boolean = true</SourceLine>
    <SourceLine>if inPtr.Byte( pos ) = kOpenSquareBracket then</SourceLine>
    <SourceLine>if IsObject then</SourceLine>
    <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>proceed = false</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>HasSetType = kHasSetArray</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif inPtr.Byte( pos ) = kOpenCurlyBrace then</SourceLine>
    <SourceLine>if IsArray then</SourceLine>
    <SourceLine>// Do nothing</SourceLine>
-   <SourceLine>return</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>proceed = false</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>HasSetType = kHasSetObject</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif inPtr.Byte( pos ) &lt;&gt; kOpenCurlyBrace and inPtr.Byte( pos ) &lt;&gt; kOpenSquareBracket then</SourceLine>
    <SourceLine>raise new JSONException( "Parse Error: Expecting '{' or '['", 1 )</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if proceed then</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim outMB as new MemoryBlock( 1024 )</SourceLine>
    <SourceLine></SourceLine>
@@ -1142,12 +1155,18 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>end if // proceed</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if // JSONString = ""</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mIsLoading = false</SourceLine>
    <SourceLine>LoadCS.Leave</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>Exception err as RuntimeException</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Restore original values</SourceLine>
    <SourceLine>//</SourceLine>
+   <SourceLine>if originalSetType &lt;&gt; kNeverStarted then</SourceLine>
    <SourceLine>self.Clear</SourceLine>
    <SourceLine>if originalSetType = kHasSetArray then</SourceLine>
    <SourceLine>ArrayValues = originalValue</SourceLine>
@@ -1156,6 +1175,9 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = originalSetType</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mIsLoading = False</SourceLine>
    <SourceLine>LoadCS.Leave</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>raise err</SourceLine>
