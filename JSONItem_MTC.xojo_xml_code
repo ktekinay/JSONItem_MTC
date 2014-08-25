@@ -2035,10 +2035,10 @@
    <SourceLine>dim thisByte as integer = p.Byte( pos )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim isNegative as boolean</SourceLine>
-   <SourceLine>if thisByte = 45 then</SourceLine>
+   <SourceLine>if thisByte = kHyphen then</SourceLine>
    <SourceLine>isNegative = true</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>elseif thisByte = 43 then</SourceLine>
+   <SourceLine>elseif thisByte = kPlus then</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -2047,7 +2047,7 @@
    <SourceLine>do</SourceLine>
    <SourceLine>thisByte = p.Byte( pos )</SourceLine>
    <SourceLine>select case thisByte</SourceLine>
-   <SourceLine>case 46</SourceLine>
+   <SourceLine>case kDot</SourceLine>
    <SourceLine>if dotFound or inExponent then</SourceLine>
    <SourceLine>r = false</SourceLine>
    <SourceLine>exit do</SourceLine>
