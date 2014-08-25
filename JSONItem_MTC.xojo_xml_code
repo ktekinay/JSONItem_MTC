@@ -380,9 +380,11 @@
    <SourceLine>pos = pos + 5</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else // Some random escaped character</SourceLine>
-   <SourceLine>//</SourceLine>
-   <SourceLine>// RFC says any character may be escaped, so just accept this byte</SourceLine>
-   <SourceLine>//</SourceLine>
+   <SourceLine>if Strict then</SourceLine>
+   <SourceLine>raise new JSONException( "Illegal Character", 9, pos + 1 )</SourceLine>
+   <SourceLine>return ""</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = inPtr.Byte( pos )</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
