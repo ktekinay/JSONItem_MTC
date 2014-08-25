@@ -232,6 +232,7 @@
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim flushStart as integer = pos</SourceLine>
    <SourceLine>dim flushEnd as integer = -1</SourceLine>
    <SourceLine>dim hasBackSlash as boolean</SourceLine>
