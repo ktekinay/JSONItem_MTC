@@ -2,6 +2,39 @@
 Protected Class BasicTests_JSONItem
 Inherits TestGroup
 	#tag Method, Flags = &h21
+		Private Sub IllegalStringTest()
+		  dim j as JSONItem
+		  
+		  dim badStrings() as string = Array( Chr( 13 ), Chr( 9 ), Chr( 8 ), Chr( 5 ), Chr( 29 ) )
+		  
+		  for each s as string in badStrings
+		    dim load as string = "[""this" + s + "that""]"
+		    #pragma BreakOnExceptions false
+		    try
+		      j = new JSONItem( load )
+		    catch err as JSONException
+		      Assert.Fail( EncodeHex( s ) + " should not have failed" )
+		      return
+		    end try
+		    #pragma BreakOnExceptions true
+		  next
+		  
+		  Assert.Pass "All tests passed"
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub LoadAdditionalTest()
+		  dim j as new JSONItem
+		  j.Value( "one" ) = 1.0
+		  
+		  j.Load( "{""one"" : ""that"", ""two"": ""this""}" )
+		  Assert.AreEqual( "that", j.Value( "one" ).StringValue )
+		  Assert.AreEqual( "this", j.Value( "two" ).StringValue )
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub LoadEncodingTest()
 		  #pragma BreakOnExceptions false
 		  
@@ -53,6 +86,47 @@ Inherits TestGroup
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem( testString )
 		  Assert.AreSame( "abc", j( 0 ) )
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub LoadInterruptionTest()
+		  dim j as JSONItem
+		  dim load as string = "{""first"" : 1.0, ""second"" : interrupt}"
+		  
+		  #pragma BreakOnExceptions false
+		  
+		  try
+		    j = new JSONItem( load )
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end 
+		  
+		  Assert.IsTrue( j is nil, "An interrupted load in the Constructor should lead to a nil object" )
+		  
+		  j = new JSONItem
+		  try
+		    j.Load load
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end
+		  
+		  Assert.IsTrue( j.Count = 0, "Interrupted load should not have a value" )
+		  
+		  j = new JSONItem
+		  j.Value( "zero" ) = true
+		  
+		  try
+		    j.Load load
+		    Assert.Fail( "That load should have failed" )
+		    return
+		  catch err as JSONException
+		  end
+		  
+		  Assert.IsTrue( j.Count = 1 and j.Value( "zero" ) = true, "Interrupted load should not have replaced value" )
 		  
 		End Sub
 	#tag EndMethod
