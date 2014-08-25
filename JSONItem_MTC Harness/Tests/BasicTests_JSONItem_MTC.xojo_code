@@ -33,13 +33,14 @@ Inherits TestGroup
 		  Assert.AreSame( "a", j( 0 ) )
 		  Assert.IsTrue( j( 1 ) = false )
 		  
+		  #pragma BreakOnExceptions false
 		  try
 		    j.Insert( 5, "c" )
 		    Assert.Fail( "Insert with an out of bounds index" )
 		  catch err as OutOfBoundsException
 		    // Worked
 		  end
-		  
+		  #pragma BreakOnExceptions true
 		End Sub
 	#tag EndMethod
 
@@ -199,6 +200,8 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h21
 		Private Sub ObjectsTest()
+		  #pragma BreakOnExceptions false
+		  
 		  dim j as new JSONItem_MTC
 		  
 		  try
@@ -253,6 +256,8 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h21
 		Private Sub StrictTest()
+		  #pragma BreakOnExceptions false
+		  
 		  dim j as new JSONItem_MTC
 		  
 		  dim d as double = val( "inf" )
@@ -332,6 +337,8 @@ Inherits TestGroup
 		  j = new JSONItem_MTC( asEncoded )
 		  Assert.AreEqual( EncodeHex( highChar, true ), EncodeHex( j( 0 ).StringValue, true ) )
 		  
+		  #pragma BreakOnExceptions false
+		  
 		  j = new JSONItem_MTC
 		  try
 		    j.Load( "[""\ujohn""]" )
@@ -367,7 +374,7 @@ Inherits TestGroup
 		  catch err as JSONException
 		  end
 		  
-		  
+		  #pragma BreakOnExceptions true
 		End Sub
 	#tag EndMethod
 
