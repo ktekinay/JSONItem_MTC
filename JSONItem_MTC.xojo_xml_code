@@ -2066,6 +2066,9 @@
    <SourceLine>if inExponent then</SourceLine>
    <SourceLine>r = false</SourceLine>
    <SourceLine>exit do</SourceLine>
+   <SourceLine>elseif Strict and dotFound and p.Byte( pos - 1 ) = kDot then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>exit do</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>inExponent = true</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
@@ -2090,6 +2093,10 @@
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine>loop until pos &gt; endPos</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if r and Strict and dotFound and ( p.Byte( endPos ) &lt; 48 or p.Byte( endPos ) &gt; 57 ) then</SourceLine>
+   <SourceLine>r = false</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if r then</SourceLine>
    <SourceLine>if not dotFound and not inExponent then // Integer</SourceLine>
