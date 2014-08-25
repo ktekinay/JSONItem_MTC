@@ -3,6 +3,8 @@ Protected Class BasicTests_JSONItem
 Inherits TestGroup
 	#tag Method, Flags = &h21
 		Private Sub LoadEncodingTest()
+		  #pragma BreakOnExceptions false
+		  
 		  const kOriginal = "[""abc""]"
 		  
 		  dim testString as string
