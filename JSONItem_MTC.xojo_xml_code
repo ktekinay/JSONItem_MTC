@@ -165,6 +165,8 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
+   <SourceLine>LoadCS = new CriticalSection</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>ObjectValues = new Dictionary</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>DecimalFormat = kDefaultDecimalFormat</SourceLine>
@@ -1006,6 +1008,11 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(JSONString As String)</SourceLine>
+   <SourceLine>if not LoadCS.TryEnter then</SourceLine>
+   <SourceLine>raise new JSONException( "This object is currently loading", 0 )</SourceLine>
+   <SourceLine>return</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>JSONString = JSONStringToUTF8( JSONString ).RTrim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if JSONString = "" then</SourceLine>
@@ -1135,6 +1142,8 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>LoadCS.Leave</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>Exception err as RuntimeException</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Restore original values</SourceLine>
@@ -1147,6 +1156,8 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>HasSetType = originalSetType</SourceLine>
+   <SourceLine>LoadCS.Leave</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>raise err</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -2449,6 +2460,20 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemDeclaration>Strict As Boolean</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>LoadCS</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadCS As CriticalSection</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadCS As CriticalSection</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
  <ViewBehavior>
