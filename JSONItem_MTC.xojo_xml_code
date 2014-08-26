@@ -845,11 +845,11 @@
    <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
-   <SourceLine>JSONItem_MTC( value ).ToString( outMB, outIndex, settings, level, inMB )</SourceLine>
+   <SourceLine>JSONItem_MTC( value ).Serialize( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value IsA Dictionary then</SourceLine>
    <SourceLine>dim child as JSONItem_MTC = Dictionary( value )</SourceLine>
-   <SourceLine>child.ToString( outMB, outIndex, settings, level, inMB )</SourceLine>
+   <SourceLine>child.Serialize( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
@@ -1356,18 +1356,18 @@
   <ItemResult></ItemResult>
  </Method>
  <Method>
-  <ItemName>ToString</ItemName>
+  <ItemName>Serialize</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function ToString() As String</SourceLine>
+   <SourceLine>Function Serialize(data As JSONItem_MTC) As String</SourceLine>
    <SourceLine>dim outMB as new MemoryBlock( 2048 )</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim inMB as new MemoryBlock( 2048 )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>ToString( outMB, outIndex, self, 0, inMB)</SourceLine>
+   <SourceLine>data.Serialize( outMB, outIndex, self, 0, inMB)</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
@@ -1379,16 +1379,16 @@
   <AliasName></AliasName>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams></ItemParams>
+  <ItemParams>data As JSONItem_MTC</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
-  <ItemName>ToString</ItemName>
+  <ItemName>Serialize</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub ToString(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
+   <SourceLine>Sub Serialize(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>#if not DebugBuild</SourceLine>
    <SourceLine>#pragma BackgroundTasks false</SourceLine>
    <SourceLine>#pragma BoundsChecking false</SourceLine>
@@ -2530,6 +2530,32 @@
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
+ <Property>
+  <ItemName>ToString</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>ToString As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>ToString As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return self.Serialize( self )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
  <ViewBehavior>
   <ViewProperty>
    <ObjName>Compact</ObjName>
@@ -2603,6 +2629,11 @@
    <ObjName>Strict</ObjName>
    <PropertyGroup>Behavior</PropertyGroup>
    <ItemType>Boolean</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>ToString</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
@@ -2732,7 +2763,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.7</ItemDef>
+  <ItemDef>2.8</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
