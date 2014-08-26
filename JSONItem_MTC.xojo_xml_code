@@ -2536,7 +2536,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property ToString As String</SourceLine>
+   <SourceLine>ToString As String</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2629,6 +2629,11 @@
    <ObjName>Strict</ObjName>
    <PropertyGroup>Behavior</PropertyGroup>
    <ItemType>Boolean</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>ToString</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
@@ -2758,7 +2763,7 @@
   <TextEncoding>134217984</TextEncoding>
   <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.7</ItemDef>
+  <ItemDef>2.8</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
