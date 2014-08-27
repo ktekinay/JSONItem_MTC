@@ -16,10 +16,9 @@ Protected Class TestGroup
 
 	#tag Method, Flags = &h0
 		Sub Constructor(controller As TestController, groupName As String)
-		  mController = controller
 		  Name = groupName
 		  
-		  mController.AddGroup(Self)
+		  controller.AddGroup(Self)
 		  
 		  mAssert = New Assert
 		  mAssert.Group = Self
@@ -188,10 +187,6 @@ Protected Class TestGroup
 
 	#tag Property, Flags = &h21
 		Private mAssert As Assert
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mController As TestController
 	#tag EndProperty
 
 	#tag Property, Flags = &h21

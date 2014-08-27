@@ -208,6 +208,7 @@ Protected Class Assert
 
 	#tag Method, Flags = &h0
 		Sub Fail(failMessage As String, message As String = "")
+		  Failed = True
 		  Group.CurrentTestResult.Result = TestResult.Failed
 		  
 		  If Group.CurrentTestResult.Message = "" Then
@@ -282,6 +283,7 @@ Protected Class Assert
 
 	#tag Method, Flags = &h0
 		Sub Pass(message As String = "")
+		  Failed = False
 		  If Group.CurrentTestResult.Result <> TestResult.Failed Then
 		    Group.CurrentTestResult.Result = TestResult.Passed
 		    Group.CurrentTestResult.Message = message
@@ -293,11 +295,38 @@ Protected Class Assert
 
 
 	#tag Property, Flags = &h0
+		Failed As Boolean
+	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  If mGroupWeakRef Is Nil Then
+			    Return Nil
+			  Else
+			    Return TestGroup(mGroupWeakRef.Value)
+			  End If
+			End Get
+		#tag EndGetter
+		#tag Setter
+			Set
+			  mGroupWeakRef = New WeakRef(value)
+			End Set
+		#tag EndSetter
 		Group As TestGroup
+	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21
+		Private mGroupWeakRef As WeakRef
 	#tag EndProperty
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Failed"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
 			Visible=true
