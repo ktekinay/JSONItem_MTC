@@ -33,6 +33,7 @@ Class=TestGroup;XojoUnit/TestFramework/TestGroup.xojo_code;&h6F90619D;&h3E1A9B41
 Class=TestController;XojoUnit/TestFramework/TestController.xojo_code;&h6FF90549;&h3E1A9B41;false
 Class=Assert;XojoUnit/TestFramework/Assert.xojo_code;&h6F374736;&h3E1A9B41;false
 Class=TestResult;XojoUnit/TestFramework/TestResult.xojo_code;&h1624A4EB;&h3E1A9B41;false
+Module=M_Global;M_Global.xojo_code;&h3616CFFF;&h0;false
 DefaultWindow=WndMenu
 AppMenuBar=MenuBar1
 MajorVersion=1
