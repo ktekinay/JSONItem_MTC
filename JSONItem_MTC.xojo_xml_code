@@ -1344,7 +1344,7 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>ObjectValues.Remove( name )</SourceLine>
+   <SourceLine>ObjectValues.Remove( NameToKey( name ) )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
