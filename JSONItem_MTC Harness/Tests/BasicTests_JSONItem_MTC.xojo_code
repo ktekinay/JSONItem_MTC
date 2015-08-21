@@ -407,6 +407,7 @@ Inherits TestGroup
 		  j.Strict = true
 		  try
 		    dim s as string = j.ToString
+		    #pragma unused s
 		    Assert.Fail( "ToString should have failed" )
 		  catch err as JSONException
 		  end

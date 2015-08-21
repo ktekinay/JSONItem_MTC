@@ -813,6 +813,7 @@ End
 		  sw.Reset
 		  sw.Start
 		  dim j2 as new JSONItem( s )
+		  #pragma unused j2
 		  sw.Stop
 		  
 		  AddToResult( "Load Native: " + format( sw.ElapsedMicroseconds, "#," ) )
@@ -820,6 +821,7 @@ End
 		  sw.Reset
 		  sw.Start
 		  dim d as Xojo.Core.Dictionary = Xojo.Data.ParseJSON( s.ToText )
+		  #pragma unused d
 		  sw.Stop
 		  
 		  AddToResult( "Load New: " + format( sw.ElapsedMicroseconds, "#," ) )

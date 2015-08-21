@@ -22,7 +22,6 @@ Inherits TestGroup
 		Private Sub BadlyFormedJSONLoadTest()
 		  Using Xojo.Core
 		  
-		  dim j as Dictionary
 		  dim loads() as string = Array( """""", "12", "[1", "2]", "[bad]" )
 		  
 		  Assert.Pass "Running tests"
@@ -31,6 +30,7 @@ Inherits TestGroup
 		    #pragma BreakOnExceptions false
 		    try
 		      dim t as Text = Xojo.Data.GenerateJSON( Xojo.Data.ParseJSON( load.ToText ) )
+		      #pragma unused t
 		      Assert.Fail "Loading '" + load.ToText + " should have failed"
 		      return
 		    catch err as Xojo.Data.InvalidJSONException
@@ -67,7 +67,6 @@ Inherits TestGroup
 		  
 		  Dim jO As Dictionary = Xojo.Data.ParseJSON( raw )
 		  
-		  dim iter as Iterator = jI.GetIterator
 		  for each entry as DictionaryEntry in jI
 		    dim k as Auto = entry.Key
 		    Assert.IsTrue( entry.Value = jO.Value(k), k)
