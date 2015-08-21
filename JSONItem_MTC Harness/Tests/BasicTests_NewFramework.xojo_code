@@ -31,7 +31,7 @@ Inherits TestGroup
 		    #pragma BreakOnExceptions false
 		    try
 		      dim t as Text = Xojo.Data.GenerateJSON( Xojo.Data.ParseJSON( load.ToText ) )
-		      Assert.Fail "Loading '" + load + " should have failed"
+		      Assert.Fail "Loading '" + load.ToText + " should have failed"
 		      return
 		    catch err as Xojo.Data.InvalidJSONException
 		    end
@@ -85,7 +85,7 @@ Inherits TestGroup
 		  Dim raw As Text = Xojo.Data.GenerateJSON( jI )
 		  Dim jO As Dictionary = Xojo.Data.ParseJSON( raw )
 		  
-		  Assert.AreEqual("", jO.Value("name"))
+		  Assert.AreEqual( "", CType( jO.Value("name"), Text ) )
 		End Sub
 	#tag EndMethod
 
@@ -98,7 +98,9 @@ Inherits TestGroup
 		  
 		  for i as integer = 0 to jsonString.Ubound
 		    j = Xojo.Data.ParseJSON( "[""" + jsonString( i ) + """]" )
-		    Assert.AreEqual( expectedString( i ), j( 0 ) )
+		    dim extracted as text = j( 0 )
+		    dim extractedString as string = extracted
+		    Assert.AreEqual( expectedString( i ), extractedString )
 		  next i
 		  
 		End Sub
@@ -121,7 +123,7 @@ Inherits TestGroup
 		    
 		    try
 		      j = Xojo.Data.ParseJSON( load )
-		      Assert.Fail( EncodeHex( s ) + " should have failed" )
+		      Assert.Fail( EncodeHex( s ).ToText + " should have failed" )
 		      return
 		    catch err as Xojo.Data.InvalidJSONException
 		    end try

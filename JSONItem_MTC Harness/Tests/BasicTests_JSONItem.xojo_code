@@ -13,7 +13,7 @@ Inherits TestGroup
 		    try
 		      j = new JSONItem( load )
 		    catch err as JSONException
-		      Assert.Fail( EncodeHex( s ) + " should not have failed" )
+		      Assert.Fail( EncodeHex( s ).ToText + " should not have failed" )
 		      return
 		    end try
 		    #pragma BreakOnExceptions true
@@ -45,47 +45,47 @@ Inherits TestGroup
 		  
 		  testString = kOriginal
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.DefineEncoding( nil )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		End Sub
 	#tag EndMethod

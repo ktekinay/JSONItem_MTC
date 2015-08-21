@@ -147,7 +147,7 @@ End
 #tag Events btnUnitTests
 	#tag Event
 		Sub Action()
-		  TestWindow.Show
+		  XojoUnitTestWindow.Show
 		End Sub
 	#tag EndEvent
 #tag EndEvents

@@ -30,7 +30,7 @@ Inherits TestGroup
 		  
 		  j.Insert( 0, "a" )
 		  
-		  Assert.AreSame( "a", j( 0 ) )
+		  Assert.AreSame( "a", j( 0 ).StringValue )
 		  Assert.IsTrue( j( 1 ) = false )
 		  
 		  #pragma BreakOnExceptions false
@@ -55,7 +55,7 @@ Inherits TestGroup
 		    #pragma BreakOnExceptions false
 		    try
 		      j = new JSONItem_MTC( load )
-		      Assert.Fail "Loading '" + load + " should have failed"
+		      Assert.Fail "Loading '" + load.ToText + " should have failed"
 		      return
 		    catch err as JSONException
 		    end
@@ -88,16 +88,16 @@ Inherits TestGroup
 		  Assert.IsTrue( j.HasName( "a" ), "HasName 'a'" )
 		  Assert.IsTrue( j.HasName( "A" ), "HasName 'A'" )
 		  
-		  Assert.AreSame( "a", j.Value( "a" ) )
-		  Assert.AreSame( "A", j.Value( "A" ) )
+		  Assert.AreSame( "a", j.Value( "a" ).StringValue )
+		  Assert.AreSame( "A", j.Value( "A" ).StringValue )
 		  
 		  dim names() as string = j.Names
 		  Assert.AreEqual( 1, names.Ubound )
 		  Assert.AreSame( "a", names( 0 ), "First name is 'a'" )
 		  Assert.AreSame( "A", names( 1 ), "Second name is 'A'" )
 		  
-		  Assert.AreSame( "A", j.Lookup( "A", "" ), "Lookup 'A'" )
-		  Assert.AreSame( "", j.Lookup( "b", "" ), "Lookup 'b'" )
+		  Assert.AreSame( "A", j.Lookup( "A", "" ).StringValue, "Lookup 'A'" )
+		  Assert.AreSame( "", j.Lookup( "b", "" ).StringValue, "Lookup 'b'" )
 		  
 		  Assert.AreSame( "a", j.Name( 0 ) )
 		  Assert.AreSame( "A", j.Name( 1 ) )
@@ -111,14 +111,14 @@ Inherits TestGroup
 	#tag Method, Flags = &h21
 		Private Sub EmbeddedQuoteTest()
 		  Dim jI As New JSONItem_MTC
-		  jI.Value("name") = "John ""Doey"" Doe"
+		  jI.Value( "name" ) = "John ""Doey"" Doe"
 		  
 		  Dim raw As String = jI.ToString
 		  
 		  Dim jO As New JSONItem_MTC(raw)
 		  
 		  For Each k As String In jI.Names
-		    Assert.IsTrue(jI.Value(k) = jO.Value(k), k)
+		    Assert.IsTrue( jI.Value(k) = jO.Value( k ), k.ToText )
 		  Next
 		End Sub
 	#tag EndMethod
@@ -131,7 +131,7 @@ Inherits TestGroup
 		  Dim raw As String = jI.ToString
 		  Dim jO As New JSONItem_MTC(raw)
 		  
-		  Assert.AreEqual("", jO.Value("name"))
+		  Assert.AreEqual("", jO.Value("name").StringValue )
 		End Sub
 	#tag EndMethod
 
@@ -143,7 +143,7 @@ Inherits TestGroup
 		  
 		  for i as integer = 0 to jsonString.Ubound
 		    j = new JSONItem_MTC( "[""" + jsonString( i ) + """]" )
-		    Assert.AreEqual( expectedString( i ), j( 0 ) )
+		    Assert.AreEqual( expectedString( i ), j( 0 ).StringValue )
 		  next i
 		  
 		End Sub
@@ -165,13 +165,13 @@ Inherits TestGroup
 		    try
 		      j = new JSONItem_MTC( load )
 		    catch err as JSONException
-		      Assert.Fail( EncodeHex( s ) + " should not have failed" )
+		      Assert.Fail( EncodeHex( s ).ToText + " should not have failed" )
 		      return
 		    end try
 		    
 		    try
 		      j = new JSONItem_MTC( load, true )
-		      Assert.Fail( EncodeHex( s ) + " should have failed with Strict" )
+		      Assert.Fail( EncodeHex( s ).ToText + " should have failed with Strict" )
 		      return
 		    catch err as JSONException
 		    end try
@@ -180,7 +180,7 @@ Inherits TestGroup
 		    
 		    try
 		      j = new JSONItem_MTC( load, true )
-		      Assert.Fail( "\" + EncodeHex( s ) + " should have failed with Strict" )
+		      Assert.Fail( "\" + EncodeHex( s ).ToText + " should have failed with Strict" )
 		      return
 		    catch err as JSONException
 		    end try
@@ -191,12 +191,12 @@ Inherits TestGroup
 		  
 		  dim load as string = "[""\w""]"
 		  j = new JSONItem_MTC( load )
-		  Assert.AreEqual( "w", j( 0 ) )
+		  Assert.AreEqual( "w", j( 0 ).StringValue )
 		  
 		  #pragma BreakOnExceptions false
 		  try
 		    j = new JSONItem_MTC( load, true )
-		    Assert.Fail( load + " should have failed with strict" )
+		    Assert.Fail( load.ToText + " should have failed with strict" )
 		  catch err as JSONException
 		  end try
 		  #pragma BreakOnExceptions true
@@ -223,47 +223,47 @@ Inherits TestGroup
 		  
 		  testString = kOriginal
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  //
 		  // With BOM
@@ -272,13 +272,13 @@ Inherits TestGroup
 		  testString = ChrB( &hFF ) + ChrB( &hFE ) + testString
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  testString = ChrB( 0 ) + ChrB( 0 ) + ChrB( &hFE ) + ChrB( &hFF ) + testString
 		  testString = testString.DefineEncoding( nil )
 		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ) )
+		  Assert.AreSame( "abc", j( 0 ).StringValue )
 		  
 		End Sub
 	#tag EndMethod
@@ -388,7 +388,7 @@ Inherits TestGroup
 		  Dim jO As New JSONItem_MTC(jI.ToString)
 		  
 		  For Each k As String In jI.Names
-		    Assert.IsTrue(jI.Value(k) = jO.Value(k), k + " matches")
+		    Assert.IsTrue(jI.Value(k) = jO.Value(k), k.ToText + " matches")
 		  Next
 		End Sub
 	#tag EndMethod
