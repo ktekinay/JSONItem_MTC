@@ -40,8 +40,8 @@ Inherits TestGroup
 		  endmem = Runtime.MemoryUsed
 		  endobj = runtime.ObjectCount
 		  
-		  ErrorIf(startmem<endmem,"JSONItem_MTC test leaked " + Format(endmem-startmem,"0") + " bytes")
-		  ErrorIf(startobj<endobj,"JSONItem_MTC test leaked " + Format(endobj-startobj,"0") + " objects")
+		  ErrorIf( startmem<endmem,"JSONItem_MTC test leaked " + Format( endmem-startmem, "0" ).ToText + " bytes" )
+		  ErrorIf( startobj<endobj,"JSONItem_MTC test leaked " + Format( endobj-startobj, "0" ).ToText + " objects" )
 		End Sub
 	#tag EndMethod
 

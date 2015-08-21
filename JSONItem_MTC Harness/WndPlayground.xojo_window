@@ -610,6 +610,11 @@ End
 		    AddToResult "JSONItem_MTC didn't load the output correctly"
 		  end if
 		  
+		  j1.Load s3
+		  if StrComp( j1.ToString, s3, 0 ) <> 0 then
+		    AddToResult "JSONItem didn't load the output correctly"
+		  end if
+		  
 		  sw.Reset
 		  sw.Start
 		  
@@ -681,6 +686,11 @@ End
 		  
 		  for i as integer = 1 to 10000
 		    j3.AddItemToObject( str( i ), JSONMBS.NewStringNode( str( i ) + chr( 127 + i ) ) )
+		    jChild.Append i
+		    jChild.Append chr( 127 + i )
+		    jChild.Append true
+		    jChild.Append CType( i, double )
+		    j3.Value( str( i ) ) = jChild
 		  next i
 		  
 		  sw.Stop
@@ -826,9 +836,18 @@ End
 		  sw.Reset
 		  sw.Start
 		  dim j2 as new JSONItem( s )
+		  #pragma unused j2
 		  sw.Stop
 		  
 		  AddToResult( "Load Native: " + format( sw.ElapsedMicroseconds, "#," ) )
+		  
+		  sw.Reset
+		  sw.Start
+		  dim d as Xojo.Core.Dictionary = Xojo.Data.ParseJSON( s.ToText )
+		  #pragma unused d
+		  sw.Stop
+		  
+		  AddToResult( "Load New: " + format( sw.ElapsedMicroseconds, "#," ) )
 		  
 		End Sub
 	#tag EndEvent
@@ -928,6 +947,7 @@ End
 		Visible=true
 		Group="ID"
 		Type="String"
+		EditorType="String"
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="LiveResize"
@@ -1008,6 +1028,7 @@ End
 		Visible=true
 		Group="ID"
 		Type="String"
+		EditorType="String"
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="Placement"
@@ -1037,6 +1058,7 @@ End
 		Visible=true
 		Group="ID"
 		Type="String"
+		EditorType="String"
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="Title"

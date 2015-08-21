@@ -10,6 +10,7 @@ Inherits TestController
 		  'group = New XojoUnitTests(Self, "Assertion")
 		  group = New BasicTests_JSONItem(Self, "Native JSONItem Tests")
 		  group = New BasicTests_JSONItem_MTC(Self, "Basic JSONItem_MTC Tests")
+		  group = new BasicTests_NewFramework( Self, "Basic New Framework Tests" )
 		  group = new LongTests_JSONItem_MTC( self, "Long JSONItem_MTC Tests" )
 		  group = New JsonOrgExampleTests(Self, "Example Documents from json.org/example")
 		  group = new CompareTests( Self, "Compare JSONItem_MTC to JSONItem" )

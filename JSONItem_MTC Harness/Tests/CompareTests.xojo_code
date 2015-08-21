@@ -18,7 +18,7 @@ Inherits TestGroup
 		      sMine = mine.ToString // Landing spot to break and trace
 		    end if
 		    
-		    Assert.AreEqual( sNative, sMine, "Codepoint: " + str( i ) )
+		    Assert.AreEqual( sNative, sMine, "Codepoint: " + i.ToText )
 		  next i
 		  
 		  mine = new JSONItem_MTC

@@ -1344,7 +1344,8 @@
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>ObjectValues.Remove( name )</SourceLine>
+   <SourceLine>dim key as string = NameToKey( name )</SourceLine>
+   <SourceLine>ObjectValues.Remove( key )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
   </ItemSource>
@@ -2208,7 +2209,7 @@
    <TextEncoding>134217984</TextEncoding>
    <NoteLine>Legal</NoteLine>
    <NoteLine>This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies.com).</NoteLine>
-   <NoteLine>It is copyright ©2014 by Kem Tekinay, all rights reserved.</NoteLine>
+   <NoteLine>It is copyright ©2015 by Kem Tekinay, all rights reserved.</NoteLine>
    <NoteLine></NoteLine>
    <NoteLine>This project is distributed AS-IS and no warranty of fitness for any particular purpose is expressed or implied.</NoteLine>
    <NoteLine>The author disavows any responsibility for bad design, poor execution, or any other faults.</NoteLine>
@@ -2634,6 +2635,19 @@
    <ObjName>ToString</ObjName>
    <PropertyGroup>Behavior</PropertyGroup>
    <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>EncodeUnicode</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <PropertyValue>EncodeType.JavaScriptCompatible</PropertyValue>
+   <ItemType>EncodeType</ItemType>
+   <EditorType>Enum</EditorType>
+   <Enumeration>
+    <ItemDef>0 - None</ItemDef>
+    <ItemDef>1 - JavaScriptCompatible</ItemDef>
+    <ItemDef>2 - All</ItemDef>
+   </Enumeration>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
@@ -2641,7 +2655,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kBackSlash</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>92</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2651,7 +2664,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kCloseCurlyBrace</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>125</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2661,7 +2673,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kCloseSquareBracket</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>93</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2671,7 +2682,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kColon</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>58</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2681,7 +2691,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kComma</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>44</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2691,7 +2700,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kForwardSlash</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>47</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2701,7 +2709,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kHasSetArray</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>1</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2711,7 +2718,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kHasSetNone</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>0</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2721,7 +2727,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kHasSetObject</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>2</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2731,7 +2736,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kOpenCurlyBrace</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>123</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2741,7 +2745,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kOpenSquareBracket</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>91</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2751,7 +2754,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kQuote</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>34</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2761,9 +2763,8 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>Version</ItemName>
   <ItemType>2</ItemType>
-  <ItemDef>2.8</ItemDef>
+  <ItemDef>2.81</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
@@ -2771,7 +2772,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kHyphen</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>45</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2781,7 +2781,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kPlus</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>43</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2791,7 +2790,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kDot</ItemName>
   <ItemType>2</ItemType>
   <ItemDef>46</ItemDef>
   <ItemFlags>33</ItemFlags>
@@ -2801,7 +2799,6 @@
   <Compatibility></Compatibility>
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
-  <ItemName>kDefaultDecimalFormat</ItemName>
   <ItemType>0</ItemType>
   <ItemDef>-0.0##############</ItemDef>
   <ItemFlags>0</ItemFlags>
