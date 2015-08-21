@@ -2642,6 +2642,12 @@
    <PropertyGroup>Behavior</PropertyGroup>
    <PropertyValue>EncodeType.JavaScriptCompatible</PropertyValue>
    <ItemType>EncodeType</ItemType>
+   <EditorType>Enum</EditorType>
+   <Enumeration>
+    <ItemDef>0 - None</ItemDef>
+    <ItemDef>1 - JavaScriptCompatible</ItemDef>
+    <ItemDef>2 - All</ItemDef>
+   </Enumeration>
   </ViewProperty>
  </ViewBehavior>
  <Constant>
