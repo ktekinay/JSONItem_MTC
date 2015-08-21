@@ -29,14 +29,14 @@ Inherits TestGroup
 		    dim wanted as string = EncodeHex( char )
 		    dim got as string = EncodeHex( j( 0 ) )
 		    if StrComp( wanted, got, 0 ) <> 0 then
-		      Assert.AreSame( wanted, got, encoded )
+		      Assert.AreSame( wanted, got, encoded.ToText )
 		      return
 		    end if
 		    
 		    wanted  = encoded
 		    got = j.ToString
 		    if StrComp( wanted, got, 0 ) <> 0 then
-		      Assert.AreSame( wanted, got, str( i ) )
+		      Assert.AreSame( wanted, got, i.ToText )
 		      return
 		    end if
 		  next i
@@ -56,14 +56,14 @@ Inherits TestGroup
 		    dim wanted as string = EncodeHex( char )
 		    dim got as string = EncodeHex( j( 0 ) )
 		    if StrComp( wanted, got, 0 ) <> 0 then
-		      Assert.AreSame( wanted, got, encoded )
+		      Assert.AreSame( wanted, got, encoded.ToText )
 		      return
 		    end if
 		    
 		    wanted = encoded
 		    got = j.ToString
 		    if StrComp( wanted, got, 0 ) <> 0 then
-		      Assert.AreSame( wanted, got, str( i ) )
+		      Assert.AreSame( wanted, got, i.ToText )
 		      return
 		    end if
 		  next i

@@ -21,12 +21,12 @@ Inherits TestGroup
 		  Dim j1 As New JSONItem_MTC(kExampleGlossary)
 		  Dim jG1 As JSONItem_MTC = j1.Value("glossary")
 		  
-		  Assert.AreEqual("example glossary", jG1.Value("title"))
+		  Assert.AreEqual("example glossary", jG1.Value("title").StringValue)
 		  
 		  Dim j2 As New JSONItem(kExampleGlossary)
 		  Dim jG2 As JSONItem = j2.Value("glossary")
 		  
-		  Assert.AreEqual("example glossary", jG2.Value("title"))
+		  Assert.AreEqual("example glossary", jG2.Value("title").StringValue)
 		  
 		End Sub
 	#tag EndMethod
