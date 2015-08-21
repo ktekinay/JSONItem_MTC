@@ -522,6 +522,7 @@ End
 		Sub Action()
 		  dim j1 as new JSONItem
 		  dim j2 as new JSONItem_MTC
+		  dim j3 as new Xojo.Core.Dictionary
 		  
 		  dim sw as new Stopwatch_MTC
 		  sw.Start
@@ -554,6 +555,20 @@ End
 		  sw.Reset
 		  sw.Start
 		  
+		  for i as integer = 1 to 1000
+		    dim j3Child() as Auto
+		    for inner as integer = 1 to 10
+		      j3Child.Append inner
+		    next
+		    j3.Value( str( i ) ) = j3Child
+		  next i
+		  
+		  sw.Stop
+		  AddToResult "Xojo.Core.Dictionary Create: " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
 		  dim s1 as string = j1.ToString
 		  
 		  sw.Stop
@@ -571,6 +586,18 @@ End
 		    AddToResult "... but they don't match"
 		  end if
 		  
+		  sw.Reset
+		  sw.Start
+		  
+		  dim s3 as string = Xojo.Data.GenerateJSON( j3 )
+		  
+		  sw.Stop
+		  AddToResult "Xojo.Data.GenerateJSON: " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  if StrComp( s1, s3, 0 ) <> 0 then
+		    AddToResult "... but they don't match"
+		  end if
+		  
 		  j1.Load s2
 		  if StrComp( j1.ToString, s1, 0 ) <> 0 then
 		    AddToResult "JSONItem didn't load the output correctly"
@@ -579,6 +606,11 @@ End
 		  j2.Load s1
 		  if StrComp( j2.ToString, s2, 0 ) <> 0 then
 		    AddToResult "JSONItem_MTC didn't load the output correctly"
+		  end if
+		  
+		  j1.Load s3
+		  if StrComp( j1.ToString, s3, 0 ) <> 0 then
+		    AddToResult "JSONItem didn't load the output correctly"
 		  end if
 		  
 		  sw.Reset
@@ -599,12 +631,21 @@ End
 		  sw.Stop
 		  AddToResult "JSONItem_MTC.Load: " + format( sw.ElapsedMicroseconds, "#," )
 		  
+		  sw.Reset
+		  sw.Start
+		  
+		  j3 = Xojo.Data.ParseJSON( s3.ToText )
+		  
+		  sw.Stop
+		  AddToResult "Xojo.Data.ParseJSON: " + format( sw.ElapsedMicroseconds, "#," )
+		  
 		  //
 		  // Stress test
 		  //
 		  
 		  j1 = new JSONItem
 		  j2 = new JSONItem_MTC
+		  j3 = new Xojo.Core.Dictionary
 		  
 		  sw.Reset
 		  sw.Start
@@ -639,6 +680,21 @@ End
 		  sw.Reset
 		  sw.Start
 		  
+		  for i as integer = 1 to 10000
+		    dim jChild() as Auto
+		    jChild.Append i
+		    jChild.Append chr( 127 + i )
+		    jChild.Append true
+		    jChild.Append CType( i, double )
+		    j3.Value( str( i ) ) = jChild
+		  next i
+		  
+		  sw.Stop
+		  AddToResult "Xojo.Core.Dictionay (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
 		  s1 = j1.ToString
 		  
 		  sw.Stop
@@ -655,6 +711,14 @@ End
 		  sw.Reset
 		  sw.Start
 		  
+		  s3 = Xojo.Data.GenerateJSON( j3 )
+		  
+		  sw.Stop
+		  AddToResult "Xojo.Data.GenerateJSON (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
 		  j1 = new JSONItem( s1 )
 		  
 		  sw.Stop
@@ -667,6 +731,14 @@ End
 		  
 		  sw.Stop
 		  AddToResult "JSONItem_MTC.Load (big): " + format( sw.ElapsedMicroseconds, "#," )
+		  
+		  sw.Reset
+		  sw.Start
+		  
+		  j3 = Xojo.Data.ParseJSON( s3.ToText )
+		  
+		  sw.Stop
+		  AddToResult "Xojo.Data.ParseJSON (big): " + format( sw.ElapsedMicroseconds, "#," )
 		  
 		  return
 		End Sub
@@ -744,9 +816,18 @@ End
 		  sw.Reset
 		  sw.Start
 		  dim j2 as new JSONItem( s )
+		  #pragma unused j2
 		  sw.Stop
 		  
 		  AddToResult( "Load Native: " + format( sw.ElapsedMicroseconds, "#," ) )
+		  
+		  sw.Reset
+		  sw.Start
+		  dim d as Xojo.Core.Dictionary = Xojo.Data.ParseJSON( s.ToText )
+		  #pragma unused d
+		  sw.Stop
+		  
+		  AddToResult( "Load New: " + format( sw.ElapsedMicroseconds, "#," ) )
 		  
 		End Sub
 	#tag EndEvent
@@ -846,6 +927,7 @@ End
 		Visible=true
 		Group="ID"
 		Type="String"
+		EditorType="String"
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="LiveResize"
@@ -926,6 +1008,7 @@ End
 		Visible=true
 		Group="ID"
 		Type="String"
+		EditorType="String"
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="Placement"
@@ -955,6 +1038,7 @@ End
 		Visible=true
 		Group="ID"
 		Type="String"
+		EditorType="String"
 	#tag EndViewProperty
 	#tag ViewProperty
 		Name="Title"
