@@ -92,7 +92,7 @@ Inherits TestGroup
 		  Assert.AreSame( "A", j.Value( "A" ).StringValue )
 		  
 		  dim names() as string = j.Names
-		  Assert.AreEqual( 1, names.Ubound )
+		  Assert.AreEqual( CType( 1, Int32 ), CType( names.Ubound, Int32 ) )
 		  Assert.AreSame( "a", names( 0 ), "First name is 'a'" )
 		  Assert.AreSame( "A", names( 1 ), "Second name is 'A'" )
 		  
@@ -216,69 +216,134 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h21
 		Private Sub LoadEncodingTest()
+		  #if Target64Bit
+		    Assert.Message "NOTE: Some of these tests may fail in 64-bit due to Xojo issues"
+		  #endif
+		  
 		  const kOriginal = "[""abc""]"
 		  
 		  dim testString as string
 		  dim j as JSONItem_MTC
 		  
+		  Assert.Message "Testing UTF8"
 		  testString = kOriginal
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing nil encoding"
 		  testString = kOriginal.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF16BE"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF16LE"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF32BE"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF32LE"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF16BE (nil encoding)"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16BE )
 		  testString = testString.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF16LE (nil encoding)"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
 		  testString = testString.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF32BE (nil encoding)"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  testString = testString.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message "Testing UTF32LE (nil encoding)"
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32LE )
 		  testString = testString.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
 		  //
 		  // With BOM
 		  //
+		  Assert.Message( "Testing BOM with UTF16LE" )
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF16LE )
 		  testString = ChrB( &hFF ) + ChrB( &hFE ) + testString
 		  testString = testString.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
 		  
+		  Assert.Message( "Testing BOM with UTF32BE" )
 		  testString = kOriginal.ConvertEncoding( Encodings.UTF32BE )
 		  testString = ChrB( 0 ) + ChrB( 0 ) + ChrB( &hFE ) + ChrB( &hFF ) + testString
 		  testString = testString.DefineEncoding( nil )
-		  j = new JSONItem_MTC( testString )
-		  Assert.AreSame( "abc", j( 0 ).StringValue )
+		  try
+		    j = new JSONItem_MTC( testString )
+		    Assert.AreSame( "abc", j( 0 ).StringValue )
+		  catch err as JSONException
+		    Assert.Fail err.Reason
+		  end try
+		  
 		  
 		End Sub
 	#tag EndMethod
@@ -402,22 +467,23 @@ Inherits TestGroup
 		  dim d as double = val( "inf" )
 		  j.Append d
 		  
-		  Assert.AreSame( "[inf]", j.ToString )
+		  Assert.AreSame( "[inf]", j.ToString, "INF test" )
 		  
 		  j.Strict = true
 		  try
 		    dim s as string = j.ToString
 		    #pragma unused s
-		    Assert.Fail( "ToString should have failed" )
+		    Assert.Fail( "ToString should have failed with ""inf""" )
 		  catch err as JSONException
 		  end
 		  
 		  j = new JSONItem_MTC( "[nan]" )
-		  Assert.AreEqual( val( "nan" ), j( 0 ).DoubleValue )
+		  dim nanVal as double = val( "nan" )
+		  Assert.IsTrue( j( 0 ).DoubleValue.Equals( nanVal, 1 ), "NAN parsing" )
 		  
 		  try
 		    j = new JSONItem_MTC( "[TRUE]", true )
-		    Assert.Fail( "Load shoudl have failed with [TRUE]" )
+		    Assert.Fail( "Load should have failed with [TRUE]" )
 		  catch err as JSONException
 		  end
 		  
@@ -428,7 +494,7 @@ Inherits TestGroup
 		  end
 		  
 		  j = new JSONItem_MTC( "[+1]" )
-		  Assert.AreEqual( 1, j( 0 ).IntegerValue )
+		  Assert.AreEqual( 1, j( 0 ).IntegerValue, """+1"" parsing" )
 		End Sub
 	#tag EndMethod
 

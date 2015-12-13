@@ -72,7 +72,8 @@ Inherits TestGroup
 		  js.Value("one") = 1
 		  s = js.ToString
 		  ErrorIf(s<>"{""one"":1}","Integer type error")
-		  ErrorIf(js.Value("one").Type <> variant.TypeInteger,"Integer type storage error")
+		  dim thisType as integer = js.Value("one").Type
+		  ErrorIf(thisType <> variant.TypeInteger and thisType <> variant.TypeInt64,"Integer type storage error")
 		  
 		  js.Value("one") = "1"
 		  s = js.ToString
@@ -127,6 +128,11 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Duration"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
 			Group="Behavior"
