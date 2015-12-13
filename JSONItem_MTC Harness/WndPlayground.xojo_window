@@ -684,14 +684,14 @@ End
 		  sw.Reset
 		  sw.Start
 		  
-		  for i as integer = 1 to 10000
-		    j3.AddItemToObject( str( i ), JSONMBS.NewStringNode( str( i ) + chr( 127 + i ) ) )
-		    jChild.Append i
-		    jChild.Append chr( 127 + i )
-		    jChild.Append true
-		    jChild.Append CType( i, double )
-		    j3.Value( str( i ) ) = jChild
-		  next i
+		  'for i as integer = 1 to 10000
+		  'j3.AddItemToObject( str( i ), JSONMBS.NewStringNode( str( i ) + chr( 127 + i ) ) )
+		  'jChild.Append i
+		  'jChild.Append chr( 127 + i )
+		  'jChild.Append true
+		  'jChild.Append CType( i, double )
+		  'j3.Value( str( i ) ) = jChild
+		  'next i
 		  
 		  sw.Stop
 		  AddToResult "JSONMBS.Create (big): " + format( sw.ElapsedMicroseconds, "#," )
