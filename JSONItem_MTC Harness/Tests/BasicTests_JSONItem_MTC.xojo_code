@@ -433,6 +433,29 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub TextTest()
+		  dim j as new JSONItem_MTC
+		  
+		  dim t1 as text = "hi"
+		  dim k1 as text = "1"
+		  
+		  dim t2 as text = "there"
+		  dim k2 as text = "2"
+		  
+		  j.Append t1
+		  j.Append t2
+		  
+		  Assert.AreEqual( "[""hi"",""there""]", j.ToString )
+		  
+		  j = new JSONItem_MTC
+		  j.Value( k1 ) = t1
+		  j.Value( k2 ) = t2
+		  
+		  Assert.AreEqual( "{""1"":""hi"",""2"":""there""}", j.ToString, "Order might differ" )
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub UnicodeTest()
 		  dim j as new JSONItem_MTC
 		  
@@ -520,6 +543,11 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Duration"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
 			Group="Behavior"
