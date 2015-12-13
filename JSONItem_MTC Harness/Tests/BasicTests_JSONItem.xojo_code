@@ -99,7 +99,7 @@ Inherits TestGroup
 		  
 		  try
 		    j = new JSONItem( load )
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading through the Constructor should have failed" )
 		    return
 		  catch err as JSONException
 		  end 
@@ -109,7 +109,7 @@ Inherits TestGroup
 		  j = new JSONItem
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Calling Load should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -121,7 +121,7 @@ Inherits TestGroup
 		  
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading into an existing Object should have failed" )
 		    return
 		  catch err as JSONException
 		  end

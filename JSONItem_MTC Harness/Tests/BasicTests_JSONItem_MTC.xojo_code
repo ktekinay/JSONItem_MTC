@@ -292,7 +292,7 @@ Inherits TestGroup
 		  
 		  try
 		    j = new JSONItem_MTC( load )
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading through Constructor should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -302,7 +302,7 @@ Inherits TestGroup
 		  j = new JSONItem_MTC
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "The Load method should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -314,7 +314,7 @@ Inherits TestGroup
 		  
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading into an existing Object should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -327,7 +327,7 @@ Inherits TestGroup
 		  
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading into an existing Array should have failed" )
 		    return
 		  catch err as JSONException
 		  end
