@@ -11,7 +11,7 @@ Inherits TestGroup
 		    dim thisExpected as string = expected( i )
 		    dim j as new JSONMBS( thisEncoded )
 		    dim returned as string = j.ChildNode.ValueString
-		    Assert.AreSame( thisExpected, returned, "Shoud be: " + EncodeHex( thisExpected ) + ", was " + EncodeHex( returned ) )
+		    Assert.AreSame( thisExpected, returned, "Should be: " + EncodeHex( thisExpected ).ToText + ", was " + EncodeHex( returned ).ToText )
 		  next i
 		End Sub
 	#tag EndMethod
