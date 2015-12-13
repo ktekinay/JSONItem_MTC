@@ -1776,7 +1776,7 @@
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeDouble, Variant.TypeSingle, Variant.TypeCurrency</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case Variant.TypeInteger, Variant.TypeLong</SourceLine>
+   <SourceLine>case Variant.TypeInteger, Variant.TypeInt64</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeObject</SourceLine>
    <SourceLine>select case value</SourceLine>
