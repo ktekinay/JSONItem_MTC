@@ -167,6 +167,11 @@ Inherits TestGroup
 
 	#tag ViewBehavior
 		#tag ViewProperty
+			Name="Duration"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="FailedTestCount"
 			Group="Behavior"
 			Type="Integer"
