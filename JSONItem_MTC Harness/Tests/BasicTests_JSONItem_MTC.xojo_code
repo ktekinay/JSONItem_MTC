@@ -292,7 +292,7 @@ Inherits TestGroup
 		  
 		  try
 		    j = new JSONItem_MTC( load )
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading through Constructor should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -302,7 +302,7 @@ Inherits TestGroup
 		  j = new JSONItem_MTC
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "The Load method should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -314,7 +314,7 @@ Inherits TestGroup
 		  
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading into an existing Object should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -327,7 +327,7 @@ Inherits TestGroup
 		  
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading into an existing Array should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -433,6 +433,31 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub TextTest()
+		  dim j as new JSONItem_MTC
+		  
+		  dim t1 as text = "hi"
+		  dim k1 as text = "1"
+		  
+		  dim t2 as text = "there"
+		  dim k2 as text = "2"
+		  
+		  j.Append t1
+		  j.Append t2
+		  
+		  Assert.AreEqual( "[""hi"",""there""]", j.ToString )
+		  
+		  j = new JSONItem_MTC
+		  j.Value( k1 ) = t1
+		  j.Value( k2 ) = t2
+		  
+		  dim asJSONString as string = j.ToString
+		  Assert.IsTrue( asJSONString = "{""1"":""hi"",""2"":""there""}" or asJSONString = "{""2"":""there"",""1"":""hi""}")
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub UnicodeTest()
 		  dim j as new JSONItem_MTC
 		  
@@ -520,6 +545,11 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Duration"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
 			Group="Behavior"

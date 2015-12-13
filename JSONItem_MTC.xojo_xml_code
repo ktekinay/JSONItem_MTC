@@ -855,6 +855,11 @@
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
    <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>elseif value.Type = Variant.TypeText then</SourceLine>
+   <SourceLine>dim t as Text = value.TextValue</SourceLine>
+   <SourceLine>dim s as string = t</SourceLine>
+   <SourceLine>EncodeString( s, settings, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim insert as string</SourceLine>
@@ -1772,11 +1777,11 @@
    <SourceLine>select case value.Type</SourceLine>
    <SourceLine>case Variant.TypeNil, Variant.TypeBoolean</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case Variant.TypeString, Variant.TypeCString, Variant.TypePString</SourceLine>
+   <SourceLine>case Variant.TypeString, Variant.TypeCString, Variant.TypePString, Variant.TypeText</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeDouble, Variant.TypeSingle, Variant.TypeCurrency</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case Variant.TypeInteger, Variant.TypeLong</SourceLine>
+   <SourceLine>case Variant.TypeInteger, Variant.TypeInt64</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeObject</SourceLine>
    <SourceLine>select case value</SourceLine>
