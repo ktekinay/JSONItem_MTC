@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2014r2.1" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2015r3.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
  <ObjContainerID>0</ObjContainerID>
@@ -854,6 +854,11 @@
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
    <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif value.Type = Variant.TypeText then</SourceLine>
+   <SourceLine>dim t as Text = value.TextValue</SourceLine>
+   <SourceLine>dim s as string = t</SourceLine>
+   <SourceLine>EncodeString( s, settings, outMB, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
@@ -1772,11 +1777,11 @@
    <SourceLine>select case value.Type</SourceLine>
    <SourceLine>case Variant.TypeNil, Variant.TypeBoolean</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case Variant.TypeString, Variant.TypeCString, Variant.TypePString</SourceLine>
+   <SourceLine>case Variant.TypeString, Variant.TypeCString, Variant.TypePString, Variant.TypeText</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeDouble, Variant.TypeSingle, Variant.TypeCurrency</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case Variant.TypeInteger, Variant.TypeLong</SourceLine>
+   <SourceLine>case Variant.TypeInteger, Variant.TypeInt64</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeObject</SourceLine>
    <SourceLine>select case value</SourceLine>
@@ -2764,7 +2769,7 @@
   <Visible>1</Visible>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
-  <ItemDef>2.81</ItemDef>
+  <ItemDef>2.9</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>

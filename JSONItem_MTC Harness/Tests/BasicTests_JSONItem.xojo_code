@@ -99,7 +99,7 @@ Inherits TestGroup
 		  
 		  try
 		    j = new JSONItem( load )
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading through the Constructor should have failed" )
 		    return
 		  catch err as JSONException
 		  end 
@@ -109,7 +109,7 @@ Inherits TestGroup
 		  j = new JSONItem
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Calling Load should have failed" )
 		    return
 		  catch err as JSONException
 		  end
@@ -121,13 +121,45 @@ Inherits TestGroup
 		  
 		  try
 		    j.Load load
-		    Assert.Fail( "That load should have failed" )
+		    Assert.Fail( "Loading into an existing Object should have failed" )
 		    return
 		  catch err as JSONException
 		  end
 		  
 		  Assert.IsTrue( j.Count = 1 and j.Value( "zero" ) = true, "Interrupted load should not have replaced value" )
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub TextTest()
+		  dim j as new JSONItem
+		  
+		  dim t1 as text = "hi"
+		  dim k1 as text = "1"
+		  
+		  dim t2 as text = "there"
+		  dim k2 as text = "2"
+		  
+		  j.Append t1
+		  j.Append t2
+		  
+		  #pragma BreakOnExceptions false
+		  Assert.AreEqual( "[""hi"",""there""]", j.ToString )
+		  #pragma BreakOnExceptions default
+		  
+		  j = new JSONItem
+		  j.Value( k1 ) = t1
+		  j.Value( k2 ) = t2
+		  
+		  #pragma BreakOnExceptions false
+		  dim asJSONString as string = j.ToString
+		  #pragma BreakOnExceptions default
+		  
+		  Assert.IsTrue( asJSONString = "{""1"":""hi"",""2"":""there""}" or asJSONString = "{""2"":""there"",""1"":""hi""}")
+		  
+		  Exception err as JSONException
+		    Assert.Fail( "Could not handle Text" )
 		End Sub
 	#tag EndMethod
 
@@ -159,6 +191,11 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Duration"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
 			Group="Behavior"
