@@ -8,6 +8,7 @@ Inherits TestController
 		  Dim group As TestGroup
 		  
 		  'group = New XojoUnitTests(Self, "Assertion")
+		  'group = New XojoUnitFailTests(Self, "Fail Tests")
 		  group = New BasicTests_JSONItem(Self, "Native JSONItem Tests")
 		  group = New BasicTests_JSONItem_MTC(Self, "Basic JSONItem_MTC Tests")
 		  group = new BasicTests_NewFramework( Self, "Basic New Framework Tests" )
