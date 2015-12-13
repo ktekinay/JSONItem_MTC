@@ -451,7 +451,9 @@ Inherits TestGroup
 		  j.Value( k1 ) = t1
 		  j.Value( k2 ) = t2
 		  
-		  Assert.AreEqual( "{""1"":""hi"",""2"":""there""}", j.ToString, "Order might differ" )
+		  dim asJSONString as string = j.ToString
+		  Assert.IsTrue( asJSONString = "{""1"":""hi"",""2"":""there""}" or asJSONString = "{""2"":""there"",""1"":""hi""}")
+		  
 		End Sub
 	#tag EndMethod
 
