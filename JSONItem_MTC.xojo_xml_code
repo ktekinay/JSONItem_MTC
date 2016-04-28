@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2015r3.1" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2016r1.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
- <ObjContainerID>0</ObjContainerID>
+ <ObjContainerID>1447604198</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
@@ -2205,6 +2205,23 @@
   <IsShared>0</IsShared>
   <ItemParams></ItemParams>
   <ItemResult>Boolean</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Subscript</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub Operator_Subscript(index As Integer, Assigns value As Variant)</SourceLine>
+   <SourceLine>self.Value( index ) = value</SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>index As Integer, Assigns value As Variant</ItemParams>
+  <ItemResult></ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
