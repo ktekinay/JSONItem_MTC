@@ -863,7 +863,7 @@ End
 		  For Each g As TestGroup In mController.TestGroups
 		    TestGroupList.AddFolder(g.Name)
 		    TestGroupList.CellType(TestGroupList.LastIndex, 2) = Listbox.TypeCheckbox
-		    TestGroupList.CellCheck(TestGroupList.LastIndex, 2) = True
+		    TestGroupList.CellCheck(TestGroupList.LastIndex, 2) = g.IncludeGroup
 		    TestGroupList.RowTag(TestGroupList.LastIndex) = g
 		  Next
 		  
@@ -1142,7 +1142,6 @@ End
 			"7 - Global Floating Window"
 			"8 - Sheet Window"
 			"9 - Metal Window"
-			"10 - Drawer Window"
 			"11 - Modeless Dialog"
 		#tag EndEnumValues
 	#tag EndViewProperty
