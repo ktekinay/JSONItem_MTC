@@ -2,7 +2,7 @@
 <RBProject version="2016r1.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
- <ObjContainerID>1447604198</ObjContainerID>
+ <ObjContainerID>0</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
@@ -207,13 +207,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As String</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -443,13 +436,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As Variant</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>static trueValue as Int32</SourceLine>
    <SourceLine>if trueValue = 0 then</SourceLine>
    <SourceLine>dim mb as MemoryBlock = "true"</SourceLine>
@@ -623,13 +609,6 @@
    <SourceLine>//  &amp;h2060 - &amp;h206f</SourceLine>
    <SourceLine>//  &amp;hfeff</SourceLine>
    <SourceLine>//  &amp;hfff0 - &amp;hffff</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>static alwaysEncode() as integer = Array( _</SourceLine>
    <SourceLine>127, &amp;hAD, _</SourceLine>
@@ -838,12 +817,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
    <SourceLine>JSONItem_MTC( value ).Serialize( outMB, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
@@ -1395,12 +1368,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Serialize(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>level = level + 1</SourceLine>
    <SourceLine>dim notCompact as boolean = not( settings.Compact ) and settings.IndentSpacing &gt; 0</SourceLine>
    <SourceLine></SourceLine>
@@ -1901,13 +1868,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim name as string</SourceLine>
@@ -1983,13 +1943,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim commaFound as boolean</SourceLine>
