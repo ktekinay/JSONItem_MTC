@@ -3,7 +3,7 @@ Protected Class StressTests
 Inherits TestGroup
 	#tag Method, Flags = &h21
 		Private Sub BigStringTest()
-		  const kSize = 700 * 1024 * 1024
+		  const kSize = 500 * 1024 * 1024
 		  dim halfSize as integer = ( kSize \ 2 ) + 1
 		  
 		  dim s as string = "0123456789"
@@ -34,11 +34,15 @@ Inherits TestGroup
 		  dim jString as string
 		  try
 		    jString = j.ToString
+		    Assert.AreEqual expect.LenB, jString.LenB, "Lengths don't match"
 		    Assert.AreEqual 0, StrComp( expect, jString, 0 ), "Strings don't match"
 		  catch err as OutOfMemoryException
 		    Assert.Fail "Ran out of memory creating string"
 		    return
 		  end try
+		  
+		  Assert.IsTrue Encodings.UTF8.IsValidData( jString ), "Not valid UTF8"
+		  Assert.IsTrue jString.Encoding = Encodings.UTF8, "Encoding isn't UTF8"
 		  
 		  return
 		End Sub
