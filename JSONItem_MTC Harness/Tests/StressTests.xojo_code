@@ -30,10 +30,11 @@ Inherits TestGroup
 		    return
 		  end try
 		  
+		  dim expect as string = "[""" + s + """]"
 		  dim jString as string
 		  try
 		    jString = j.ToString
-		    Assert.AreEqual 0, StrComp( "[""" + s + """]", jString, 0 ), "Strings don't match"
+		    Assert.AreEqual 0, StrComp( expect, jString, 0 ), "Strings don't match"
 		  catch err as OutOfMemoryException
 		    Assert.Fail "Ran out of memory creating string"
 		    return
@@ -45,6 +46,22 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Duration"
+			Group="Behavior"
+			Type="Double"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="FailedTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IncludeGroup"
+			Group="Behavior"
+			InitialValue="True"
+			Type="Boolean"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
 			Visible=true
@@ -66,10 +83,35 @@ Inherits TestGroup
 			Type="String"
 		#tag EndViewProperty
 		#tag ViewProperty
+			Name="NotImplementedCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="PassedTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="RunTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="SkippedTestCount"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
 			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="TestCount"
+			Group="Behavior"
+			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
