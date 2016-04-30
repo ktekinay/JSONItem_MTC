@@ -41,7 +41,6 @@ Inherits TestGroup
 		    return
 		  end try
 		  
-		  Assert.IsTrue Encodings.UTF8.IsValidData( jString ), "Not valid UTF8"
 		  Assert.IsTrue jString.Encoding = Encodings.UTF8, "Encoding isn't UTF8"
 		  
 		  return
