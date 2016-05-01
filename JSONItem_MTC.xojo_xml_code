@@ -624,9 +624,11 @@
    <SourceLine>&amp;hFFFA, &amp;hFFFB, &amp;hFFFC, &amp;hFFFD, &amp;hFFFE, &amp;hFFFF _</SourceLine>
    <SourceLine>)</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>const kByteBuffer = 13 // Most an encoding can use plus the trailing quote</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim outMB as MemoryBlock = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - kByteBuffer ) then</SourceLine>
    <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
@@ -663,7 +665,7 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - kByteBuffer ) then</SourceLine>
    <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
    <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
@@ -786,11 +788,6 @@
    <SourceLine></SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
-   <SourceLine>outPtr = outMB</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = kQuote</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
@@ -856,15 +853,15 @@
    <SourceLine>insert = value.StringValue.Lowercase</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim insertLen as integer = insert.LenB</SourceLine>
    <SourceLine>dim outMB as MemoryBlock = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - insert.LenB ) then</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - insertLen ) then</SourceLine>
    <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
-   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>outMB.StringValue( outIndex, insert.LenB ) = insert</SourceLine>
-   <SourceLine>outIndex = outIndex + insert.LenB</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, insertLen ) = insert</SourceLine>
+   <SourceLine>outIndex = outIndex + insertLen</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -1333,7 +1330,12 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Serialize(data As JSONItem_MTC) As String</SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( kOutMBSize )</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Most JSON will be rather small, so we'll start with a small initial block</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>const kInitialMBSize = 10 * 1024</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( kInitialMBSize )</SourceLine>
    <SourceLine>dim outMBs() as MemoryBlock</SourceLine>
    <SourceLine>outMBs.Append outMB</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
@@ -1341,7 +1343,11 @@
    <SourceLine>dim inMB as new MemoryBlock( kInMBSize )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>data.Serialize( outMBs, outIndex, self, 0, inMB)</SourceLine>
-   <SourceLine>outMBs( outMBs.Ubound ).Size = outIndex</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// We know exactly how long the last MemoryBlock's data is</SourceLine>
+   <SourceLine>// in outIndex</SourceLine>
+   <SourceLine>//</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim joiner() as string </SourceLine>
    <SourceLine>redim joiner( outMBs.Ubound)</SourceLine>
@@ -1355,8 +1361,32 @@
    <SourceLine></SourceLine>
    <SourceLine>outMB = outMBs( i )</SourceLine>
    <SourceLine>outMBs( i ) = nil</SourceLine>
-   <SourceLine>dim s as string = outMB</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim s as string</SourceLine>
+   <SourceLine>if i = outMBs.Ubound then</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>s = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Scan for the final null</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim lastBytePos as integer = outMB.Size - 1</SourceLine>
+   <SourceLine>dim p as Ptr = outMB</SourceLine>
+   <SourceLine>for bytePos as integer = lastBytePos downto 0</SourceLine>
+   <SourceLine>if p.Byte( bytePos ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>s = outMB.StringValue( 0, bytePos + 1 )</SourceLine>
+   <SourceLine>exit for bytePos</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next bytePos</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>outMB = nil</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if s = "" then</SourceLine>
+   <SourceLine>raise new JSONException( "Couldn't find non-null bytes in a MemoryBlock", 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>s = s.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>joiner( i ) = s</SourceLine>
@@ -2179,8 +2209,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function AppendOutMB(outMBs() As MemoryBlock, ByRef outIndex As Integer) As MemoryBlock</SourceLine>
-   <SourceLine>dim outMB as MemoryBlock = outMBs( outMBs.Ubound )</SourceLine>
-   <SourceLine>outMB.Size = outIndex</SourceLine>
+   <SourceLine>dim outMB as MemoryBlock</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outMB = new MemoryBlock( kOutMBSize )</SourceLine>
    <SourceLine>outMBs.Append outMB</SourceLine>
