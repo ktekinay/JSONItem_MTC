@@ -22,7 +22,7 @@ This class implements all the features and functions of its native twin and shou
 
 - This class has a Strict property. When set to `True`, it will strictly interpret JSON string according to JSON specs (values like `TRUE` and `+1` will be rejected), and will raise an exception rather than outputting `inf` or `nan`.
 
-- This class will properly handle characters with code points > &hFFFF when both encoding and decoding. The native class does not.
+- This class will properly handle characters with code points > &uFFFF when both encoding and decoding. The native class does not.
 
 - This class will properly reject invalid hex in a "\uNNNN" structure. 
 
@@ -30,11 +30,11 @@ This class implements all the features and functions of its native twin and shou
 
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
-- As of Xojo 2014r21, ToString and Load are significantly faster in this class than the native version.
+- As of Xojo 2016r1, ToString and Load are significantly faster in this class than the native version.
 
 ##License
 
-This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2014 by Kem Tekinay, all rights reserved.
+This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2016 by Kem Tekinay, all rights reserved.
 
 This project is distributed AS-IS and no warranty of fitness for any particular purpose is expressed or implied. The author disavows any responsibility for bad design, poor execution, or any other faults.
 
