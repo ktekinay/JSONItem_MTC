@@ -1380,9 +1380,9 @@
    <SourceLine>end if</SourceLine>
    <SourceLine>next bytePos</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>outMB = nil</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB = nil</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if s = "" then</SourceLine>
    <SourceLine>raise new JSONException( "Couldn't find non-null bytes in a MemoryBlock", 0 )</SourceLine>
