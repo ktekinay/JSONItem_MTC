@@ -72,6 +72,10 @@ Inherits TestGroup
 		  
 		  Assert.AreEqual( 2, j.Count, "Should be 2 objects" )
 		  Assert.AreEqual( 1, j.Value( "a" ).IntegerValue )
+		  
+		  j.Value( "Man" ) = 3
+		  Assert.IsFalse( j.HasName( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
+		  
 		End Sub
 	#tag EndMethod
 
@@ -646,6 +650,11 @@ Inherits TestGroup
 			Visible=true
 			Group="ID"
 			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="NotImplementedCount"
+			Group="Behavior"
+			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="PassedTestCount"

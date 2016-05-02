@@ -44,14 +44,15 @@ Inherits TestGroup
 		Private Sub CaseSensitiveKeyTest()
 		  Using Xojo.Core
 		  
-		  dim j as Dictionary = NewCaseSensitiveDictionary
+		  dim j as Dictionary = Xojo.Data.ParseJSON( kCaseSensitiveJSON )
 		  
-		  j.Value( "a" ) = 1
-		  j.Value( "A" ) = 2
-		  
-		  Assert.AreEqual( 2, j.Count, "Should be 2 objects" )
+		  Assert.AreEqual( 3, j.Count, "Should be 3 objects" )
 		  dim r as integer = j.Value( "a" )
 		  Assert.AreEqual( 1, r )
+		  
+		  Assert.IsFalse( j.HasKey( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
+		  
+		  
 		End Sub
 	#tag EndMethod
 
@@ -165,6 +166,10 @@ Inherits TestGroup
 	#tag EndMethod
 
 
+	#tag Constant, Name = kCaseSensitiveJSON, Type = Text, Dynamic = False, Default = \"{\n    \"a\" : 1\x2C\n    \"A\" : 2\x2C\n    \"Man\" : 3\n}", Scope = Private
+	#tag EndConstant
+
+
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Duration"
@@ -201,6 +206,11 @@ Inherits TestGroup
 			Visible=true
 			Group="ID"
 			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="NotImplementedCount"
+			Group="Behavior"
+			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="PassedTestCount"

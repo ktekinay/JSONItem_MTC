@@ -2,7 +2,7 @@
 <RBProject version="2016r1.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
- <ObjContainerID>1447604198</ObjContainerID>
+ <ObjContainerID>0</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
@@ -207,13 +207,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As String</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim lastPos as integer = inMB.Size - 1</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Missing """, 7, pos + 1 )</SourceLine>
@@ -443,13 +436,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As Variant</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>static trueValue as Int32</SourceLine>
    <SourceLine>if trueValue = 0 then</SourceLine>
    <SourceLine>dim mb as MemoryBlock = "true"</SourceLine>
@@ -608,7 +594,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
+   <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMBs() As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>// Encodes a string for output during ToString.</SourceLine>
    <SourceLine>// Honors the EncodeUnicode setting, but some characters must ALWAYS be encoded for </SourceLine>
    <SourceLine>// Javascript compatibility. These are</SourceLine>
@@ -624,13 +610,6 @@
    <SourceLine>//  &amp;hfeff</SourceLine>
    <SourceLine>//  &amp;hfff0 - &amp;hffff</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>static alwaysEncode() as integer = Array( _</SourceLine>
    <SourceLine>127, &amp;hAD, _</SourceLine>
    <SourceLine>&amp;h600, &amp;h601, &amp;h602, &amp;h603, &amp;h604, _</SourceLine>
@@ -645,12 +624,12 @@
    <SourceLine>&amp;hFFFA, &amp;hFFFB, &amp;hFFFC, &amp;hFFFD, &amp;hFFFE, &amp;hFFFF _</SourceLine>
    <SourceLine>)</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>const kByteBuffer = 13 // Most an encoding can use plus the trailing quote</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim outMB as MemoryBlock = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 12 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - kByteBuffer ) then</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
    <SourceLine></SourceLine>
@@ -686,11 +665,9 @@
    <SourceLine>exit do</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 12 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 12 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - kByteBuffer ) then</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -811,14 +788,6 @@
    <SourceLine></SourceLine>
    <SourceLine>loop</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
-   <SourceLine>outPtr = outMB</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = kQuote</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
@@ -828,7 +797,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>s As String, settings As JSONItem_MTC, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
+  <ItemParams>s As String, settings As JSONItem_MTC, outMBs() As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -837,28 +806,22 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMBs() As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
-   <SourceLine>JSONItem_MTC( value ).Serialize( outMB, outIndex, settings, level, inMB )</SourceLine>
+   <SourceLine>JSONItem_MTC( value ).Serialize( outMBs, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value IsA Dictionary then</SourceLine>
    <SourceLine>dim child as JSONItem_MTC = Dictionary( value )</SourceLine>
-   <SourceLine>child.Serialize( outMB, outIndex, settings, level, inMB )</SourceLine>
+   <SourceLine>child.Serialize( outMBs, outIndex, settings, level, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeString or value.Type = Variant.TypeCString or _</SourceLine>
    <SourceLine>value.Type = Variant.TypePString then</SourceLine>
-   <SourceLine>EncodeString( value.StringValue, settings, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine>EncodeString( value.StringValue, settings, outMBs, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>elseif value.Type = Variant.TypeText then</SourceLine>
    <SourceLine>dim t as Text = value.TextValue</SourceLine>
    <SourceLine>dim s as string = t</SourceLine>
-   <SourceLine>EncodeString( s, settings, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine>EncodeString( s, settings, outMBs, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
@@ -890,16 +853,15 @@
    <SourceLine>insert = value.StringValue.Lowercase</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>dim insertLen as integer = insert.LenB</SourceLine>
+   <SourceLine>dim outMB as MemoryBlock = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
-   <SourceLine>if outIndex &gt; ( outSize - insert.LenB ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - insert.LenB )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>if outIndex &gt; ( outSize - insertLen ) then</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>outMB.StringValue( outIndex, insert.LenB ) = insert</SourceLine>
-   <SourceLine>outIndex = outIndex + insert.LenB</SourceLine>
+   <SourceLine>outMB.StringValue( outIndex, insertLen ) = insert</SourceLine>
+   <SourceLine>outIndex = outIndex + insertLen</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -908,7 +870,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMB As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
+  <ItemParams>value As Variant, settings As JSONItem_MTC, level As Integer, outMBs() As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1368,15 +1330,69 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Serialize(data As JSONItem_MTC) As String</SourceLine>
-   <SourceLine>dim outMB as new MemoryBlock( 2048 )</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Most JSON will be rather small, so we'll start with a small initial block</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>const kInitialMBSize = 10 * 1024</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim outMB as new MemoryBlock( kInitialMBSize )</SourceLine>
+   <SourceLine>dim outMBs() as MemoryBlock</SourceLine>
+   <SourceLine>outMBs.Append outMB</SourceLine>
    <SourceLine>dim outIndex as integer</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim inMB as new MemoryBlock( 2048 )</SourceLine>
+   <SourceLine>dim inMB as new MemoryBlock( kInMBSize )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>data.Serialize( outMB, outIndex, self, 0, inMB)</SourceLine>
+   <SourceLine>data.Serialize( outMBs, outIndex, self, 0, inMB)</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim r as string = outMB.StringValue( 0, outIndex )</SourceLine>
-   <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// We know exactly how long the last MemoryBlock's data is</SourceLine>
+   <SourceLine>// in outIndex</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim joiner() as string </SourceLine>
+   <SourceLine>redim joiner( outMBs.Ubound)</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for i as integer = 0  to outMBs.Ubound</SourceLine>
+   <SourceLine>#if DebugBuild</SourceLine>
+   <SourceLine>if i = 1 then</SourceLine>
+   <SourceLine>i = i // A place to break</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>#endif</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB = outMBs( i )</SourceLine>
+   <SourceLine>outMBs( i ) = nil</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim s as string</SourceLine>
+   <SourceLine>if i = outMBs.Ubound then</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>s = outMB.StringValue( 0, outIndex )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Scan for the final null</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim lastBytePos as integer = outMB.Size - 1</SourceLine>
+   <SourceLine>dim p as Ptr = outMB</SourceLine>
+   <SourceLine>for bytePos as integer = lastBytePos downto 0</SourceLine>
+   <SourceLine>if p.Byte( bytePos ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>s = outMB.StringValue( 0, bytePos + 1 )</SourceLine>
+   <SourceLine>exit for bytePos</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next bytePos</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB = nil</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if s = "" then</SourceLine>
+   <SourceLine>raise new JSONException( "Couldn't find non-null bytes in a MemoryBlock", 0 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>s = s.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>joiner( i ) = s</SourceLine>
+   <SourceLine>next i</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim r as string = join( joiner, "" )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
@@ -1394,12 +1410,8 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Serialize(outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
+   <SourceLine>Sub Serialize(outMBs() As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
+   <SourceLine>dim outMB as MemoryBlock = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>level = level + 1</SourceLine>
    <SourceLine>dim notCompact as boolean = not( settings.Compact ) and settings.IndentSpacing &gt; 0</SourceLine>
@@ -1420,10 +1432,8 @@
    <SourceLine>//</SourceLine>
    <SourceLine>dim outSize as integer = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim outPtr as Ptr = outMB</SourceLine>
@@ -1445,12 +1455,10 @@
    <SourceLine></SourceLine>
    <SourceLine>for i as integer = 0 to ArrayValues.Ubound</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
    <SourceLine>outMB.StringValue( outIndex, indenter.LenB ) = indenter</SourceLine>
@@ -1458,14 +1466,13 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = ArrayValues( i )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMBs, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>outMB = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine></SourceLine>
@@ -1484,21 +1491,17 @@
    <SourceLine>next i</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - indenter.LenB ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - indenter.LenB )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outMB.StringValue( outIndex, indenter.LenB - settings.IndentSpacing ) = indenter.LeftB( indenter.LenB - indentSpacing )</SourceLine>
    <SourceLine>outIndex = outIndex + ( indenter.LenB - settings.IndentSpacing )</SourceLine>
@@ -1506,12 +1509,10 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
-   <SourceLine>end if</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>outPtr.Byte( outIndex ) = kCloseSquareBracket</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
@@ -1536,10 +1537,8 @@
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
    <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -1550,14 +1549,13 @@
    <SourceLine></SourceLine>
    <SourceLine>dim key as variant = keys( i )</SourceLine>
    <SourceLine>dim name as string = KeyToName( key )</SourceLine>
-   <SourceLine>EncodeString( name, settings, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine>EncodeString( name, settings, outMBs, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>outMB = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine></SourceLine>
@@ -1565,14 +1563,13 @@
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim value as variant = d.Value( key )</SourceLine>
-   <SourceLine>EncodeValue( value, settings, level, outMB, outIndex, inMB )</SourceLine>
+   <SourceLine>EncodeValue( value, settings, level, outMBs, outIndex, inMB )</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>outMB = outMBs( outMBs.Ubound )</SourceLine>
    <SourceLine>outSize  = outMB.Size</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine></SourceLine>
@@ -1592,10 +1589,8 @@
    <SourceLine></SourceLine>
    <SourceLine>if notCompact then</SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - indenter.LenB ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - indenter.LenB )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -1605,10 +1600,8 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if outIndex &gt; ( outSize - 1024 ) then</SourceLine>
-   <SourceLine>do</SourceLine>
-   <SourceLine>outSize = outSize + outSize</SourceLine>
-   <SourceLine>loop until outIndex &lt;= ( outSize - 1024 )</SourceLine>
-   <SourceLine>outMB.Size = outSize</SourceLine>
+   <SourceLine>outMB = AppendOutMB( outMBs, outIndex )</SourceLine>
+   <SourceLine>outSize = outMB.Size</SourceLine>
    <SourceLine>outPtr = outMB</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -1623,7 +1616,7 @@
   <AliasName></AliasName>
   <ItemFlags>1</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>outMB As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock</ItemParams>
+  <ItemParams>outMBs() As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -1901,13 +1894,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim name as string</SourceLine>
@@ -1983,13 +1969,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
-   <SourceLine>#if not DebugBuild</SourceLine>
-   <SourceLine>#pragma BackgroundTasks false</SourceLine>
-   <SourceLine>#pragma BoundsChecking false</SourceLine>
-   <SourceLine>#pragma NilObjectChecking false</SourceLine>
-   <SourceLine>#pragma StackOverflowChecking false</SourceLine>
-   <SourceLine>#endif</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>dim inPtr As Ptr = inMB</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim commaFound as boolean</SourceLine>
@@ -2222,6 +2201,29 @@
   <IsShared>0</IsShared>
   <ItemParams>index As Integer, Assigns value As Variant</ItemParams>
   <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>AppendOutMB</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function AppendOutMB(outMBs() As MemoryBlock, ByRef outIndex As Integer) As MemoryBlock</SourceLine>
+   <SourceLine>dim outMB as MemoryBlock</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>outMB = new MemoryBlock( kOutMBSize )</SourceLine>
+   <SourceLine>outMBs.Append outMB</SourceLine>
+   <SourceLine>outIndex = 0</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return outMB</SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>outMBs() As MemoryBlock, ByRef outIndex As Integer</ItemParams>
+  <ItemResult>MemoryBlock</ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
@@ -2824,6 +2826,24 @@
   <ItemType>0</ItemType>
   <ItemDef>-0.0##############</ItemDef>
   <ItemFlags>0</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kInMBSize</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>2</ItemType>
+  <ItemDef>2048</ItemDef>
+  <ItemFlags>33</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kOutMBSize</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>2</ItemType>
+  <ItemDef>2097152</ItemDef>
+  <ItemFlags>33</ItemFlags>
  </Constant>
  <Enumeration>
   <TextEncoding>134217984</TextEncoding>

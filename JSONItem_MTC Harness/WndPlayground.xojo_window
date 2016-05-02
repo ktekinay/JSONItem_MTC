@@ -135,7 +135,7 @@ Begin Window WndPlayground
       Visible         =   True
       Width           =   132
    End
-   Begin TextField fldJSON
+   Begin TextArea fldJSON
       AcceptTabs      =   False
       Alignment       =   0
       AutoDeactivate  =   True
@@ -143,26 +143,31 @@ Begin Window WndPlayground
       BackColor       =   &cFFFFFF00
       Bold            =   False
       Border          =   True
-      CueText         =   ""
       DataField       =   ""
       DataSource      =   ""
       Enabled         =   True
       Format          =   ""
-      Height          =   22
+      Height          =   40
       HelpTag         =   ""
+      HideSelection   =   True
       Index           =   -2147483648
       Italic          =   False
       Left            =   20
       LimitText       =   0
+      LineHeight      =   0.0
+      LineSpacing     =   1.0
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   True
       Mask            =   ""
-      Password        =   False
+      Multiline       =   True
       ReadOnly        =   False
       Scope           =   0
+      ScrollbarHorizontal=   False
+      ScrollbarVertical=   True
+      Styled          =   False
       TabIndex        =   4
       TabPanelIndex   =   0
       TabStop         =   True
@@ -325,7 +330,6 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   8
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "JSONItem"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -360,7 +364,6 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   9
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "JSONItem_MTC"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -426,7 +429,6 @@ Begin Window WndPlayground
       Selectable      =   False
       TabIndex        =   11
       TabPanelIndex   =   0
-      TabStop         =   True
       Text            =   "Encode Unicode:"
       TextAlign       =   0
       TextColor       =   &c00000000
@@ -880,7 +882,6 @@ End
 			"7 - Global Floating Window"
 			"8 - Sheet Window"
 			"9 - Metal Window"
-			"10 - Drawer Window"
 			"11 - Modeless Dialog"
 		#tag EndEnumValues
 	#tag EndViewProperty
