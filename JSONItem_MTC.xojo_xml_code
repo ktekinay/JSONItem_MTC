@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2016r1.1" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2016r4.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
- <ObjContainerID>0</ObjContainerID>
+ <ObjContainerID>1447604198</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
@@ -2225,6 +2225,24 @@
   <ItemParams>outMBs() As MemoryBlock, ByRef outIndex As Integer</ItemParams>
   <ItemResult>MemoryBlock</ItemResult>
  </Method>
+ <Method>
+  <ItemName>ParseJSON</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function ParseJSON(s As String) As Variant</SourceLine>
+   <SourceLine>dim j as new JSONItem_MTC( s )</SourceLine>
+   <SourceLine>return j.ToNativeValue</SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>s As String</ItemParams>
+  <ItemResult>Variant</ItemResult>
+ </Method>
  <Note>
   <ItemName>Legal</ItemName>
   <Compatibility></Compatibility>
@@ -2334,7 +2352,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Compact As Boolean</SourceLine>
+   <SourceLine>Compact As Boolean = True</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2362,7 +2380,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EscapeSlashes As Boolean</SourceLine>
+   <SourceLine>EscapeSlashes As Boolean = True</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2390,7 +2408,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>IndentSpacing As Integer</SourceLine>
+   <SourceLine>IndentSpacing As Integer = 2</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2472,7 +2490,7 @@
   <Visible>1</Visible>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EncodeUnicode As EncodeType</SourceLine>
+   <SourceLine>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2578,6 +2596,70 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
    <SourceLine>return self.Serialize( self )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>ToNativeValue</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Property ToNativeValue As Variant</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>ToNativeValue As Variant</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>if IsObject then</SourceLine>
+   <SourceLine>dim d as new Dictionary</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim rawKeys() as variant = ObjectValues.Keys</SourceLine>
+   <SourceLine>dim values() as variant = ObjectValues.Values</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for i as integer = 0 to rawKeys.Ubound</SourceLine>
+   <SourceLine>dim name as string = KeyToName( rawKeys( i ) )</SourceLine>
+   <SourceLine>dim value as variant = values( i )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value isa JSONItem_MTC then</SourceLine>
+   <SourceLine>value = JSONItem_MTC( value ).ToNativeValue</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>d.Value( name ) = value</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return d</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif IsArray then</SourceLine>
+   <SourceLine>dim arr() as variant</SourceLine>
+   <SourceLine>redim arr( ArrayValues.Ubound )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for i as integer = 0 to ArrayValues.Ubound</SourceLine>
+   <SourceLine>dim value as variant = ArrayValues( i )</SourceLine>
+   <SourceLine>if value isa JSONItem_MTC then</SourceLine>
+   <SourceLine>value = JSONItem_MTC( value ).ToNativeValue</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>arr( i ) = value</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return nil</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
  </Property>
