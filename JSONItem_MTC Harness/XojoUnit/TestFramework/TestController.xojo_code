@@ -7,48 +7,72 @@ Protected Class TestController
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EndTimer()
-		  mDuration = (Microseconds-mTimer) / 1000000
-		  
+		Private Sub CalculateDuration()
+		  mFinishMS = Microseconds
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, CompatibilityFlags = (not TargetHasGUI and not TargetWeb and not TargetIOS) or  (TargetWeb) or  (TargetHasGUI)
 		Sub ExportTestResults(filePath As Text)
+		  //
+		  // Conforms to JUnit XML schema, found here:
+		  //
+		  // http://www.ibm.com/support/knowledgecenter/SSQ2R2_9.5.1/com.ibm.rsar.analysis.codereview.cobol.doc/topics/cac_useresults_junit.html
+		  //
+		  
 		  #If TargetWin32 Then
 		    Const kEOL As Text = &u0D + &u0A
 		  #Else
 		    Const kEOL As Text = &u0A
 		  #Endif
 		  
-		  Dim f as FolderItem
+		  Dim testId As Text = Xojo.Core.Date.Now.ToText + "." + Xojo.Core.Date.Now.Nanosecond.ToText
+		  
+		  Dim f As FolderItem
 		  f = New FolderItem(filePath, FolderItem.PathTypeShell)
-		  Dim stream as BinaryStream
+		  Dim stream As BinaryStream
 		  If f <> Nil Then
 		    stream=BinaryStream.Create(f, True)
 		    stream.Write "<?xml version=""1.0"" encoding=""UTF-8"" ?>" + kEOL
-		    stream.Write "<testsuites>" + kEOL
+		    stream.Write "<testsuites id=""" + testId + _
+		    """ tests=""" + RunTestCount.ToText + _
+		    """ failures=""" + FailedCount.ToText + _
+		    """ time=""" + Duration.ToText + """>" + kEOL
+		    
 		    For Each tg As TestGroup In mTestGroups
-		      stream.Write "  <testsuite errors=""0"" skipped=""" + tg.SkippedTestCount.ToText + """ tests=""" + tg.TestCount.ToText + """ time=""" + tg.Duration.ToText + """ failures=""" + tg.FailedTestCount.ToText + """ name=""com.atlassian.bamboo.labels." + tg.Name + """>" + kEOL
+		      stream.Write "  <testsuite errors=""0"" skipped=""" + tg.SkippedTestCount.ToText + _
+		      """ tests=""" + tg.TestCount.ToText + _
+		      """ time=""" + tg.Duration.ToText + _
+		      """ failures=""" + tg.FailedTestCount.ToText + _
+		      """ name=""com.atlassian.bamboo.labels." + tg.Name + """>" + kEOL
+		      
 		      For Each tr As TestResult In tg.Results
-		        stream.Write "    <testcase name=""" + tr.TestName + """ duration=""" + tr.Duration.ToText + """>" + kEOL
-		        if tr.Result = TestResult.Skipped then
+		        stream.Write "    <testcase name=""" + tr.TestName + """ time=""" + tr.Duration.ToText + _
+		        """ duration= """ + tr.Duration.ToText + """>" + kEOL // "time" is right, but "duration" is maintained for backwards compatibility
+		        
+		        If tr.Result = TestResult.Skipped Then
 		          stream.Write "       <skipped />" + EndOfLine
-		        end
-		        if tr.Result = TestResult.Failed then
-		          dim failMessage As Text = tr.Message
+		          
+		        ElseIf tr.Result = TestResult.NotImplemented Then
+		          stream.Write "       <not_implemented />" + EndOfLine
+		          
+		        ElseIf tr.Result = TestResult.Failed Then
+		          Dim failMessage As Text = tr.Message
 		          failMessage = failMessage.ReplaceAll("<", "&lt;")
 		          failMessage = failMessage.ReplaceAll(">", "&gt;")
 		          stream.Write "       <failure type=""xojo.AssertionFailedError"" message=""" + failMessage + """/>" + kEOL
-		        end
+		        End If
+		        
 		        stream.Write "    </testcase>" + kEOL
 		      Next
+		      
 		      stream.Write "  </testsuite>" + kEOL
 		    Next
+		    
 		    stream.Write "</testsuites>" + kEOL
 		    stream.Close
-		  End if
+		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -68,12 +92,25 @@ Protected Class TestController
 		  //  "*.Some" = Match the method named "SomeTest" in any group ("Test" is optional)
 		  //  "My*Group" = Match any group that starts with "My" and ends with "Group"
 		  
+		  //
+		  // Replace Nil with an empty array
+		  //
+		  If True Then // Scope
+		    Dim emptyArr() As String
+		    
+		    If includePatterns Is Nil Then
+		      includePatterns = emptyArr
+		    End If
+		    If excludePatterns Is Nil Then
+		      excludePatterns = emptyArr
+		    End If
+		  End If
 		  
 		  If includePatterns.Ubound = -1 And excludePatterns.Ubound = -1 Then
 		    Dim err As New RuntimeException
 		    err.Message = "You must specify at least one include or exclude pattern"
 		    Raise err
-		  End if
+		  End If
 		  
 		  //
 		  // Convert the patterns into regular expressions
@@ -174,6 +211,15 @@ Protected Class TestController
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub Finish()
+		  CalculateDuration
+		  
+		  Call RunTestCount // Updates all the counts
+		  RaiseEvent AllTestsFinished
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Sub LoadTestGroups()
 		  InitializeTestGroups
@@ -186,13 +232,58 @@ Protected Class TestController
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub RaiseGroupFinished(group As TestGroup)
+		  RaiseEvent GroupFinished(group)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub RaiseTestFinished(result As TestResult, group As TestGroup)
+		  RaiseEvent TestFinished(result, group)
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ResetDuration()
+		  mStartMS = Microseconds
+		  mFinishMS = 0.0
+		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Attributes( Hidden )  Sub RunNextTest()
+		  If TestQueue.Ubound = -1 Then
+		    Stop
+		  Else
+		    Dim tg As TestGroup = TestQueue(0)
+		    TestQueue.Remove(0)
+		    tg.Start
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21
 		Private Sub RunTestGroups()
-		  StartTimer
+		  ResetDuration
+		  
 		  For Each tg As TestGroup In mTestGroups
-		    tg.Start
+		    If tg.IncludeGroup Then
+		      TestQueue.Append tg
+		      tg.ClearResults
+		    Else
+		      tg.ClearResults(True)
+		    End If
 		  Next
-		  EndTimer
+		  
+		  RunNextTest
+		  
+		  
 		End Sub
 	#tag EndMethod
 
@@ -215,20 +306,26 @@ Protected Class TestController
 		  
 		  pattern = pattern + "$"
 		  
-		  return pattern
+		  Return pattern
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub Start()
 		  RunTestGroups
-		  Call RunTestCount // Updates all the counts
+		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub StartTimer()
-		  mTimer = Microseconds
+	#tag Method, Flags = &h0
+		Sub Stop()
+		  For Each tg As TestGroup In mTestGroups
+		    tg.Stop
+		  Next
+		  
+		  Redim TestQueue(-1)
+		  Finish
+		  
 		End Sub
 	#tag EndMethod
 
@@ -240,7 +337,19 @@ Protected Class TestController
 
 
 	#tag Hook, Flags = &h0
+		Event AllTestsFinished()
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
+		Event GroupFinished(group As TestGroup)
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
 		Event InitializeTestGroups()
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
+		Event TestFinished(result As TestResult, group As TestGroup)
 	#tag EndHook
 
 
@@ -250,7 +359,9 @@ Protected Class TestController
 			  Dim totalCount As Integer
 			  
 			  For Each tg As TestGroup In mTestGroups
-			    totalCount = totalCount + tg.TestCount
+			    If tg.IncludeGroup Then
+			      totalCount = totalCount + tg.TestCount
+			    End If
 			  Next
 			  
 			  Return totalCount
@@ -262,7 +373,14 @@ Protected Class TestController
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  Return mDuration
+			  Dim duration As Double
+			  If mFinishMS = 0.0 Then
+			    duration = Microseconds - mStartMS
+			  Else
+			    duration = mFinishMS - mStartMS
+			  End If
+			  
+			  Return duration / 1000000.0
 			End Get
 		#tag EndGetter
 		Duration As Double
@@ -286,12 +404,28 @@ Protected Class TestController
 		GroupCount As Integer
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h21
-		Private mDuration As Double
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  For Each group As TestGroup In mTestGroups
+			    If group.IsRunning Then
+			      Return True
+			    End If
+			  Next
+			  
+			  Return False
+			  
+			End Get
+		#tag EndGetter
+		IsRunning As Boolean
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
 		Private mFailedCount As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mFinishMS As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -307,11 +441,11 @@ Protected Class TestController
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Private mTestGroups() As TestGroup
+		Private mStartMS As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Private mTimer As Double
+		Private mTestGroups() As TestGroup
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -358,12 +492,14 @@ Protected Class TestController
 			  Dim totalCount As Integer
 			  
 			  For Each tg As TestGroup In mTestGroups
-			    totalCount = totalCount + tg.RunTestCount
-			    
-			    mPassedCount = mPassedCount + tg.PassedTestCount
-			    mFailedCount = mFailedCount + tg.FailedTestCount
-			    mSkippedCount = mSkippedCount + tg.SkippedTestCount
-			    mNotImplementedCount = mNotImplementedCount + tg.NotImplementedCount
+			    If tg.IncludeGroup Then
+			      totalCount = totalCount + tg.RunTestCount
+			      
+			      mPassedCount = mPassedCount + tg.PassedTestCount
+			      mFailedCount = mFailedCount + tg.FailedTestCount
+			      mSkippedCount = mSkippedCount + tg.SkippedTestCount
+			      mNotImplementedCount = mNotImplementedCount + tg.NotImplementedCount
+			    End If
 			  Next
 			  
 			  Return totalCount
@@ -381,11 +517,15 @@ Protected Class TestController
 		SkippedCount As Integer
 	#tag EndComputedProperty
 
+	#tag Property, Flags = &h21
+		Private TestQueue() As TestGroup
+	#tag EndProperty
+
 
 	#tag Constant, Name = kHasDotComment, Type = String, Dynamic = False, Default = \"(\?#HasDot)", Scope = Private, CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit))
 	#tag EndConstant
 
-	#tag Constant, Name = XojoUnitVersion, Type = Text, Dynamic = False, Default = \"5.0", Scope = Public
+	#tag Constant, Name = XojoUnitVersion, Type = Text, Dynamic = False, Default = \"6.5", Scope = Public
 	#tag EndConstant
 
 
@@ -416,6 +556,11 @@ Protected Class TestController
 			Group="ID"
 			InitialValue="-2147483648"
 			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsRunning"
+			Group="Behavior"
+			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"

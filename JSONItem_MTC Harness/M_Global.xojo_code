@@ -13,6 +13,39 @@ Protected Module M_Global
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function Repeat(src As String, repetitions As Integer) As String
+		  return src.Repeat_MTC( repetitions )
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Repeat_MTC(Extends src As String, repetitions As Integer) As String
+		  // Repeats the given string repetitions times.
+		  
+		  // Common cases
+		  if repetitions < 1 then return ""
+		  if repetitions = 1 then return src
+		  if repetitions = 2 then return src + src
+		  if repetitions = 3 then return src + src + src
+		  
+		  dim curLenB as integer = src.LenB
+		  dim targetLenB as integer = curLenB * repetitions
+		  dim halfLenB as integer = ( targetLenB + 1 ) \ 2
+		  
+		  while curLenB < halfLenB
+		    src = src + src
+		    curLenB = curLenB + curLenB
+		  wend
+		  
+		  dim diffB as integer = targetLenB - curLenB
+		  if diffB <> 0 then src = src + LeftB( src, diffB )
+		  
+		  return src
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
