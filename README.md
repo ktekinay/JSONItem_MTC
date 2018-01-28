@@ -1,10 +1,10 @@
-#JSONItem_MTC
+# JSONItem_MTC
 
 This is a drop-in replacements for the native JSONItem. It emulates all its features but should perform certain functions faster.
 
 To use it, search for "JSONItem" within your project and replace it with "JSONItem_MTC". Then drag the JSONItem_MTC class into your project.
 
-##Differences
+## Differences
 
 This class implements all the features and functions of its native twin and should be indistinguishable except for the following:
 
@@ -32,7 +32,7 @@ This class implements all the features and functions of its native twin and shou
 
 - As of Xojo 2016r1, ToString and Load are significantly faster in this class than the native version.
 
-##License
+## License
 
 This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2016 by Kem Tekinay, all rights reserved.
 
@@ -40,12 +40,12 @@ This project is distributed AS-IS and no warranty of fitness for any particular 
 
 You may freely use or modify this project or any part within. You may distribute a modified version as long as this notice or any other legal notice is left undisturbed and all modifications are clearly documented and accredited. The author does not actively support this class, although comments and recommendations are welcome.
 
-##Comments and Contributions
+## Comments and Contributions
 
 All contributions to this project will be gratefully considered. Fork this repo to your own, then submit your changes via a Pull Request.
 
 All comments are also welcome.
 
-##Who Did This?!?
+## Who Did This?!?
 
 This project was created by and is maintained by Kem Tekinay (ktekinay@mactechnologies dot com).
