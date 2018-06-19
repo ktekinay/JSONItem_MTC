@@ -2,6 +2,135 @@
 Protected Class M_JSONTests
 Inherits TestGroup
 	#tag Method, Flags = &h0
+		Sub BadJSONTest()
+		  #pragma BreakOnExceptions false
+		  
+		  dim v as variant
+		  
+		  try
+		    v = ParseJSON_MTC( "[1" )
+		    Assert.Fail "Missing ]"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"":nil" )
+		    Assert.Fail "Missing }"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "true]" )
+		    Assert.Fail "Missing ["
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( """a"":true}" )
+		    Assert.Fail "Missing {"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "[1}" )
+		    Assert.Fail "[ with }"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"":nil]" )
+		    Assert.Fail "{ with ]"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "[,]" )
+		    Assert.Fail "Array with a single comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "[1,]" )
+		    Assert.Fail "Array with a trailing comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "[,1]" )
+		    Assert.Fail "Array with a leading comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "[2,,1]" )
+		    Assert.Fail "Array with an extra comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{,}" )
+		    Assert.Fail "Object with a single comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"":nil,}" )
+		    Assert.Fail "Object with a trailing comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{,""a"":nil}" )
+		    Assert.Fail "Object with a leading comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"":nil,,""b"":true}" )
+		    Assert.Fail "Object with an extra comma"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"":nil : ,""b"":true}" )
+		    Assert.Fail "Object with stray"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"":,""b"":true}" )
+		    Assert.Fail "Object with missing value"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    v = ParseJSON_MTC( "{""a"": nil, :true}" )
+		    Assert.Fail "Object with missing key"
+		  catch err as JSONException
+		    Assert.Pass
+		  end try
+		  
+		  #pragma BreakOnExceptions true
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub EmptyArrayTest()
 		  dim arr() as variant = ParseJSON_MTC( "[  ]" )
 		  Assert.AreEqual -1, Ctype( arr.Ubound, integer ), "With spaces"
@@ -34,6 +163,63 @@ Inherits TestGroup
 		    Assert.AreEqual( expectedString( i ), arr( 0 ).StringValue )
 		  next i
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub GenerateBigJSONTest()
+		  dim json as string = kBigJSON
+		  
+		  if true then
+		    dim arr() as variant = ParseJSON_MTC( json )
+		    
+		    StartTestTimer "mine"
+		    json = GenerateJSON_MTC( arr )
+		    LogTestTimer "mine"
+		  end if
+		  
+		  if true then
+		    dim jsonText as text = json.ToText
+		    dim arr() as auto = Xojo.Data.ParseJSON( jsonText )
+		    
+		    StartTestTimer "Xojo"
+		    jsonText = Xojo.Data.GenerateJSON( arr )
+		    LogTestTimer "Xojo"
+		  end if
+		  
+		  Assert.Pass
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub GenerateTest()
+		  dim d as new Date( 2001, 2, 25, 1, 2, 3 )
+		  dim json as string
+		  
+		  dim arr() as variant
+		  dim emptyDict as new Dictionary
+		  arr.Append emptyDict
+		  arr.Append nil
+		  arr.Append 1
+		  arr.Append 2.5
+		  arr.Append false
+		  arr.Append d
+		  dim emptyArr() as boolean
+		  arr.Append emptyArr
+		  arr.Append "©" + ChrB( 0 ) + "123" + ChrB( 10 ) + ChrB( 13 ) + ChrB( 2 ) + ChrB( 31 )
+		  
+		  json = GenerateJSON_MTC( arr )
+		  Assert.AreSame "[{},nil,1,2.5,false,""2001-02-25 01:02:03"",[],""©\u0000123\n\r\u0002\u001F""]", json
+		  
+		  dim dict as new Dictionary
+		  dict.Value( "nil" ) = nil
+		  dict.Value( "1" ) = 1
+		  dict.Value( "2.5" ) = 2.5
+		  dict.Value( "false" ) = false
+		  dict.Value( "arr" ) = arr
+		  
+		  json = GenerateJSON_MTC( dict, true )
+		  Assert.Message json.ToText
 		End Sub
 	#tag EndMethod
 
@@ -75,6 +261,14 @@ Inherits TestGroup
 		  
 		  Assert.AreNotEqual -1, Ctype( arr.Ubound, integer )
 		  Assert.Message "Array.Ubound = " + arr.Ubound.ToText
+		  
+		  dim jsonText as text = json.ToText
+		  
+		  StartTestTimer "Xojo"
+		  dim autoArr() as auto = Xojo.Data.ParseJSON( jsonText )
+		  LogTestTimer "Xojo"
+		  
+		  Assert.AreEqual arr.Ubound, autoArr.Ubound
 		End Sub
 	#tag EndMethod
 

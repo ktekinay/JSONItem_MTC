@@ -9,7 +9,8 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  while bytePos < mb.Size
+		  dim mbSize as integer = mb.Size
+		  while bytePos < mbSize
 		    select case p.Byte( bytePos )
 		    case kTab, kLinefeed, kReturn, kSpace
 		      bytePos = bytePos + 1
@@ -21,6 +22,545 @@ Protected Module M_JSON
 		  raise new JSONException( "Unexpected end of data at", 2, bytePos )
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub EncodeArray(value As Variant, toArray() As String, level As Integer, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		  #if not DebugBuild
+		    #pragma BackgroundTasks kAllowBackgroudTasks
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  dim thisIndent as string
+		  dim nextIndent as string
+		  const kComma as string = ","
+		  if level <> -1 then
+		    ExpandIndentArr level + 1
+		    thisIndent = IndentArr( level )
+		    nextIndent = IndentArr( level + 1 )
+		  end if
+		  
+		  dim isEmpty as boolean = true
+		  
+		  toArray.Append "["
+		  
+		  select case Introspection.GetType( value ).Name
+		  case "Variant()"
+		    dim arr() as variant = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      EncodeValue arr( i ), toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Auto()"
+		    dim arr() as auto = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as variant = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "String()"
+		    dim arr() as string = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as string = arr( i )
+		      EncodeString item, toArray, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Text()"
+		    dim arr() as text = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as string = arr( i )
+		      EncodeString item, toArray, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Double()"
+		    dim arr() as double = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as double = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Single()"
+		    dim arr() as single = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as single = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Int32()"
+		    dim arr() as Int32 = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as Int32 = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Int64()"
+		    dim arr() as Int64 = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as Int64 = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Integer()"
+		    dim arr() as Integer = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as Integer = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case "Boolean()"
+		    dim arr() as boolean = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as boolean = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  case else
+		    //
+		    // Objects?
+		    //
+		    dim arr() as object = value
+		    if arr.Ubound <> -1 then
+		      isEmpty = false
+		    end if
+		    
+		    for i as integer = 0 to arr.Ubound
+		      if level <> -1 then
+		        toArray.Append EndOfLine
+		        toArray.Append nextIndent
+		      end if
+		      dim item as object = arr( i )
+		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      if i < arr.Ubound then
+		        toArray.Append kComma
+		      end if
+		    next
+		    
+		  end select
+		  
+		  if level <> -1 and not isEmpty then
+		    toArray.Append EndOfLine
+		    toArray.Append thisIndent
+		  end if
+		  
+		  toArray.Append "]"
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub EncodeDictionary(dict As Dictionary, toArray() As String, level As Integer, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		  #if not DebugBuild
+		    #pragma BackgroundTasks kAllowBackgroudTasks
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  dim keys() as variant = dict.Keys
+		  dim values() as variant = dict.Values
+		  
+		  dim thisIndent as string
+		  dim nextIndent as string
+		  const kComma as string = ","
+		  dim colon as string = ":"
+		  if level <> -1 then
+		    ExpandIndentArr( level + 1 )
+		    thisIndent = IndentArr( level )
+		    nextIndent = IndentArr( level + 1 )
+		    colon = " : "
+		  end if
+		  
+		  toArray.Append "{"
+		  if keys.Ubound = -1 then
+		    toArray.Append "}"
+		    return
+		  end if
+		  
+		  for i as integer = 0 to keys.Ubound
+		    dim key as string = keys( i ).StringValue
+		    dim value as variant = values( i )
+		    
+		    if level <> -1 then
+		      toArray.Append EndOfLine
+		      toArray.Append nextIndent
+		    end if
+		    
+		    EncodeString key, toArray, inBuffer, outBuffer
+		    toArray.Append colon
+		    EncodeValue value, toArray, level + 1, inBuffer, outBuffer
+		    if i < keys.Ubound then
+		      toArray.Append kComma
+		    end if
+		  next
+		  
+		  if level <> -1 then
+		    toArray.Append EndOfLine
+		    toArray.Append thisIndent
+		  end if
+		  toArray.Append "}"
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub EncodeString(s As String, toArray() As String, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		  #if not DebugBuild
+		    #pragma BackgroundTasks kAllowBackgroudTasks
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  const kSlash as integer = 47
+		  const kA as integer = 65
+		  const kB as integer = 98
+		  const kF as integer = 102
+		  const kN as integer = 110
+		  const kR as integer = 114
+		  const kT as integer = 116
+		  const kU as integer = 117
+		  
+		  if s = "" then
+		    toArray.Append """"""
+		    return
+		  end if
+		  
+		  if s.Encoding is nil then
+		    if Encodings.UTF8.IsValidData( s ) then
+		      s = s.DefineEncoding( Encodings.UTF8 )
+		    else
+		      s = s.DefineEncoding( Encodings.SystemDefault )
+		      s = s.ConvertEncoding( Encodings.UTF8 )
+		    end if
+		    
+		  elseif s.Encoding <> Encodings.UTF8 then
+		    s = s.ConvertEncoding( Encodings.UTF8 )
+		  end if
+		  
+		  dim sLen as integer = s.LenB
+		  if inBuffer.Size < sLen then
+		    inBuffer = new MemoryBlock( sLen * 2 )
+		  end if
+		  
+		  inBuffer.StringValue( 0, sLen ) = s
+		  dim pIn as ptr = inBuffer
+		  
+		  dim outSize as integer = sLen * 6 + 2
+		  if outBuffer.Size < outSize then
+		    outBuffer = new MemoryBlock( outSize * 2 )
+		  end if
+		  
+		  dim pOut as ptr = outBuffer
+		  
+		  dim lastInByte as integer = sLen - 1
+		  dim outIndex as integer = 0
+		  for inIndex as integer = 0 to lastInByte
+		    dim thisByte as integer = pIn.Byte( inIndex )
+		    
+		    select case thisByte
+		    case 8 // vertical tab
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kB
+		      outIndex = outIndex + 1
+		      
+		    case 9 // tab
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kT
+		      outIndex = outIndex + 1
+		      
+		    case 10 // linefeed
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kN
+		      outIndex = outIndex + 1
+		      
+		    case 12 // form feed
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kF
+		      outIndex = outIndex + 1
+		      
+		    case 13 // return
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kR
+		      outIndex = outIndex + 1
+		      
+		    case is < 16 // have to encode it
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kU
+		      outIndex = outIndex + 1
+		      outBuffer.StringValue( outIndex, 3 ) = "000"
+		      outIndex = outIndex + 3
+		      outBuffer.StringValue( outIndex, 1 ) = Hex( thisByte )
+		      outIndex = outIndex + 1
+		      
+		    case is < 32 // have to encode it
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kU
+		      outIndex = outIndex + 1
+		      outBuffer.StringValue( outIndex, 2 ) = "00"
+		      outIndex = outIndex + 2
+		      outBuffer.StringValue( outIndex, 2 ) = Hex( thisByte )
+		      outIndex = outIndex + 2
+		      
+		    case else
+		      pOut.Byte( outIndex ) = thisByte
+		      outIndex = outIndex + 1
+		      
+		    end select
+		    
+		  next
+		  
+		  toArray.Append """"
+		  toArray.Append outBuffer.StringValue( 0, outIndex ).DefineEncoding( Encodings.UTF8 )
+		  toArray.Append """"
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub EncodeValue(value As Variant, toArray() As String, level As Integer, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		  //
+		  // We don't know if this is being called from a broader encoder so
+		  // we only append the raw value here
+		  //
+		  
+		  #if not DebugBuild
+		    #pragma BackgroundTasks kAllowBackgroudTasks
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  if value.IsNull then
+		    toArray.Append "nil"
+		    return // EARLY RETURN
+		  end if
+		  
+		  select case value.Type
+		  case Variant.TypeBoolean
+		    if value.BooleanValue then
+		      toArray.Append "true"
+		    else
+		      toArray.Append "false"
+		    end if
+		    
+		  case Variant.TypeInt32, Variant.TypeInt64, Variant.TypeInteger
+		    toArray.Append value.StringValue
+		    
+		  case Variant.TypeDouble, Variant.TypeSingle
+		    dim d as double = value.DoubleValue
+		    
+		    if d > ( 10.0 ^ 12.0 ) or d < 0.00009 then
+		      toArray.Append value.StringValue
+		    else
+		      toArray.Append format( d, "0.0########" )
+		    end if
+		    
+		  case Variant.TypeString
+		    EncodeString( value.StringValue, toArray, inBuffer, outBuffer )
+		    
+		  case Variant.TypeText
+		    dim t as text = value.TextValue
+		    dim s as string = t
+		    EncodeString( s, toArray, inBuffer, outBuffer )
+		    
+		  case Variant.TypeDate
+		    toArray.Append """"
+		    toArray.Append value.DateValue.SQLDateTime
+		    toArray.Append """"
+		    
+		  case else
+		    if value.Type = Variant.TypeObject and value isa Dictionary then
+		      EncodeDictionary( value, toArray, level, inBuffer, outBuffer )
+		    elseif value.IsArray then
+		      EncodeArray( value, toArray, level, inBuffer, outBuffer )
+		    end if
+		    
+		  end select
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ExpandIndentArr(targetUbound As Integer)
+		  #if not DebugBuild
+		    #pragma BackgroundTasks kAllowBackgroudTasks
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  if IndentArr.Ubound < targetUbound then
+		    dim startingIndex as integer = IndentArr.Ubound + 1
+		    if startingIndex = 0 then
+		      startingIndex = 1
+		    end if
+		    
+		    redim IndentArr( targetUbound )
+		    for i as integer = startingIndex to targetUbound
+		      IndentArr( i ) = IndentArr( i - 1 ) + kDefaultIndent
+		    next
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function GenerateJSON_MTC(json As Variant, prettyPrint As Boolean = False) As String
+		  //
+		  // Make sure we are starting with a Dictionary or array
+		  //
+		  
+		  if json.IsNull then
+		    return ""
+		    
+		  elseif json.Type = Variant.TypeObject and json isa Dictionary then
+		    //
+		    // Good
+		    //
+		    
+		  elseif json.IsArray then
+		    //
+		    // Good
+		    //
+		    
+		  else
+		    raise new IllegalCastException
+		    
+		  end if
+		  
+		  if prettyPrint then
+		    ExpandIndentArr( 256 )
+		  end if
+		  
+		  dim arr() as string
+		  dim level as integer = if( prettyPrint, 0, -1 )
+		  dim inBuffer as new MemoryBlock( 100 )
+		  dim outBuffer as new MemoryBlock( inBuffer.Size * 6 + 2 )
+		  EncodeValue( json, arr, level, inBuffer, outBuffer )
+		  
+		  dim result as string = join( arr, "" )
+		  return result
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -86,7 +626,9 @@ Protected Module M_JSON
 		  dim expectingComma as boolean
 		  dim foundComma as boolean
 		  
-		  while bytePos < mb.Size
+		  dim mbSize as integer = mb.Size
+		  
+		  while bytePos < mbSize
 		    AdvancePastWhiteSpace mb, p, bytePos
 		    
 		    dim thisByte as integer = p.Byte( bytePos )
@@ -108,6 +650,7 @@ Protected Module M_JSON
 		      end if
 		      
 		      bytePos = bytePos + 1
+		      
 		      return result
 		    end if
 		    
@@ -116,7 +659,10 @@ Protected Module M_JSON
 		    end if
 		    
 		    foundComma = false
-		    result.Append ParseValue( mb, p, bytePos )
+		    
+		    dim value as variant = ParseValue( mb, p, bytePos )
+		    result.Append value
+		    
 		    expectingComma = true
 		    
 		  wend
@@ -226,9 +772,10 @@ Protected Module M_JSON
 		  dim foundE as boolean
 		  
 		  dim startPos as integer = bytePos
+		  dim mbSize as integer = mb.Size
 		  
 		  do
-		    if bytePos >= mb.Size then
+		    if bytePos >= mbSize then
 		      raise new JSONException( "Illegal value", 10, startPos )
 		    end if
 		    
@@ -336,7 +883,9 @@ Protected Module M_JSON
 		  dim expectingValue as boolean
 		  dim foundComma as boolean
 		  
-		  while bytePos < mb.Size
+		  dim mbSize as integer = mb.Size
+		  
+		  while bytePos < mbSize
 		    AdvancePastWhiteSpace mb, p, bytePos
 		    
 		    dim thisByte as integer = p.Byte( bytePos )
@@ -350,7 +899,7 @@ Protected Module M_JSON
 		        bytePos = bytePos + 1
 		        continue while
 		      else
-		        raise new JSONException( "Unexpected character", 10, bytePos )
+		        raise new JSONException( "Unexpected character", 10, bytePos + 1 )
 		      end if
 		    end if
 		    
@@ -361,7 +910,7 @@ Protected Module M_JSON
 		        bytePos = bytePos + 1
 		        continue while
 		      else
-		        raise new JSONException( "Unexpected character", 10, bytePos )
+		        raise new JSONException( "Unexpected character", 10, bytePos + 1 )
 		      end if
 		    end if
 		    
@@ -380,9 +929,9 @@ Protected Module M_JSON
 		    foundComma = false
 		    
 		    if expectingComma and thisByte <> kComma then
-		      raise new JSONException( "Missing comma", 6, bytePos )
+		      raise new JSONException( "Missing comma", 6, bytePos + 1 )
 		    elseif expectingColon and thisByte <> kColon then
-		      raise new JSONException( "Missing colon", 6, bytePos )
+		      raise new JSONException( "Missing colon", 6, bytePos + 1 )
 		    end if
 		    
 		    if expectingValue then
@@ -393,7 +942,7 @@ Protected Module M_JSON
 		      result.Value( key ) = value
 		      
 		    elseif thisByte <> kQuote then
-		      raise new JSONException( "Illegal value", 10, bytePos )
+		      raise new JSONException( "Illegal value", 10, bytePos + 1 )
 		      
 		    else
 		      
@@ -407,7 +956,7 @@ Protected Module M_JSON
 		    end if
 		  wend
 		  
-		  raise new JSONException( "Missing }", 6, bytePos )
+		  raise new JSONException( "Missing }", 6, bytePos + 1 )
 		  
 		End Function
 	#tag EndMethod
@@ -427,8 +976,9 @@ Protected Module M_JSON
 		  #endif
 		  
 		  dim scanPos as integer = bytePos
+		  dim mbSize as integer = mb.Size
 		  do
-		    if scanPos >= mb.Size then
+		    if scanPos >= mbSize then
 		      raise new JSONException( "Invalid string", 10, bytePos )
 		    end if
 		    
@@ -496,7 +1046,8 @@ Protected Module M_JSON
 		  dim expectingSurrogate as boolean
 		  dim surrogateFirstHalf as integer
 		  
-		  while bytePos < mb.Size
+		  dim mbSize as integer = mb.Size
+		  while bytePos < mbSize
 		    dim thisByte as integer = p.Byte( bytePos )
 		    
 		    if inBackslash then
@@ -674,6 +1225,11 @@ Protected Module M_JSON
 	#tag EndMethod
 
 
+	#tag Property, Flags = &h21
+		Private IndentArr() As String
+	#tag EndProperty
+
+
 	#tag Constant, Name = kAllowBackgroudTasks, Type = Boolean, Dynamic = False, Default = \"True", Scope = Private
 	#tag EndConstant
 
@@ -690,6 +1246,9 @@ Protected Module M_JSON
 	#tag EndConstant
 
 	#tag Constant, Name = kCurlyBrace, Type = Double, Dynamic = False, Default = \"123", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kDefaultIndent, Type = String, Dynamic = False, Default = \"  ", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kLineFeed, Type = Double, Dynamic = False, Default = \"10", Scope = Private
