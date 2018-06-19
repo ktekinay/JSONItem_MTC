@@ -61,9 +61,17 @@ Inherits TestGroup
 		  dim json as string = kBigJSON
 		  Assert.Message "JSON.Len = " + json.Len.ToText
 		  
-		  StartTestTimer
+		  #if XojoVersion >= 2018.02
+		    StartProfiling
+		  #endif
+		  
+		  StartTestTimer "mine"
 		  dim arr() as variant = ParseJSON_MTC( json )
-		  LogTestTimer
+		  LogTestTimer "mine"
+		  
+		  #if XojoVersion >= 2018.02
+		    StopProfiling
+		  #endif
 		  
 		  Assert.AreNotEqual -1, Ctype( arr.Ubound, integer )
 		  Assert.Message "Array.Ubound = " + arr.Ubound.ToText
