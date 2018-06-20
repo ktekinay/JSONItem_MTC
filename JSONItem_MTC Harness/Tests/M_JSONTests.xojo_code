@@ -131,6 +131,32 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub DifferentEncodingsTest()
+		  dim json as string = "[1,2,""©""]"
+		  
+		  dim tryEncodings() as TextEncoding = array( _
+		  Encodings.UTF32BE, _
+		  Encodings.UTF32LE, _
+		  Encodings.UTF16BE, _
+		  Encodings.UTF16LE, _
+		  Encodings.SystemDefault _
+		  )
+		  
+		  for each enc as TextEncoding in tryEncodings
+		    dim diff as string = json.ConvertEncoding( enc )
+		    dim arr() as variant = ParseJSON_MTC( diff )
+		    Assert.AreEqual 2, Ctype( arr.Ubound, integer )
+		    Assert.AreEqual "©", arr( 2 ).StringValue
+		    
+		    diff = diff.DefineEncoding( nil )
+		    arr = ParseJSON_MTC( diff )
+		    Assert.AreEqual 2, Ctype( arr.Ubound, integer )
+		    Assert.AreEqual "©", arr( 2 ).StringValue
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub EmptyArrayTest()
 		  dim arr() as variant = ParseJSON_MTC( "[  ]" )
 		  Assert.AreEqual -1, Ctype( arr.Ubound, integer ), "With spaces"
