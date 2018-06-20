@@ -52,9 +52,9 @@ Protected Module M_JSON
 		  outPtr.Byte( outIndex ) = kSquareBracket
 		  outIndex = outIndex + 1
 		  
-		  select case Introspection.GetType( value ).Name
-		  case "Variant()"
-		    dim arr() as variant = value
+		  select case value.ArrayElementType
+		  case Variant.TypeObject
+		    dim arr() as object = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
 		    end if
@@ -72,27 +72,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Auto()"
-		    dim arr() as auto = value
-		    if arr.Ubound <> -1 then
-		      isEmpty = false
-		    end if
-		    
-		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
-		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
-		        outIndex = outIndex + nextIndentLen
-		      end if
-		      dim item as variant = arr( i )
-		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
-		      if i < arr.Ubound then
-		        outPtr.Byte( outIndex ) = kComma
-		        outIndex = outIndex + 1
-		      end if
-		    next
-		    
-		  case "String()"
+		  case Variant.TypeString
 		    dim arr() as string = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -112,7 +92,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Text()"
+		  case Variant.TypeText
 		    dim arr() as text = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -132,7 +112,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Double()"
+		  case Variant.TypeDouble
 		    dim arr() as double = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -152,7 +132,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Single()"
+		  case Variant.TypeSingle
 		    dim arr() as single = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -172,7 +152,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Int32()"
+		  case Variant.TypeInt32
 		    dim arr() as Int32 = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -192,7 +172,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Int64()"
+		  case Variant.TypeInt64
 		    dim arr() as Int64 = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -212,7 +192,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Integer()"
+		  case Variant.TypeInteger
 		    dim arr() as Integer = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -232,7 +212,7 @@ Protected Module M_JSON
 		      end if
 		    next
 		    
-		  case "Boolean()"
+		  case Variant.TypeBoolean
 		    dim arr() as boolean = value
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
@@ -254,26 +234,34 @@ Protected Module M_JSON
 		    
 		  case else
 		    //
-		    // Objects?
+		    // Auto() ?
 		    //
-		    dim arr() as object = value
-		    if arr.Ubound <> -1 then
-		      isEmpty = false
+		    if Introspection.GetType( value ).Name = "Auto()" then
+		      
+		      dim arr() as auto = value
+		      if arr.Ubound <> -1 then
+		        isEmpty = false
+		      end if
+		      
+		      for i as integer = 0 to arr.Ubound
+		        if level <> -1 then
+		          ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
+		          outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		          outIndex = outIndex + nextIndentLen
+		        end if
+		        dim item as variant = arr( i )
+		        EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
+		        if i < arr.Ubound then
+		          outPtr.Byte( outIndex ) = kComma
+		          outIndex = outIndex + 1
+		        end if
+		      next
+		      
+		    else
+		      
+		      raise new IllegalCastException
+		      
 		    end if
-		    
-		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
-		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
-		        outIndex = outIndex + nextIndentLen
-		      end if
-		      dim item as object = arr( i )
-		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
-		      if i < arr.Ubound then
-		        outPtr.Byte( outIndex ) = kComma
-		        outIndex = outIndex + 1
-		      end if
-		    next
 		    
 		  end select
 		  
