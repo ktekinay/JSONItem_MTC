@@ -567,7 +567,7 @@ Protected Module M_JSON
 		    if dAbs > ( 10.0 ^ 12.0 ) or dAbs < 0.00001 then
 		      s = value.StringValue
 		    else
-		      s = format( d, "0.0########" )
+		      s = format( d, "-0.0########" )
 		    end if
 		    dim sLen as integer = s.LenB
 		    ExpandOutBuffer sLen, outBuffer, outPtr, outIndex
