@@ -25,6 +25,7 @@ Class=StressTests;Tests/StressTests.xojo_code;&h000000001D5DEFFF;&h000000001962C
 Class=XojoJSONItemTests;Tests/XojoJSONItemTests.xojo_code;&h00000000794C237D;&h000000001962C3CC;false
 RawData=json_sample;Text Files/json_sample.txt;&h000000005E7609A1;&h0000000000000000;false
 Module=M_Global;M_Global.xojo_code;&h000000003616CFFF;&h0000000000000000;false
+Class=JSONDictionary;M_JSON/JSONDictionary.xojo_code;&h0000000035DB8FFF;&h00000000190CD7FF;false
 Folder=Tests;XojoUnit/Tests;&h0000000044C729E7;&h000000002516B04D;false
 Class=XojoUnitSuperClassTests;XojoUnit/Tests/XojoUnitSuperClassTests.xojo_code;&h000000003A8067FF;&h0000000044C729E7;false
 Class=XojoUnitTests;XojoUnit/Tests/XojoUnitTests.xojo_code;&h0000000045CA76B3;&h0000000044C729E7;false

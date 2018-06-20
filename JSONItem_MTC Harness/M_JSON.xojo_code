@@ -942,7 +942,7 @@ Protected Module M_JSON
 		  
 		  const kColon as integer = 58
 		  
-		  dim result as new Dictionary
+		  dim result as new M_JSON.JSONDictionary
 		  
 		  dim key as string
 		  dim value as variant
