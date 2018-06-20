@@ -655,7 +655,7 @@ Protected Module M_JSON
 		      return result
 		    end if
 		    
-		    if thisByte <> kComma and expectingComma then
+		    if expectingComma and thisByte <> kComma then
 		      raise new JSONException( "Illegal value", 10, bytePos + 1 )
 		    end if
 		    
