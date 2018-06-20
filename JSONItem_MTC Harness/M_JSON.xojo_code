@@ -34,9 +34,6 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  static eol as string = EndOfLine
-		  static eolLen as integer = eol.LenB
-		  
 		  dim thisIndent as string
 		  dim nextIndent as string
 		  dim nextIndentLen as integer
@@ -64,9 +61,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -85,9 +80,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -107,9 +100,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -129,9 +120,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -151,9 +140,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -173,9 +160,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -195,9 +180,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -217,9 +200,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -239,9 +220,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -261,9 +240,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -286,9 +263,7 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
-		        outBuffer.StringValue( outIndex, eolLen ) = eol
-		        outIndex = outIndex + eolLen
+		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
 		      end if
@@ -302,10 +277,8 @@ Protected Module M_JSON
 		    
 		  end select
 		  
-		  ExpandOutBuffer nextIndentLen + eolLen + 2, outBuffer, outPtr, outIndex
+		  ExpandOutBuffer nextIndentLen + 2, outBuffer, outPtr, outIndex
 		  if level <> -1 and not isEmpty then
-		    outBuffer.StringValue( outIndex, eolLen ) = eol
-		    outIndex = outIndex + eolLen
 		    outBuffer.StringValue( outIndex, thisIndent.LenB ) = thisIndent
 		    outIndex = outIndex + thisIndent.LenB
 		  end if
@@ -324,9 +297,6 @@ Protected Module M_JSON
 		    #pragma NilObjectChecking false
 		    #pragma StackOverflowChecking false
 		  #endif
-		  
-		  static eol as string = EndOfLine
-		  static eolLen as integer = eol.LenB
 		  
 		  dim keys() as variant = dict.Keys
 		  dim values() as variant = dict.Values
@@ -362,9 +332,7 @@ Protected Module M_JSON
 		    dim value as variant = values( i )
 		    
 		    if level <> -1 then
-		      ExpandOutBuffer nextIndentLen + eolLen, outBuffer, outPtr, outIndex
-		      outBuffer.StringValue( outIndex, eolLen ) = eol
-		      outIndex = outIndex + eolLen
+		      ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		      outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		      outIndex = outIndex + nextIndentLen
 		    end if
@@ -383,9 +351,7 @@ Protected Module M_JSON
 		  next
 		  
 		  if level <> -1 then
-		    ExpandOutBuffer nextIndentLen + eolLen, outBuffer, outPtr, outIndex
-		    outBuffer.StringValue( outIndex, eolLen ) = eol
-		    outIndex = outIndex + eolLen
+		    ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		    outBuffer.StringValue( outIndex, thisIndent.LenB ) = thisIndent
 		    outIndex = outIndex + thisIndent.LenB
 		  end if
@@ -613,6 +579,10 @@ Protected Module M_JSON
 		    end if
 		    
 		    redim IndentArr( targetUbound )
+		    if IndentArr( 0 ) = "" then
+		      IndentArr( 0 ) = EndOfLine
+		    end if
+		    
 		    for i as integer = startingIndex to targetUbound
 		      IndentArr( i ) = IndentArr( i - 1 ) + kDefaultIndent
 		    next
