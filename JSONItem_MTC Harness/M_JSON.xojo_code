@@ -39,7 +39,7 @@ Protected Module M_JSON
 		  dim nextIndentLen as integer
 		  const kComma as integer = 44
 		  
-		  if level <> -1 then
+		  if level > -1 then
 		    ExpandIndentArr level + 1
 		    thisIndent = IndentArr( level )
 		    nextIndent = IndentArr( level + 1 )
@@ -53,14 +53,21 @@ Protected Module M_JSON
 		  outIndex = outIndex + 1
 		  
 		  select case value.ArrayElementType
+		  case Variant.TypeDate
+		    break
+		    
 		  case Variant.TypeObject
-		    dim arr() as object = value
+		    //
+		    // Can't go directly from variant, have to pass through auto
+		    //
+		    dim autoValue as auto = value
+		    dim arr() as object = autoValue
 		    if arr.Ubound <> -1 then
 		      isEmpty = false
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -79,7 +86,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -99,7 +106,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -119,7 +126,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -139,7 +146,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -159,7 +166,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -179,7 +186,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -199,7 +206,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -219,7 +226,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    for i as integer = 0 to arr.Ubound
-		      if level <> -1 then
+		      if level > -1 then
 		        ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		        outIndex = outIndex + nextIndentLen
@@ -238,13 +245,14 @@ Protected Module M_JSON
 		    //
 		    if Introspection.GetType( value ).Name = "Auto()" then
 		      
-		      dim arr() as auto = value
+		      dim autoValue as auto = value
+		      dim arr() as auto = autoValue
 		      if arr.Ubound <> -1 then
 		        isEmpty = false
 		      end if
 		      
 		      for i as integer = 0 to arr.Ubound
-		        if level <> -1 then
+		        if level > -1 then
 		          ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		          outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		          outIndex = outIndex + nextIndentLen
@@ -266,7 +274,7 @@ Protected Module M_JSON
 		  end select
 		  
 		  ExpandOutBuffer nextIndentLen + 2, outBuffer, outPtr, outIndex
-		  if level <> -1 and not isEmpty then
+		  if level > -1 and not isEmpty then
 		    outBuffer.StringValue( outIndex, thisIndent.LenB ) = thisIndent
 		    outIndex = outIndex + thisIndent.LenB
 		  end if
@@ -297,7 +305,7 @@ Protected Module M_JSON
 		  const kComma as integer = 44
 		  dim colon as string = ":"
 		  dim colonLen as integer = 1
-		  if level <> -1 then
+		  if level > -1 then
 		    ExpandIndentArr( level + 1 )
 		    thisIndent = IndentArr( level )
 		    nextIndent = IndentArr( level + 1 )
@@ -319,7 +327,7 @@ Protected Module M_JSON
 		    dim key as string = keys( i ).StringValue
 		    dim value as variant = values( i )
 		    
-		    if level <> -1 then
+		    if level > -1 then
 		      ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		      outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
 		      outIndex = outIndex + nextIndentLen
@@ -338,7 +346,7 @@ Protected Module M_JSON
 		    end if
 		  next
 		  
-		  if level <> -1 then
+		  if level > -1 then
 		    ExpandOutBuffer nextIndentLen, outBuffer, outPtr, outIndex
 		    outBuffer.StringValue( outIndex, thisIndent.LenB ) = thisIndent
 		    outIndex = outIndex + thisIndent.LenB
@@ -619,9 +627,9 @@ Protected Module M_JSON
 		    ExpandIndentArr( 256 )
 		  end if
 		  
-		  dim level as integer = if( prettyPrint, 0, -1 )
-		  dim inBuffer as new MemoryBlock( 100 )
-		  dim outBuffer as new MemoryBlock( inBuffer.Size * 6 + 2 )
+		  dim level as integer = if( prettyPrint, 0, -2000000 ) // Crazy low number to prevent pretty print
+		  dim inBuffer as new MemoryBlock( 1024 )
+		  dim outBuffer as new MemoryBlock( inBuffer.Size * 10 )
 		  dim outPtr as ptr = outBuffer
 		  dim outIndex as integer = 0
 		  

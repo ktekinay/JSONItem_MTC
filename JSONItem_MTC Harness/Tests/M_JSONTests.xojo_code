@@ -169,22 +169,39 @@ Inherits TestGroup
 	#tag Method, Flags = &h0
 		Sub GenerateBigJSONTest()
 		  dim json as string = kBigJSON
+		  dim out as string
 		  
 		  if true then
 		    dim arr() as variant = ParseJSON_MTC( json )
 		    
-		    StartTestTimer "mine"
-		    json = GenerateJSON_MTC( arr )
-		    LogTestTimer "mine"
+		    StartTestTimer "GenerateJSON_MTC"
+		    out = GenerateJSON_MTC( arr )
+		    LogTestTimer "GenerateJSON_MTC"
 		  end if
 		  
 		  if true then
 		    dim jsonText as text = json.ToText
 		    dim arr() as auto = Xojo.Data.ParseJSON( jsonText )
 		    
-		    StartTestTimer "Xojo"
+		    StartTestTimer "Xojo.Data.GenerateJSON"
 		    jsonText = Xojo.Data.GenerateJSON( arr )
-		    LogTestTimer "Xojo"
+		    LogTestTimer "Xojo.Data.GenerateJSON"
+		  end if
+		  
+		  if true then
+		    dim j as new JSONItem( json )
+		    
+		    StartTestTimer "JSONItem.ToString"
+		    out = j.ToString
+		    LogTestTimer "JSONItem.ToString"
+		  end if
+		  
+		  if true then
+		    dim j as new JSONItem_MTC( json )
+		    
+		    StartTestTimer "JSONItem_MTC.ToString"
+		    out = j.ToString
+		    LogTestTimer "JSONItem_MTC.ToString"
 		  end if
 		  
 		  Assert.Pass
@@ -251,9 +268,9 @@ Inherits TestGroup
 		    StartProfiling
 		  #endif
 		  
-		  StartTestTimer "mine"
+		  StartTestTimer "ParseJSON_MTC"
 		  dim arr() as variant = ParseJSON_MTC( json )
-		  LogTestTimer "mine"
+		  LogTestTimer "ParseJSON_MTC"
 		  
 		  #if XojoVersion >= 2018.02
 		    StopProfiling
@@ -264,11 +281,27 @@ Inherits TestGroup
 		  
 		  dim jsonText as text = json.ToText
 		  
-		  StartTestTimer "Xojo"
+		  StartTestTimer "Xojo.Data.ParseJSON"
 		  dim autoArr() as auto = Xojo.Data.ParseJSON( jsonText )
-		  LogTestTimer "Xojo"
+		  LogTestTimer "Xojo.Data.ParseJSON"
 		  
 		  Assert.AreEqual arr.Ubound, autoArr.Ubound
+		  
+		  if true then
+		    StartTestTimer "JSONItem"
+		    dim j as new JSONItem( json )
+		    LogTestTimer "JSONItem"
+		    
+		    Assert.AreEqual Ctype( arr.Ubound, integer ), Ctype( j.Count, integer) - 1
+		  end if
+		  
+		  if true then
+		    StartTestTimer "JSONItem_MTC"
+		    dim j as new JSONItem_MTC( json )
+		    LogTestTimer "JSONItem_MTC"
+		    
+		    Assert.AreEqual Ctype( arr.Ubound, integer ), Ctype( j.Count, integer) - 1
+		  end if
 		End Sub
 	#tag EndMethod
 
@@ -284,7 +317,7 @@ Inherits TestGroup
 		  Assert.IsTrue d.HasKey( "c" ), "Has c"
 		  
 		  Assert.AreEqual 1, d.Value( "a" ).IntegerValue
-		  Assert.IsTrue d.Value( "b" ).BooleanValue
+		  Assert.IsTrue d.Value( "b" ).BooleanValue, "b"
 		  Assert.IsNil d.Value( "c" )
 		End Sub
 	#tag EndMethod
@@ -323,6 +356,89 @@ Inherits TestGroup
 		  
 		  arr = ParseJSON_MTC( asEncoded )
 		  Assert.AreEqual highChar, arr( 0 ).StringValue
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub VariousArraysTest()
+		  dim d as new Dictionary
+		  
+		  dim b1() as boolean
+		  d.Value( "boolean empty" ) = b1
+		  dim b2() as boolean = array( true, true, false )
+		  d.Value( "boolean" ) = b2
+		  
+		  dim d1() as double
+		  d.Value( "double empty" ) = d1
+		  dim d2() as double = array( 1.3, 4.5, 5.0 )
+		  d.Value( "double" ) = d2
+		  
+		  dim s1() as single
+		  d.Value( "single empty" ) = s1
+		  dim s2() as single
+		  s2.Append 1.3
+		  s2.Append 4.5
+		  s2.Append 5.0
+		  d.Value( "single" ) = s2
+		  
+		  dim i321() as int32
+		  d.Value( "int32 empty" ) = i321
+		  dim i322() as int32
+		  i322.Append 1
+		  i322.Append 2
+		  i322.Append 3
+		  d.Value( "int32" ) = i322
+		  
+		  dim i641() as int64
+		  d.Value( "int64 empty" ) = i641
+		  dim i642() as int64
+		  i642.Append 1
+		  i642.Append 2
+		  i642.Append 3
+		  d.Value( "int64" ) = i642
+		  
+		  dim i1() as integer
+		  d.Value( "integer empty" ) = i1
+		  dim i2() as integer
+		  i2.Append 1
+		  i2.Append 2
+		  i2.Append 3
+		  d.Value( "integer" ) = i2
+		  
+		  dim v1() as variant
+		  d.Value( "variant empty" ) = v1
+		  dim v2() as variant
+		  v2.Append nil
+		  v2.Append Ctype( "hi", string )
+		  v2.Append 1.3
+		  v2.Append 5
+		  v2.Append true
+		  v2.Append Ctype( "ho", text )
+		  v2.Append new Date
+		  d.Value( "variant" ) = v2
+		  
+		  dim a1() as auto
+		  d.Value( "auto empty" ) = a1
+		  dim a2() as auto
+		  a2.Append nil
+		  a2.Append Ctype( "hi", string )
+		  a2.Append 1.3
+		  a2.Append 5
+		  a2.Append true
+		  a2.Append Ctype( "ho", text )
+		  a2.Append new Date
+		  d.Value( "auto" ) = a2
+		  
+		  dim dt1() as Date
+		  d.Value( "date empty" ) = dt1
+		  dim dt2() as Date = array( new Date )
+		  d.Value( "date" ) = dt2
+		  
+		  dim json as string = GenerateJSON_MTC( d )
+		  Assert.AreNotEqual "", json // Important part here is, no RuntimeException
+		  
+		  Assert.Message json.ToText
+		  
 		End Sub
 	#tag EndMethod
 
