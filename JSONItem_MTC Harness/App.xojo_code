@@ -3,12 +3,27 @@ Protected Class App
 Inherits Application
 	#tag Event
 		Sub Open()
-		  #if XojoVersion >= 2018.02
-		    StopProfiling
-		  #endif
+		  App.StopProfiling
 		  
 		End Sub
 	#tag EndEvent
+
+
+	#tag Method, Flags = &h0
+		Sub StartProfiling()
+		  #if XojoVersion >= 2018.02 then
+		    global.StartProfiling
+		  #endif
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub StopProfiling()
+		  #if XojoVersion >= 2018.02 then
+		    global.StopProfiling
+		  #endif
+		End Sub
+	#tag EndMethod
 
 
 	#tag Constant, Name = kEditClear, Type = String, Dynamic = False, Default = \"&Delete", Scope = Public
