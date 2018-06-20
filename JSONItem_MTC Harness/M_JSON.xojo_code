@@ -25,7 +25,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EncodeArray(value As Variant, toArray() As String, level As Integer, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		Private Sub EncodeArray(value As Variant, level As Integer, ByRef outBuffer As MemoryBlock, ByRef outPtr As Ptr, ByRef outIndex As Integer, ByRef inBuffer As MemoryBlock)
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -33,18 +33,26 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
+		  static eol as string = EndOfLine
+		  static eolLen as integer = eol.LenB
+		  
 		  dim thisIndent as string
 		  dim nextIndent as string
-		  const kComma as string = ","
+		  dim nextIndentLen as integer
+		  const kComma as integer = 44
+		  
 		  if level <> -1 then
 		    ExpandIndentArr level + 1
 		    thisIndent = IndentArr( level )
 		    nextIndent = IndentArr( level + 1 )
+		    nextIndentLen = nextIndent.LenB
 		  end if
 		  
 		  dim isEmpty as boolean = true
 		  
-		  toArray.Append "["
+		  ExpandOutBuffer 10, outBuffer, outPtr, outIndex
+		  outPtr.Byte( outIndex ) = kSquareBracket
+		  outIndex = outIndex + 1
 		  
 		  select case Introspection.GetType( value ).Name
 		  case "Variant()"
@@ -55,12 +63,16 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
-		      EncodeValue arr( i ), toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue arr( i ), level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -72,13 +84,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as variant = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -90,13 +106,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as string = arr( i )
-		      EncodeString item, toArray, inBuffer, outBuffer
+		      EncodeString item, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -108,13 +128,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as string = arr( i )
-		      EncodeString item, toArray, inBuffer, outBuffer
+		      EncodeString item, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -126,13 +150,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as double = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -144,13 +172,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as single = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -162,13 +194,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as Int32 = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -180,13 +216,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as Int64 = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -198,13 +238,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as Integer = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -216,13 +260,17 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as boolean = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
@@ -237,30 +285,38 @@ Protected Module M_JSON
 		    
 		    for i as integer = 0 to arr.Ubound
 		      if level <> -1 then
-		        toArray.Append EndOfLine
-		        toArray.Append nextIndent
+		        ExpandOutBuffer eolLen + nextIndentLen, outBuffer, outPtr, outIndex
+		        outBuffer.StringValue( outIndex, eolLen ) = eol
+		        outIndex = outIndex + eolLen
+		        outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		        outIndex = outIndex + nextIndentLen
 		      end if
 		      dim item as object = arr( i )
-		      EncodeValue item, toArray, level + 1, inBuffer, outBuffer
+		      EncodeValue item, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		      if i < arr.Ubound then
-		        toArray.Append kComma
+		        outPtr.Byte( outIndex ) = kComma
+		        outIndex = outIndex + 1
 		      end if
 		    next
 		    
 		  end select
 		  
+		  ExpandOutBuffer nextIndentLen + eolLen + 2, outBuffer, outPtr, outIndex
 		  if level <> -1 and not isEmpty then
-		    toArray.Append EndOfLine
-		    toArray.Append thisIndent
+		    outBuffer.StringValue( outIndex, eolLen ) = eol
+		    outIndex = outIndex + eolLen
+		    outBuffer.StringValue( outIndex, thisIndent.LenB ) = thisIndent
+		    outIndex = outIndex + thisIndent.LenB
 		  end if
 		  
-		  toArray.Append "]"
+		  outPtr.Byte( outIndex ) = kCloseSquareBracket
+		  outIndex = outIndex + 1
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EncodeDictionary(dict As Dictionary, toArray() As String, level As Integer, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		Private Sub EncodeDictionary(dict As Dictionary, level As Integer, ByRef outBuffer As MemoryBlock, ByRef outPtr As Ptr, ByRef outIndex As Integer, ByRef inBuffer As MemoryBlock)
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -268,23 +324,35 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
+		  static eol as string = EndOfLine
+		  static eolLen as integer = eol.LenB
+		  
 		  dim keys() as variant = dict.Keys
 		  dim values() as variant = dict.Values
 		  
+		  ExpandOutBuffer ( keys.Ubound + 1 ) * 20 + 5, outBuffer, outPtr, outIndex
+		  
 		  dim thisIndent as string
 		  dim nextIndent as string
-		  const kComma as string = ","
+		  dim nextIndentLen as integer
+		  const kComma as integer = 44
 		  dim colon as string = ":"
+		  dim colonLen as integer = 1
 		  if level <> -1 then
 		    ExpandIndentArr( level + 1 )
 		    thisIndent = IndentArr( level )
 		    nextIndent = IndentArr( level + 1 )
+		    nextIndentLen = nextIndent.LenB
 		    colon = " : "
+		    colonLen = 3
 		  end if
 		  
-		  toArray.Append "{"
+		  outBuffer.Byte( outIndex ) = kCurlyBrace
+		  outIndex = outIndex + 1
+		  
 		  if keys.Ubound = -1 then
-		    toArray.Append "}"
+		    outBuffer.Byte( outIndex ) = kCloseCurlyBrace
+		    outIndex = outIndex + 1
 		    return
 		  end if
 		  
@@ -293,29 +361,43 @@ Protected Module M_JSON
 		    dim value as variant = values( i )
 		    
 		    if level <> -1 then
-		      toArray.Append EndOfLine
-		      toArray.Append nextIndent
+		      ExpandOutBuffer nextIndentLen + eolLen, outBuffer, outPtr, outIndex
+		      outBuffer.StringValue( outIndex, eolLen ) = eol
+		      outIndex = outIndex + eolLen
+		      outBuffer.StringValue( outIndex, nextIndentLen ) = nextIndent
+		      outIndex = outIndex + nextIndentLen
 		    end if
 		    
-		    EncodeString key, toArray, inBuffer, outBuffer
-		    toArray.Append colon
-		    EncodeValue value, toArray, level + 1, inBuffer, outBuffer
+		    EncodeString key, outBuffer, outPtr, outIndex, inBuffer
+		    ExpandOutBuffer colonLen, outBuffer, outPtr, outIndex
+		    outBuffer.StringValue( outIndex, colonLen ) = colon
+		    outIndex = outIndex + colonLen
+		    
+		    EncodeValue value, level + 1, outBuffer, outPtr, outIndex, inBuffer
 		    if i < keys.Ubound then
-		      toArray.Append kComma
+		      ExpandOutBuffer 1, outBuffer, outPtr, outIndex
+		      outBuffer.Byte( outIndex ) = kComma
+		      outIndex = outIndex + 1
 		    end if
 		  next
 		  
 		  if level <> -1 then
-		    toArray.Append EndOfLine
-		    toArray.Append thisIndent
+		    ExpandOutBuffer nextIndentLen + eolLen, outBuffer, outPtr, outIndex
+		    outBuffer.StringValue( outIndex, eolLen ) = eol
+		    outIndex = outIndex + eolLen
+		    outBuffer.StringValue( outIndex, thisIndent.LenB ) = thisIndent
+		    outIndex = outIndex + thisIndent.LenB
 		  end if
-		  toArray.Append "}"
+		  
+		  ExpandOutBuffer 1, outBuffer, outPtr, outIndex
+		  outBuffer.Byte( outIndex ) = kCloseCurlyBrace
+		  outIndex = outIndex + 1
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EncodeString(s As String, toArray() As String, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		Private Sub EncodeString(s As String, ByRef outBuffer As MemoryBlock, ByRef outPtr As Ptr, ByRef outIndex As Integer, ByRef inBuffer As MemoryBlock)
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -333,7 +415,10 @@ Protected Module M_JSON
 		  const kU as integer = 117
 		  
 		  if s = "" then
-		    toArray.Append """"""
+		    ExpandOutBuffer 2, outBuffer, outPtr, outIndex
+		    outBuffer.Byte( outIndex ) = kQuote
+		    outBuffer.Byte( outIndex + 1 ) = kQuote
+		    outIndex = outIndex + 2
 		    return
 		  end if
 		  
@@ -358,14 +443,14 @@ Protected Module M_JSON
 		  dim pIn as ptr = inBuffer
 		  
 		  dim outSize as integer = sLen * 6 + 2
-		  if outBuffer.Size < outSize then
-		    outBuffer = new MemoryBlock( outSize * 2 )
-		  end if
+		  ExpandOutBuffer outSize, outBuffer, outPtr, outIndex
 		  
-		  dim pOut as ptr = outBuffer
+		  dim pOut as ptr = outPtr
+		  
+		  pOut.Byte( outIndex ) = kQuote
+		  outIndex = outIndex + 1
 		  
 		  dim lastInByte as integer = sLen - 1
-		  dim outIndex as integer = 0
 		  for inIndex as integer = 0 to lastInByte
 		    dim thisByte as integer = pIn.Byte( inIndex )
 		    
@@ -428,15 +513,14 @@ Protected Module M_JSON
 		    
 		  next
 		  
-		  toArray.Append """"
-		  toArray.Append outBuffer.StringValue( 0, outIndex ).DefineEncoding( Encodings.UTF8 )
-		  toArray.Append """"
+		  pOut.Byte( outIndex ) = kQuote
+		  outIndex = outIndex + 1
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EncodeValue(value As Variant, toArray() As String, level As Integer, ByRef inBuffer As MemoryBlock, ByRef outBuffer As MemoryBlock)
+		Private Sub EncodeValue(value As Variant, level As Integer, ByRef outBuffer As MemoryBlock, ByRef outPtr As Ptr, ByRef outIndex As Integer, ByRef inBuffer As MemoryBlock)
 		  //
 		  // We don't know if this is being called from a broader encoder so
 		  // we only append the raw value here
@@ -450,48 +534,61 @@ Protected Module M_JSON
 		  #endif
 		  
 		  if value.IsNull then
-		    toArray.Append "nil"
+		    ExpandOutBuffer 4, outBuffer, outPtr, outIndex
+		    outBuffer.StringValue( outIndex, 3 ) = "nil"
+		    outIndex = outIndex + 3
 		    return // EARLY RETURN
 		  end if
 		  
 		  select case value.Type
 		  case Variant.TypeBoolean
+		    ExpandOutBuffer 6, outBuffer, outPtr, outIndex
 		    if value.BooleanValue then
-		      toArray.Append "true"
+		      outBuffer.StringValue( outIndex, 4 ) = "true"
+		      outIndex = outIndex + 4
 		    else
-		      toArray.Append "false"
+		      outBuffer.StringValue( outIndex, 5 ) = "false"
+		      outIndex = outIndex + 5
 		    end if
 		    
 		  case Variant.TypeInt32, Variant.TypeInt64, Variant.TypeInteger
-		    toArray.Append value.StringValue
+		    dim s as string = value.StringValue
+		    dim sLen as integer = s.LenB
+		    ExpandOutBuffer sLen, outBuffer, outPtr, outIndex
+		    outBuffer.StringValue( outIndex, sLen ) = s
+		    outIndex = outIndex + sLen
 		    
 		  case Variant.TypeDouble, Variant.TypeSingle
 		    dim d as double = value.DoubleValue
+		    dim dAbs as double = abs( d )
 		    
-		    if d > ( 10.0 ^ 12.0 ) or d < 0.00009 then
-		      toArray.Append value.StringValue
+		    dim s as string
+		    if dAbs > ( 10.0 ^ 12.0 ) or dAbs < 0.00001 then
+		      s = value.StringValue
 		    else
-		      toArray.Append format( d, "0.0########" )
+		      s = format( d, "0.0########" )
 		    end if
+		    dim sLen as integer = s.LenB
+		    ExpandOutBuffer sLen, outBuffer, outPtr, outIndex
+		    outBuffer.StringValue( outIndex, sLen ) = s
+		    outIndex = outIndex + sLen
 		    
 		  case Variant.TypeString
-		    EncodeString( value.StringValue, toArray, inBuffer, outBuffer )
+		    EncodeString( value.StringValue, outBuffer, outPtr, outIndex, inBuffer )
 		    
 		  case Variant.TypeText
 		    dim t as text = value.TextValue
 		    dim s as string = t
-		    EncodeString( s, toArray, inBuffer, outBuffer )
+		    EncodeString( s, outBuffer, outPtr, outIndex, inBuffer )
 		    
 		  case Variant.TypeDate
-		    toArray.Append """"
-		    toArray.Append value.DateValue.SQLDateTime
-		    toArray.Append """"
+		    EncodeString( value.DateValue.SQLDateTime, outBuffer, outPtr, outIndex, inBuffer )
 		    
 		  case else
 		    if value.Type = Variant.TypeObject and value isa Dictionary then
-		      EncodeDictionary( value, toArray, level, inBuffer, outBuffer )
+		      EncodeDictionary( value, level, outBuffer, outPtr, outIndex, inBuffer )
 		    elseif value.IsArray then
-		      EncodeArray( value, toArray, level, inBuffer, outBuffer )
+		      EncodeArray( value, level, outBuffer, outPtr, outIndex, inBuffer )
 		    end if
 		    
 		  end select
@@ -518,6 +615,18 @@ Protected Module M_JSON
 		    for i as integer = startingIndex to targetUbound
 		      IndentArr( i ) = IndentArr( i - 1 ) + kDefaultIndent
 		    next
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ExpandOutBuffer(additionalBytes As Integer, ByRef outBuffer As MemoryBlock, ByRef outPtr As Ptr, outIndex As Integer)
+		  dim targetSize as integer = outIndex + additionalBytes + 10
+		  if targetSize >= outBuffer.Size then
+		    targetSize = targetSize * 10
+		    outBuffer.Size = targetSize
+		    outPtr = outBuffer
 		  end if
 		  
 		End Sub
@@ -551,13 +660,15 @@ Protected Module M_JSON
 		    ExpandIndentArr( 256 )
 		  end if
 		  
-		  dim arr() as string
 		  dim level as integer = if( prettyPrint, 0, -1 )
 		  dim inBuffer as new MemoryBlock( 100 )
 		  dim outBuffer as new MemoryBlock( inBuffer.Size * 6 + 2 )
-		  EncodeValue( json, arr, level, inBuffer, outBuffer )
+		  dim outPtr as ptr = outBuffer
+		  dim outIndex as integer = 0
 		  
-		  dim result as string = join( arr, "" )
+		  EncodeValue( json, level, outBuffer, outPtr, outIndex, inBuffer )
+		  
+		  dim result as string = outBuffer.StringValue( 0, outIndex ).DefineEncoding( Encodings.UTF8 )
 		  return result
 		  
 		End Function
