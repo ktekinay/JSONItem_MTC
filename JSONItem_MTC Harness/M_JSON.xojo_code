@@ -467,8 +467,9 @@ Protected Module M_JSON
 		    
 		  case Variant.TypeDouble, Variant.TypeSingle
 		    dim d as double = value.DoubleValue
+		    dim dAbs as double = abs( d )
 		    
-		    if d > ( 10.0 ^ 12.0 ) or d < 0.00009 then
+		    if dAbs > ( 10.0 ^ 12.0 ) or dAbs < 0.00001 then
 		      toArray.Append value.StringValue
 		    else
 		      toArray.Append format( d, "0.0########" )
