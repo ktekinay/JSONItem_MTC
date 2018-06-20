@@ -19,7 +19,7 @@ Protected Module M_JSON
 		    end select
 		  wend
 		  
-		  raise new JSONException( "Unexpected end of data at", 2, bytePos )
+		  raise new JSONException( "Unexpected end of data", 2, bytePos )
 		  
 		End Sub
 	#tag EndMethod
