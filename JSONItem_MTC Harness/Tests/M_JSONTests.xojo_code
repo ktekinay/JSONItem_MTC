@@ -152,6 +152,9 @@ Inherits TestGroup
 		    arr = ParseJSON_MTC( diff )
 		    Assert.AreEqual 2, Ctype( arr.Ubound, integer )
 		    Assert.AreEqual "©", arr( 2 ).StringValue
+		    
+		    diff = GenerateJSON_MTC( arr )
+		    Assert.AreSame json, diff
 		  next
 		End Sub
 	#tag EndMethod
