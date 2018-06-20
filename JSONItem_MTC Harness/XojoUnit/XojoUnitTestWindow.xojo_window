@@ -70,6 +70,7 @@ Begin Window XojoUnitTestWindow
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   0
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   False
       Visible         =   True
@@ -101,6 +102,7 @@ Begin Window XojoUnitTestWindow
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   14
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
       Width           =   494
@@ -619,6 +621,7 @@ Begin Window XojoUnitTestWindow
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   214
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
       Width           =   500
@@ -770,6 +773,7 @@ Begin Window XojoUnitTestWindow
          TextSize        =   0.0
          TextUnit        =   0
          Top             =   346
+         Transparent     =   False
          Underline       =   False
          UseFocusRing    =   True
          Visible         =   True
@@ -891,6 +895,7 @@ Begin Window XojoUnitTestWindow
       TabPanelIndex   =   0
       TabStop         =   True
       Top             =   7
+      Transparent     =   False
       Visible         =   False
       Width           =   16
    End
