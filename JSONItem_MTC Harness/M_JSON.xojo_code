@@ -11,7 +11,8 @@ Protected Module M_JSON
 		  
 		  dim mbSize as integer = mb.Size
 		  while bytePos < mbSize
-		    select case p.Byte( bytePos )
+		    dim thisByte as integer = p.Byte( bytePos )
+		    select case thisByte
 		    case kTab, kLinefeed, kReturn, kSpace
 		      bytePos = bytePos + 1
 		    case else
@@ -651,7 +652,6 @@ Protected Module M_JSON
 		      end if
 		      
 		      bytePos = bytePos + 1
-		      
 		      return result
 		    end if
 		    
@@ -978,11 +978,7 @@ Protected Module M_JSON
 		  
 		  dim scanPos as integer = bytePos
 		  dim mbSize as integer = mb.Size
-		  do
-		    if scanPos >= mbSize then
-		      raise new JSONException( "Invalid string", 10, bytePos )
-		    end if
-		    
+		  while scanPos < mbSize
 		    dim thisByte as integer = p.Byte( scanPos )
 		    
 		    select case thisByte
@@ -1017,7 +1013,12 @@ Protected Module M_JSON
 		    end select
 		    
 		    scanPos = scanPos + 1
-		  loop
+		  wend
+		  
+		  //
+		  // If we get here...
+		  //
+		  raise new JSONException( "Invalid string", 10, bytePos )
 		  
 		  
 		End Function
@@ -1175,7 +1176,9 @@ Protected Module M_JSON
 		  
 		  AdvancePastWhiteSpace mb, p, bytePos
 		  
-		  select case p.Byte( bytePos )
+		  dim thisByte as integer = p.Byte( bytePos )
+		  
+		  select case thisByte
 		  case kSquareBracket
 		    bytePos = bytePos + 1
 		    return ParseArray( mb, p, bytePos )
