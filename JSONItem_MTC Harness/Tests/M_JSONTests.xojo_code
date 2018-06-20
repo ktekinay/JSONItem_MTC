@@ -368,6 +368,20 @@ Inherits TestGroup
 		Sub VariousArraysTest()
 		  dim d as new Dictionary
 		  
+		  if true then
+		    dim s1() as string
+		    d.Value( "string empty" ) = s1
+		    dim s2() as string = array( "hey", "ho", "howdy" )
+		    d.Value( "string" ) = s2
+		  end if
+		  
+		  if true then
+		    dim t1() as text
+		    d.Value( "text empty" ) = t1
+		    dim t2() as text = array( "hey", "ho", "howdy" )
+		    d.Value( "text" ) = t2
+		  end if
+		  
 		  dim b1() as boolean
 		  d.Value( "boolean empty" ) = b1
 		  dim b2() as boolean = array( true, true, false )
@@ -378,13 +392,15 @@ Inherits TestGroup
 		  dim d2() as double = array( 1.3, 4.5, 5.0 )
 		  d.Value( "double" ) = d2
 		  
-		  dim s1() as single
-		  d.Value( "single empty" ) = s1
-		  dim s2() as single
-		  s2.Append 1.3
-		  s2.Append 4.5
-		  s2.Append 5.0
-		  d.Value( "single" ) = s2
+		  if true then
+		    dim s1() as single
+		    d.Value( "single empty" ) = s1
+		    dim s2() as single
+		    s2.Append 1.3
+		    s2.Append 4.5
+		    s2.Append 5.0
+		    d.Value( "single" ) = s2
+		  end if
 		  
 		  dim i321() as int32
 		  d.Value( "int32 empty" ) = i321
@@ -439,7 +455,7 @@ Inherits TestGroup
 		  dim dt2() as Date = array( new Date )
 		  d.Value( "date" ) = dt2
 		  
-		  dim json as string = GenerateJSON_MTC( d )
+		  dim json as string = GenerateJSON_MTC( d, true )
 		  Assert.AreNotEqual "", json // Important part here is, no RuntimeException
 		  
 		  Assert.Message json.ToText
