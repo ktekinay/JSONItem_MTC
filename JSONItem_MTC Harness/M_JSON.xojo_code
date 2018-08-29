@@ -505,8 +505,8 @@ Protected Module M_JSON
 		  
 		  if value.IsNull then
 		    ExpandOutBuffer 4, outBuffer, outPtr, outIndex
-		    outBuffer.StringValue( outIndex, 3 ) = "nil"
-		    outIndex = outIndex + 3
+		    outBuffer.StringValue( outIndex, 4 ) = "null"
+		    outIndex = outIndex + 4
 		    return // EARLY RETURN
 		  end if
 		  
@@ -1270,9 +1270,9 @@ Protected Module M_JSON
 		    bytePos = bytePos + 1
 		    return ParseObject( mb, p, bytePos )
 		    
-		  case kN // Should be nil
-		    if ( bytePos + 3 ) < mb.Size and p.Byte( bytePos + 1 ) = kI and p.Byte( bytePos + 2 ) = kL then
-		      bytePos = bytePos + 3
+		  case kN // Should be null
+		    if ( bytePos + 4 ) < mb.Size and p.Byte( bytePos + 1 ) = kU and p.Byte( bytePos + 2 ) = kL and p.Byte( bytePos + 3 ) = kL then
+		      bytePos = bytePos + 4
 		      return nil
 		    end if
 		    

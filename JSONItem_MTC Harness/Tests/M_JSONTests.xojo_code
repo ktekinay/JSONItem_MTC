@@ -15,7 +15,7 @@ Inherits TestGroup
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{""a"":nil" )
+		    v = ParseJSON_MTC( "{""a"":null" )
 		    Assert.Fail "Missing }"
 		  catch err as JSONException
 		    Assert.Pass
@@ -43,7 +43,7 @@ Inherits TestGroup
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{""a"":nil]" )
+		    v = ParseJSON_MTC( "{""a"":null]" )
 		    Assert.Fail "{ with ]"
 		  catch err as JSONException
 		    Assert.Pass
@@ -85,28 +85,28 @@ Inherits TestGroup
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{""a"":nil,}" )
+		    v = ParseJSON_MTC( "{""a"":null,}" )
 		    Assert.Fail "Object with a trailing comma"
 		  catch err as JSONException
 		    Assert.Pass
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{,""a"":nil}" )
+		    v = ParseJSON_MTC( "{,""a"":null" )
 		    Assert.Fail "Object with a leading comma"
 		  catch err as JSONException
 		    Assert.Pass
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{""a"":nil,,""b"":true}" )
+		    v = ParseJSON_MTC( "{""a"":null,,""b"":true}" )
 		    Assert.Fail "Object with an extra comma"
 		  catch err as JSONException
 		    Assert.Pass
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{""a"":nil : ,""b"":true}" )
+		    v = ParseJSON_MTC( "{""a"":null : ,""b"":true}" )
 		    Assert.Fail "Object with stray"
 		  catch err as JSONException
 		    Assert.Pass
@@ -120,7 +120,7 @@ Inherits TestGroup
 		  end try
 		  
 		  try
-		    v = ParseJSON_MTC( "{""a"": nil, :true}" )
+		    v = ParseJSON_MTC( "{""a"": null, :true}" )
 		    Assert.Fail "Object with missing key"
 		  catch err as JSONException
 		    Assert.Pass
@@ -262,7 +262,7 @@ Inherits TestGroup
 		  arr.Append "©" + ChrB( 0 ) + "123" + ChrB( 10 ) + ChrB( 13 ) + ChrB( 2 ) + ChrB( 31 )
 		  
 		  json = GenerateJSON_MTC( arr )
-		  Assert.AreSame "[{},nil,1,2.5,false,""2001-02-25 01:02:03"",[],""©\u0000123\n\r\u0002\u001F""]", json
+		  Assert.AreSame "[{},null,1,2.5,false,""2001-02-25 01:02:03"",[],""©\u0000123\n\r\u0002\u001F""]", json
 		  
 		  dim dict as new Dictionary
 		  dict.Value( "nil" ) = nil
@@ -277,9 +277,18 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub NullTest()
+		  dim json as Dictionary = M_JSON.ParseJSON_MTC( "{""nullvalue"":null, ""notnull"":1}" )
+		  dim v as variant = json.Value( "nullvalue" )
+		  Assert.IsNil v, "Should be nil"
+		  Assert.AreEqual 1, json.Value( "notnull" ).IntegerValue, "notnull"
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ParseArrayJSONTest()
 		  const kUbound as integer = 5
-		  dim v as variant = ParseJSON_MTC( "[1, 2.5, false, ""a string"", ""a string with \""quote\"""", nil]" )
+		  dim v as variant = ParseJSON_MTC( "[1, 2.5, false, ""a string"", ""a string with \""quote\"""", null]" )
 		  
 		  Assert.IsTrue v.IsArray
 		  
@@ -343,7 +352,7 @@ Inherits TestGroup
 		Sub ParseObjectTest()
 		  self.StopTestOnFail = true
 		  
-		  dim d as Dictionary = ParseJSON_MTC( "{""a"" : 1, ""b"" : true, ""c"":nil}" )
+		  dim d as Dictionary = ParseJSON_MTC( "{""a"" : 1, ""b"" : true, ""c"":null}" )
 		  
 		  Assert.AreEqual d.Count, 3
 		  Assert.IsTrue d.HasKey( "a" ), "Has a"
