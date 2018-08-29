@@ -349,6 +349,28 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ParseHugeStringTest()
+		  dim s as string = "A"
+		  while s.LenB < 1024
+		    s = s + s
+		  wend
+		  s = "\""" + s.Left( 1024 )
+		  while s.LenB < 20000000
+		    s = s + s
+		  wend
+		  s = s.Left( 20000000 )
+		  
+		  dim json as string = "{""key"":""" + s + """}"
+		  
+		  self.StartTestTimer "Parse string"
+		  dim d as Dictionary = ParseJSON_MTC( json )
+		  self.LogTestTimer "Parse string"
+		  
+		  Assert.AreEqual s.ReplaceAll( "\""", """" ), d.Value( "key" ).StringValue
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ParseObjectTest()
 		  self.StopTestOnFail = true
 		  
