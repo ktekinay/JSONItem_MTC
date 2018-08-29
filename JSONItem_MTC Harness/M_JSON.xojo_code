@@ -1047,68 +1047,6 @@ Protected Module M_JSON
 
 	#tag Method, Flags = &h21
 		Private Function ParseString(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As String
-		  //
-		  // Prescan the MemoryBlock for a backslash
-		  // If there aren't any, we don't need to do anything else
-		  //
-		  
-		  #if not DebugBuild
-		    #pragma BackgroundTasks kAllowBackgroudTasks
-		    #pragma BoundsChecking false
-		    #pragma NilObjectChecking false
-		    #pragma StackOverflowChecking false
-		  #endif
-		  
-		  dim scanPos as integer = bytePos
-		  dim mbSize as integer = mb.Size
-		  while scanPos < mbSize
-		    dim thisByte as integer = p.Byte( scanPos )
-		    
-		    select case thisByte
-		    case kBackslash 
-		      //
-		      // We need the more extensive code
-		      //
-		      dim s as string
-		      dim byteLen as integer = scanPos - bytePos
-		      if byteLen <> 0 then
-		        s = mb.StringValue( bytePos, byteLen )
-		        bytePos = scanPos
-		      end if
-		      s = s + ParseStringWithBackslash( mb, p, bytePos )
-		      s = s.DefineEncoding( Encodings.UTF8 )
-		      return s
-		      
-		    case kQuote
-		      //
-		      // We found the end of the quote
-		      //
-		      dim s as string
-		      dim byteLen as integer = scanPos - bytePos
-		      if byteLen <> 0 then
-		        s = mb.StringValue( bytePos, byteLen )
-		        s = s.DefineEncoding( Encodings.UTF8 )
-		      end if
-		      
-		      bytePos = scanPos + 1
-		      return s
-		      
-		    end select
-		    
-		    scanPos = scanPos + 1
-		  wend
-		  
-		  //
-		  // If we get here...
-		  //
-		  raise new JSONException( "Invalid string", 10, bytePos )
-		  
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function ParseStringWithBackslash(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As String
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -1192,6 +1130,7 @@ Protected Module M_JSON
 		          
 		        end if
 		        
+		        
 		      case else
 		        //
 		        // If we were strict, we would...
@@ -1203,7 +1142,14 @@ Protected Module M_JSON
 		        
 		      end select
 		      
+		      startPos = bytePos + 1
+		      
 		    elseif thisByte = kBackslash then
+		      dim diff as integer = bytePos - startPos
+		      if diff <> 0 then
+		        builder.Append mb.StringValue( startPos, diff)
+		      end if
+		      
 		      inBackslash = true
 		      
 		    elseif expectingSurrogate then
@@ -1213,13 +1159,21 @@ Protected Module M_JSON
 		      //
 		      // We're done with this string
 		      //
+		      dim diff as integer = bytePos - startPos
+		      dim s as string
+		      if diff <> 0 then
+		        s = mb.StringValue( startPos, diff )
+		      end if
+		      
 		      bytePos = bytePos + 1
-		      dim s as string = join( builder, "" )
+		      
+		      if builder.Ubound <> -1 then
+		        builder.Append s
+		        s = join( builder, "" )
+		      end if
+		      
 		      s = s.DefineEncoding( Encodings.UTF8 )
 		      return s
-		      
-		    else
-		      builder.Append ChrB( thisByte )
 		      
 		    end if
 		    
