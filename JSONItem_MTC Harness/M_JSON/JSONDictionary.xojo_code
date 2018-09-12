@@ -60,6 +60,21 @@ Inherits Dictionary
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function ToDictionary() As Dictionary
+		  dim keys() as variant = self.Keys
+		  dim values() as variant = self.Values
+		  
+		  dim d as new Dictionary
+		  for i as integer = 0 to keys.Ubound
+		    d.Value( keys( i ) ) = values( i )
+		  next
+		  
+		  return d
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Value(key As Variant) As Variant
 		  if key.Type = Variant.TypeString then
 		    key = EncodeHex( key.StringValue )
@@ -92,7 +107,7 @@ Inherits Dictionary
 			  dim longest as integer
 			  dim shortest as integer = &h7FFFFFFF
 			  
-			  for i as integer = 0 to rawKeys.Ubound 
+			  for i as integer = 0 to rawKeys.Ubound
 			    dim thisKey as variant = rawKeys( i )
 			    
 			    if thisKey.Type = Variant.TypeString then
@@ -174,11 +189,6 @@ Inherits Dictionary
 			Visible=true
 			Group="Position"
 			InitialValue="0"
-			Type="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="KeyMap"
-			Group="Behavior"
 			Type="Integer"
 		#tag EndViewProperty
 	#tag EndViewBehavior

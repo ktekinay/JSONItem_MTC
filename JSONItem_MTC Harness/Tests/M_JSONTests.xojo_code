@@ -277,6 +277,17 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub JSONDIctionaryToDictionaryTest()
+		  dim jd as M_JSON.JSONDictionary = ParseJSON_MTC( "{""aa"" : 1, ""AA"" : 2, ""Aa"" : 3}" )
+		  Assert.AreEqual 3, jd.Count
+		  
+		  dim d as Dictionary = jd.ToDictionary
+		  Assert.AreEqual "Dictionary", Introspection.GetType( d ).Name
+		  Assert.AreEqual 1, d.Count
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub NullTest()
 		  dim json as Dictionary = M_JSON.ParseJSON_MTC( "{""nullvalue"":null, ""notnull"":1}" )
 		  dim v as variant = json.Value( "nullvalue" )
