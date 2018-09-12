@@ -1,0 +1,1321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RBProject version="2017r3" FormatVersion="2" MinIDEVersion="20070100">
+<block type="Module" ID="1069731839">
+ <ObjName>JSONWebToken_MTC</ObjName>
+ <ObjContainerID>1219351307</ObjContainerID>
+ <IsClass>1</IsClass>
+ <ItemFlags>1</ItemFlags>
+ <IsInterface>0</IsInterface>
+ <Compatibility></Compatibility>
+ <Method>
+  <ItemName>Constructor</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub Constructor(claimValues As JSONItem_MTC = Nil, headerValues As JSONItem_MTC = Nil)</SourceLine>
+   <SourceLine>if headerValues is nil then</SourceLine>
+   <SourceLine>Header = new JSONItem_MTC( "{}" )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if claimValues is nil then</SourceLine>
+   <SourceLine>Claim = new JSONItem_MTC( "{}" )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>LoadValues claimValues, headerValues</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not Header.HasName( kKeyType ) then</SourceLine>
+   <SourceLine>Header.Value( kKeyType ) = kTypeJWT</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim nowSecs as Int64 = Xojo.Core.Date.Now.SecondsFrom1970</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim issuedAt as Int64 = Claim.Lookup( kKeyIssuedAt, nowSecs )</SourceLine>
+   <SourceLine>dim expiresAt as Int64 = Claim.Lookup( kKeyExpiration, nowSecs )</SourceLine>
+   <SourceLine>ExpirationSeconds = expiresAt - issuedAt</SourceLine>
+   <SourceLine>if ExpirationSeconds &lt; 0 then</SourceLine>
+   <SourceLine>ExpirationSeconds = 0</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>claimValues As JSONItem_MTC = Nil, headerValues As JSONItem_MTC = Nil</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Decode</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function Decode(token As String) As JSONWebToken_MTC</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Decodes the data without regard to signature, but performs content validation</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim result as new JSONWebToken_MTC</SourceLine>
+   <SourceLine>if DecodeInto( result, token ) = false then</SourceLine>
+   <SourceLine>result = nil</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return result</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>token As String</ItemParams>
+  <ItemResult>JSONWebToken_MTC</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>DecodeBase64URL</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function DecodeBase64URL(value As String, encoding As TextEncoding = Nil) As String</SourceLine>
+   <SourceLine>if value = "" then</SourceLine>
+   <SourceLine>return value</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>value = value.ReplaceAllB( "-", "+" )</SourceLine>
+   <SourceLine>value = value.ReplaceAllB( "_", "/" )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// The native decoder doesn't care about the padding ("=") so</SourceLine>
+   <SourceLine>// we don't have to bother putting it back in</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim result as string = DecodeBase64( value, encoding )</SourceLine>
+   <SourceLine>return result</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>value As String, encoding As TextEncoding = Nil</ItemParams>
+  <ItemResult>String</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>DecodeInto</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function DecodeInto(result As JSONWebToken_MTC, token As String) As Boolean</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Decodes the data without regard to signature, but performs content validation</SourceLine>
+   <SourceLine>// Returns false only if the content did not validate, i.e., result was not filled</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if token = "" then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>token = ToUTF8( token )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim parts() as string = token.Split( "." )</SourceLine>
+   <SourceLine>if parts.Ubound = 0 or parts.Ubound &gt; 2 then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim headerEncoded as string = parts( 0 )</SourceLine>
+   <SourceLine>dim claimEncoded as string = parts( 1 )</SourceLine>
+   <SourceLine>dim signatureEncoded as string = if( parts.Ubound = 2, parts( 2 ), "" )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim headerJSON as string = DecodeBase64URL( headerEncoded )</SourceLine>
+   <SourceLine>dim claimJSON as string = DecodeBase64URL( claimEncoded )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Start the validation</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not Encodings.UTF8.IsValidData( headerJSON ) then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>headerJSON = ToUTF8( headerJSON )</SourceLine>
+   <SourceLine>claimJSON = ToUTF8( claimJSON )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim rxBadChars as new RegEx</SourceLine>
+   <SourceLine>rxBadChars.SearchPattern = "(?mi-Us)""(\\""|[^""])*""(*SKIP)(*FAIL)|(true|false|null)(*SKIP)(*FAIL)|(?:\d*\.)?\d+(*SKIP)(*FAIL)|[^:{[\]},]"</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if rxBadChars.Search( headerJSON ) isa RegExMatch or rxBadChars.Search( claimJSON ) isa RegExMatch then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim header as new JSONItem_MTC( headerJSON )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if header.HasName( kKeyType ) then</SourceLine>
+   <SourceLine>dim type as string = header.Value( kKeyType )</SourceLine>
+   <SourceLine>if StrComp( type, kTypeJWT, 0 ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Create it</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if claimJSON = "" then</SourceLine>
+   <SourceLine>claimJSON = "{}"</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>dim claim as JSONItem_MTC = new JSONItem_MTC( claimJSON )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>result.LoadValues claim, header</SourceLine>
+   <SourceLine>result.IncludeIssuedAt = claim.HasName( kKeyIssuedAt )</SourceLine>
+   <SourceLine>result.mSignature = signatureEncoded</SourceLine>
+   <SourceLine>result.mLoadedSignaturePart = signatureEncoded</SourceLine>
+   <SourceLine>result.mLoadedDataPart = headerEncoded + "." + claimEncoded</SourceLine>
+   <SourceLine>result.mLoadedToken = token</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>Exception err as RuntimeException</SourceLine>
+   <SourceLine>if err isa EndException or err isa ThreadEndException then</SourceLine>
+   <SourceLine>raise err</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>1</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>result As JSONWebToken_MTC, token As String</ItemParams>
+  <ItemResult>Boolean</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>EncodeBase64URL</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function EncodeBase64URL(value As String) As String</SourceLine>
+   <SourceLine>if value = "" then</SourceLine>
+   <SourceLine>return value</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim result as string = EncodeBase64( value, -1 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>result = result.ReplaceAllB( "+", "-" )</SourceLine>
+   <SourceLine>result = result.ReplaceAllB( "/", "_" )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if result.RightB( 2 ) = "==" then</SourceLine>
+   <SourceLine>result = result.LeftB( result.LenB - 2 )</SourceLine>
+   <SourceLine>elseif result.RightB( 1 ) = "=" then</SourceLine>
+   <SourceLine>result = result.LeftB( result.LenB - 1 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return result.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>value As String</ItemParams>
+  <ItemResult>String</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>HasKey</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function HasKey(key As String) As Boolean</SourceLine>
+   <SourceLine>return Claim.HasName( key )</SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>key As String</ItemParams>
+  <ItemResult>Boolean</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>LoadValues</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub LoadValues(claimValues As JSONItem_MTC, headerValues As JSONItem_MTC)</SourceLine>
+   <SourceLine>if claimValues isa object then</SourceLine>
+   <SourceLine>Claim = new JSONItem_MTC( claimValues.ToString )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if headerValues isa object then</SourceLine>
+   <SourceLine>Header = new JSONItem_MTC( headerValues.ToString )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>claimValues As JSONItem_MTC, headerValues As JSONItem_MTC</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Lookup</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function Lookup(key As String, defaultValue As Variant) As Variant</SourceLine>
+   <SourceLine>return Claim.Lookup( key, defaultValue )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>key As String, defaultValue As Variant</ItemParams>
+  <ItemResult>Variant</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Remove</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub Remove(key As String)</SourceLine>
+   <SourceLine>RemoveValue key, Claim</SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>key As String</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>RemoveValue</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub RemoveValue(key As String, json As JSONItem_MTC)</SourceLine>
+   <SourceLine>if json.HasName( key ) then</SourceLine>
+   <SourceLine>json.Remove key</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>key As String, json As JSONItem_MTC</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>ToToken</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function ToToken(algorithm As String, secret As String) As String</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Check parameters</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if algorithm &lt;&gt; kAlgorithmNone and secret = "" then</SourceLine>
+   <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
+   <SourceLine>err.Message = "A secret must be specified"</SourceLine>
+   <SourceLine>raise err</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim nowSecs as Int64 = Xojo.Core.Date.Now.SecondsFrom1970</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>self.Header.Value( kKeyAlgorithm ) = algorithm</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim header as string = Header.ToString</SourceLine>
+   <SourceLine>dim headerEncoded as string = EncodeBase64URL( header )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim claimJSON as JSONItem_MTC = RawClaim</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if ExpirationSeconds &gt; 0 then</SourceLine>
+   <SourceLine>claimJSON.Value( kKeyExpiration ) = nowSecs + ExpirationSeconds</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if IncludeIssuedAt then</SourceLine>
+   <SourceLine>claimJSON.Value( kKeyIssuedAt ) = nowSecs</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>RemoveValue kKeyIssuedAt, claimJSON</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim claim as string = claimJSON.ToString</SourceLine>
+   <SourceLine>dim claimEncoded as string = EncodeBase64URL( claim )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim data as string = headerEncoded + "." + claimEncoded</SourceLine>
+   <SourceLine>dim signature as string</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if algorithm &lt;&gt; kAlgorithmNone then</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>select case algorithm</SourceLine>
+   <SourceLine>case kAlgorithmHS256</SourceLine>
+   <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secret, data, Crypto.Algorithm.SHA256 ) )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case kAlgorithmHS512</SourceLine>
+   <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secret, data, Crypto.Algorithm.SHA512 ) )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>mSignature = signature</SourceLine>
+   <SourceLine>dim token as string = data + if( signature &lt;&gt; "", "." + signature, "" )</SourceLine>
+   <SourceLine>return token</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>algorithm As String, secret As String</ItemParams>
+  <ItemResult>String</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>ToUTF8</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function ToUTF8(s As String) As String</SourceLine>
+   <SourceLine>if s = "" or s.Encoding = Encodings.UTF8 then</SourceLine>
+   <SourceLine>return s</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if s.Encoding isa TextEncoding then</SourceLine>
+   <SourceLine>return s.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// It's nil</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if Encodings.UTF8.IsValidData( s ) then</SourceLine>
+   <SourceLine>return s.DefineEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return s.DefineEncoding( Encodings.ISOLatin1 ) // Guessing</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>s As String</ItemParams>
+  <ItemResult>String</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Validate</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function Validate(token As String, secret As String) As JSONWebToken_MTC</SourceLine>
+   <SourceLine>dim result as new JSONWebToken_MTC</SourceLine>
+   <SourceLine>if ValidateInto( result, token, secret ) then</SourceLine>
+   <SourceLine>return result</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return nil</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>token As String, secret As String</ItemParams>
+  <ItemResult>JSONWebToken_MTC</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>ValidateInto</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Shared Function ValidateInto(result As JSONWebToken_MTC, token As String, secret As String) As Boolean</SourceLine>
+   <SourceLine>if DecodeInto( result, token ) = false then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Validate the signature</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim signature as string = DecodeBase64URL( result.LoadedSignaturePart )</SourceLine>
+   <SourceLine>dim compareSignature as string</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim algorithm as string = result.Header.Lookup( kKeyAlgorithm, "" )</SourceLine>
+   <SourceLine>select case algorithm</SourceLine>
+   <SourceLine>case kAlgorithmNone</SourceLine>
+   <SourceLine>if signature &lt;&gt; "" then</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// That doesn't make sense</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case kAlgorithmHS256</SourceLine>
+   <SourceLine>compareSignature = Crypto.HMAC( secret, result.LoadedDataPart, Crypto.Algorithm.SHA256 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case kAlgorithmHS512</SourceLine>
+   <SourceLine>compareSignature = Crypto.HMAC( secret, result.LoadedDataPart, Crypto.Algorithm.SHA512 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if StrComp( signature, compareSignature, 0 ) &lt;&gt; 0 then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Make sure it's current</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if not result.IsCurrent then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return true</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>Exception err as RuntimeException</SourceLine>
+   <SourceLine>if err isa EndException or err isa ThreadEndException then</SourceLine>
+   <SourceLine>raise err</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>1</ItemFlags>
+  <IsShared>1</IsShared>
+  <ItemParams>result As JSONWebToken_MTC, token As String, secret As String</ItemParams>
+  <ItemResult>Boolean</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Value</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function Value(key As String) As Variant</SourceLine>
+   <SourceLine>return Claim.Value( key )</SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>key As String</ItemParams>
+  <ItemResult>Variant</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Value</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub Value(key As String, Assigns value As Variant)</SourceLine>
+   <SourceLine>Claim.Value( key ) = value</SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>key As String, Assigns value As Variant</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Property>
+  <ItemName>Audience</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Audience As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Audience As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine>dim key as string = kKeyAudience</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value = "" then</SourceLine>
+   <SourceLine>Remove key</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>Value( key ) = value</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return Claim.Lookup( kKeyAudience, "" )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>Claim</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Claim As JSONItem_MTC</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Claim As JSONItem_MTC</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>ExpirationSeconds</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>ExpirationSeconds As Int64</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>ExpirationSeconds As Int64</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>Header</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Header As JSONItem_MTC</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Header As JSONItem_MTC</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>IncludeIssuedAt</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>IncludeIssuedAt As Boolean = True</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>IncludeIssuedAt As Boolean = True</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>IsCurrent</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>IsCurrent As Boolean</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>IsCurrent As Boolean</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>dim nowSecs as Int64 = Xojo.Core.Date.Now.SecondsFrom1970</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if NotBeforeDate isa Xojo.Core.Date and NotBeforeDate.SecondsFrom1970 &gt; nowSecs then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim expireAt as Int64 = claim.Lookup( kKeyExpiration, nowSecs )</SourceLine>
+   <SourceLine>if expireAt &lt; nowSecs then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>Issuer</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Issuer As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Issuer As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine>dim key as string = kKeyIssuer</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value = "" then</SourceLine>
+   <SourceLine>Remove key</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>Value( key ) = value</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return Claim.Lookup( kKeyIssuer, "" )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>JWTId</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>JWTId As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>JWTId As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine>dim key as string = kKeyJWTId</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value = "" then</SourceLine>
+   <SourceLine>Remove key</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>Value( key ) = value</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return Claim.Lookup( kKeyJWTId, "" )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>LoadedDataPart</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadedDataPart As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadedDataPart As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return mLoadedDataPart</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>LoadedExpiresAt</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadedExpiresAt As Xojo.Core.Date</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadedExpiresAt As Xojo.Core.Date</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>dim d as Xojo.Core.Date</SourceLine>
+   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if claim.HasName( kKeyExpiration ) then</SourceLine>
+   <SourceLine>dim rawSecs as Int64 = claim.Value( kKeyExpiration )</SourceLine>
+   <SourceLine>d = new Xojo.Core.Date( rawSecs, Xojo.Core.TimeZone.Current )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return d</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>LoadedIssuedAt</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadedIssuedAt As Xojo.Core.Date</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadedIssuedAt As Xojo.Core.Date</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>dim d as Xojo.Core.Date</SourceLine>
+   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if claim.HasName( kKeyIssuedAt ) then</SourceLine>
+   <SourceLine>dim rawSecs as Int64 = claim.Value( kKeyIssuedAt )</SourceLine>
+   <SourceLine>d = new Xojo.Core.Date( rawSecs, Xojo.Core.TimeZone.Current )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return d</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>LoadedSignaturePart</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadedSignaturePart As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadedSignaturePart As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return mLoadedSignaturePart</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>LoadedToken</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>LoadedToken As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>LoadedToken As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return mLoadedToken</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>mLoadedDataPart</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden ) Private mLoadedDataPart As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>mLoadedDataPart As String</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>mLoadedSignaturePart</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden ) Private mLoadedSignaturePart As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>mLoadedSignaturePart As String</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>mLoadedToken</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden ) Private mLoadedToken As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>mLoadedToken As String</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>mSignature</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden ) Private mSignature As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>mSignature As String</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>NotBeforeDate</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>NotBeforeDate As Xojo.Core.Date</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>NotBeforeDate As Xojo.Core.Date</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine>if value is nil then</SourceLine>
+   <SourceLine>Remove kKeyNotBefore</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>Value( kKeyNotBefore ) = value.SecondsFrom1970</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>dim d as Xojo.Core.Date</SourceLine>
+   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim key as string = kKeyNotBefore</SourceLine>
+   <SourceLine>dim hasKey as boolean = claim.HasName( key )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if hasKey then</SourceLine>
+   <SourceLine>dim rawSecs as Int64 = claim.Value( key )</SourceLine>
+   <SourceLine>d = new Xojo.Core.Date( rawSecs, Xojo.Core.TimeZone.Current )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return d</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>RawClaim</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>RawClaim As JSONItem_MTC</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>RawClaim As JSONItem_MTC</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return new JSONItem_MTC( Claim.ToString )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>RawHeader</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>RawHeader As JSONItem_MTC</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>RawHeader As JSONItem_MTC</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return new JSONItem_MTC( Header.ToString )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>Signature</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Signature As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Signature As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return mSignature</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>Subject</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Subject As String</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>Subject As String</ItemDeclaration>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <SetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Set</SourceLine>
+   <SourceLine>dim key as string = kKeySubject</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value = "" then</SourceLine>
+   <SourceLine>Remove key</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>Value( key ) = value</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Set</SourceLine>
+  </SetAccessor>
+  <GetAccessor>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Get</SourceLine>
+   <SourceLine>return Claim.Lookup( kKeySubject, "" )</SourceLine>
+   <SourceLine>End Get</SourceLine>
+  </GetAccessor>
+ </Property>
+ <ViewBehavior>
+  <ViewProperty>
+   <ObjName>Audience</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>ExpirationSeconds</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>Int64</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>IncludeIssuedAt</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <PropertyValue>True</PropertyValue>
+   <ItemType>Boolean</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Index</ObjName>
+   <Visible>1</Visible>
+   <PropertyGroup>ID</PropertyGroup>
+   <PropertyValue>-2147483648</PropertyValue>
+   <ItemType>Integer</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>IsCurrent</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>Boolean</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Issuer</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>JWTId</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Left</ObjName>
+   <Visible>1</Visible>
+   <PropertyGroup>Position</PropertyGroup>
+   <PropertyValue>0</PropertyValue>
+   <ItemType>Integer</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>LoadedDataPart</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>LoadedSignaturePart</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>LoadedToken</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Name</ObjName>
+   <Visible>1</Visible>
+   <PropertyGroup>ID</PropertyGroup>
+   <ItemType>String</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Signature</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Subject</ObjName>
+   <PropertyGroup>Behavior</PropertyGroup>
+   <ItemType>String</ItemType>
+   <EditorType>MultiLineEditor</EditorType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Super</ObjName>
+   <Visible>1</Visible>
+   <PropertyGroup>ID</PropertyGroup>
+   <ItemType>String</ItemType>
+  </ViewProperty>
+  <ViewProperty>
+   <ObjName>Top</ObjName>
+   <Visible>1</Visible>
+   <PropertyGroup>Position</PropertyGroup>
+   <PropertyValue>0</PropertyValue>
+   <ItemType>Integer</ItemType>
+  </ViewProperty>
+ </ViewBehavior>
+ <Constant>
+  <ItemName>kAlgorithmHS256</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>HS256</ItemDef>
+  <ItemFlags>0</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kAlgorithmHS512</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>HAS512</ItemDef>
+  <ItemFlags>0</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kAlgorithmNone</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>none</ItemDef>
+  <ItemFlags>0</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyAlgorithm</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>alg</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyAudience</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>aud</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyExpiration</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>exp</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyIssuedAt</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>iat</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyIssuer</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>iss</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyJWTId</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>jti</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyNotBefore</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>nbf</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeySubject</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>sub</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kKeyType</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>typ</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kTypeJWT</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>JWT</ItemDef>
+  <ItemFlags>1</ItemFlags>
+ </Constant>
+</block>
+</RBProject>
