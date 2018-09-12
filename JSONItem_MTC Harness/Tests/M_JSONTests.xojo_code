@@ -126,6 +126,13 @@ Inherits TestGroup
 		    Assert.Pass
 		  end try
 		  
+		  try
+		    v = ParseJSON_MTC( "[""\ujohn""]" )
+		    Assert.Fail "\ujohn"
+		  catch err as JSONException
+		    Assert.Pass 
+		  end try
+		  
 		  #pragma BreakOnExceptions true
 		End Sub
 	#tag EndMethod
