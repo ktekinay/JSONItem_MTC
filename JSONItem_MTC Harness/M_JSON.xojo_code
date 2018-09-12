@@ -1310,6 +1310,9 @@ Protected Module M_JSON
 	#tag Constant, Name = kTab, Type = Double, Dynamic = False, Default = \"9", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = kVersion, Type = Double, Dynamic = False, Default = \"4.0", Scope = Protected
+	#tag EndConstant
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
