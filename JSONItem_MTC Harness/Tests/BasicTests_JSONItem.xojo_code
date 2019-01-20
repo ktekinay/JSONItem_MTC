@@ -21,9 +21,6 @@ Inherits TestGroup
 		  Assert.AreEqual( CType( storedKeys.Ubound, integer ) + 1, j.Count, "Should be 5 objects" )
 		  Assert.AreEqual( 1, j.Value( "a" ).IntegerValue )
 		  
-		  j.Value( "Man" ) = 6
-		  Assert.IsFalse( j.HasName( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
-		  
 		  dim keys() as string = j.Names
 		  
 		  for each storedKey as string in storedKeys
@@ -37,6 +34,11 @@ Inherits TestGroup
 		    dim endingUb as integer = keys.Ubound
 		    Assert.AreEqual( startingUb - 1, endingUb, storedKey.ToText + " was not found" )
 		  next
+		  
+		  Assert.AreEqual( -1, CType( keys.Ubound, integer ), "keys should be empty" )
+		  
+		  j.Value( "Man" ) = 6
+		  Assert.IsFalse( j.HasName( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
 		  
 		End Sub
 	#tag EndMethod
