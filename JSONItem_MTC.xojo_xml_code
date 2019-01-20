@@ -173,18 +173,6 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
-   <SourceLine>const kZeroWidthSpace as string = &amp;u200B</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>RxNameToKey = new RegEx</SourceLine>
-   <SourceLine>RxNameToKey.SearchPattern = "(" + kZeroWidthSpace + "|\p{Lu})"</SourceLine>
-   <SourceLine>RxNameToKey.ReplacementPattern = kZeroWidthSpace + "$1"</SourceLine>
-   <SourceLine>RxNameToKey.Options.ReplaceAllMatches = true</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>RxKeyToName = new RegEx</SourceLine>
-   <SourceLine>RxKeyToName.SearchPattern = kZeroWidthSpace + "(" + kZeroWidthSpace + "|\p{Lu})"</SourceLine>
-   <SourceLine>RxKeyToName.ReplacementPattern = "$1"</SourceLine>
-   <SourceLine>RxKeyToName.Options.ReplaceAllMatches = true</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>LoadCS = new CriticalSection</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>ObjectValues = new Dictionary</SourceLine>
@@ -1770,9 +1758,9 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function NameToKey(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>r = RxNameToKey.Replace( r )</SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>name = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>dim key as string = name + "-" + EncodeHex( name )</SourceLine>
+   <SourceLine>return key</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -1790,17 +1778,17 @@
   <PartID>826953727</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function KeyToName(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = RxKeyToName.Replace( name )</SourceLine>
-   <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>Function KeyToName(key As String) As String</SourceLine>
+   <SourceLine>dim hex as string = key.NthField( "-", key.CountFields( "-" ) )</SourceLine>
+   <SourceLine>dim name as string = key.LeftB( key.LenB - hex.LenB - 1 )</SourceLine>
+   <SourceLine>return name</SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>name As String</ItemParams>
+  <ItemParams>key As String</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
@@ -2653,36 +2641,6 @@
    <SourceLine>return self.Serialize( self )</SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
- </Property>
- <Property>
-  <ItemName>RxNameToKey</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <PartID>931289087</PartID>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>RxNameToKey As RegEx</SourceLine>
-   <SourceLine></SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>RxNameToKey As RegEx</ItemDeclaration>
-  <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
- </Property>
- <Property>
-  <ItemName>RxKeyToName</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <PartID>1811279871</PartID>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>RxKeyToName As RegEx</SourceLine>
-   <SourceLine></SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>RxKeyToName As RegEx</ItemDeclaration>
-  <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
  </Property>
  <ViewBehavior>
   <ViewProperty>
