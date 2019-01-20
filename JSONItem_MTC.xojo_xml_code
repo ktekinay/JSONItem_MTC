@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2018r2" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2018r4" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
  <ObjContainerID>0</ObjContainerID>
@@ -173,6 +173,18 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
+   <SourceLine>const kZeroWidthSpace as string = &amp;u200B</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>RxNameToKey = new RegEx</SourceLine>
+   <SourceLine>RxNameToKey.SearchPattern = "(" + kZeroWidthSpace + "|\p{Lu})"</SourceLine>
+   <SourceLine>RxNameToKey.ReplacementPattern = kZeroWidthSpace + "$1"</SourceLine>
+   <SourceLine>RxNameToKey.Options.ReplaceAllMatches = true</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>RxKeyToName = new RegEx</SourceLine>
+   <SourceLine>RxKeyToName.SearchPattern = kZeroWidthSpace + "(" + kZeroWidthSpace + "|\p{Lu})"</SourceLine>
+   <SourceLine>RxKeyToName.ReplacementPattern = "$1"</SourceLine>
+   <SourceLine>RxKeyToName.Options.ReplaceAllMatches = true</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>LoadCS = new CriticalSection</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>ObjectValues = new Dictionary</SourceLine>
@@ -1759,7 +1771,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function NameToKey(name As String) As String</SourceLine>
    <SourceLine>dim r as string = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>r = EncodeHex( r )</SourceLine>
+   <SourceLine>r = RxNameToKey.Replace( r )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
@@ -1779,7 +1791,7 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function KeyToName(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = DecodeHex( name )</SourceLine>
+   <SourceLine>dim r as string = RxKeyToName.Replace( name )</SourceLine>
    <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
    <SourceLine>return r</SourceLine>
    <SourceLine>End Function</SourceLine>
@@ -1971,7 +1983,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
-   <SourceLine>key = EncodeHex( name )</SourceLine>
+   <SourceLine>key = NameToKey( name )</SourceLine>
    <SourceLine>current.ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
@@ -2641,6 +2653,36 @@
    <SourceLine>return self.Serialize( self )</SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
+ </Property>
+ <Property>
+  <ItemName>RxNameToKey</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>931289087</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>RxNameToKey As RegEx</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>RxNameToKey As RegEx</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+ </Property>
+ <Property>
+  <ItemName>RxKeyToName</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>1811279871</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>RxKeyToName As RegEx</SourceLine>
+   <SourceLine></SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemDeclaration>RxKeyToName As RegEx</ItemDeclaration>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
  </Property>
  <ViewBehavior>
   <ViewProperty>
