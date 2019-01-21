@@ -49,6 +49,7 @@ Inherits Dictionary
 
 	#tag Method, Flags = &h21
 		Private Function NameToKey(name As String) As Variant
+		  name = name.ConvertEncoding( Encodings.UTF8 )
 		  dim key as variant = name + "-" + EncodeHex( name )
 		  return key
 		  
