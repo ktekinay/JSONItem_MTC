@@ -138,6 +138,19 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub CaseSensitiveNamesTest()
+		  dim s as string = "{""Abc"":1, ""ABC"":2, ""abc"":3}"
+		  
+		  dim d as Dictionary = ParseJSON_MTC( s )
+		  Assert.AreEqual( 3, d.Count, "Dictionary.Count does not match" )
+		  Assert.AreEqual( 1, d.Value( "Abc" ).IntegerValue, "Abc" )
+		  Assert.AreEqual( 2, d.Value( "ABC" ).IntegerValue, "ABC" )
+		  Assert.AreEqual( 3, d.Value( "abc" ).IntegerValue, "abc" )
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub DifferentEncodingsTest()
 		  dim json as string = "[1,2,""©""]"
 		  
