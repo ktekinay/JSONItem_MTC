@@ -142,10 +142,13 @@ Inherits TestGroup
 		  dim s as string = "{""Abc"":1, ""ABC"":2, ""abc"":3}"
 		  
 		  dim d as Dictionary = ParseJSON_MTC( s )
+		  Assert.IsTrue( Introspection.GetType( d ) = GetTypeInfo( M_JSON.JSONDictionary ), "Is not JSONDictionary" )
+		  
 		  Assert.AreEqual( 3, d.Count, "Dictionary.Count does not match" )
 		  Assert.AreEqual( 1, d.Value( "Abc" ).IntegerValue, "Abc" )
 		  Assert.AreEqual( 2, d.Value( "ABC" ).IntegerValue, "ABC" )
 		  Assert.AreEqual( 3, d.Value( "abc" ).IntegerValue, "abc" )
+		  
 		  
 		End Sub
 	#tag EndMethod
@@ -293,6 +296,18 @@ Inherits TestGroup
 		  
 		  json = GenerateJSON_MTC( dict, true )
 		  Assert.Message json.ToText
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub JSONDictionaryTextKeyTest()
+		  dim t as text = "someTextKey"
+		  dim s as string = t
+		  
+		  dim d as new M_JSON.JSONDictionary
+		  
+		  d.Value( t ) = 1
+		  Assert.AreEqual( 1, d.Value( s ).IntegerValue, "Text key does not match" )
 		End Sub
 	#tag EndMethod
 
