@@ -66,6 +66,10 @@ This project was created by and is maintained by Kem Tekinay (ktekinay@mactechno
 
 # Release Notes
 
+**4.1** (Jan. 23, 2019)
+
+- JSON objects in both JSONItem\_MTC and the JSONDictionary will store keys internally as key-HEX instead of just hex for easier debugging.
+
 **4.0** (Sept. 12, 2018)
 
 - Added M\_JSON module.

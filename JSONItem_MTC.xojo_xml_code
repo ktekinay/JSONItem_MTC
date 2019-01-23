@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2018r2" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2018r4" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
  <ObjContainerID>0</ObjContainerID>
@@ -1758,9 +1758,9 @@
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function NameToKey(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>r = EncodeHex( r )</SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>name = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>dim key as string = name + "-" + EncodeHex( name )</SourceLine>
+   <SourceLine>return key</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -1778,17 +1778,17 @@
   <PartID>826953727</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function KeyToName(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = DecodeHex( name )</SourceLine>
-   <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>Function KeyToName(key As String) As String</SourceLine>
+   <SourceLine>dim hex as string = key.NthField( "-", key.CountFields( "-" ) )</SourceLine>
+   <SourceLine>dim name as string = key.LeftB( key.LenB - hex.LenB - 1 )</SourceLine>
+   <SourceLine>return name</SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>name As String</ItemParams>
+  <ItemParams>key As String</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
@@ -1971,7 +1971,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
-   <SourceLine>key = EncodeHex( name )</SourceLine>
+   <SourceLine>key = NameToKey( name )</SourceLine>
    <SourceLine>current.ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
@@ -2862,7 +2862,7 @@
   <PartID>1097842687</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
-  <ItemDef>4.0</ItemDef>
+  <ItemDef>4.1</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>

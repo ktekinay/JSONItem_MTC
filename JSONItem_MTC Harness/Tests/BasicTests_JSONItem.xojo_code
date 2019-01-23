@@ -4,13 +4,40 @@ Inherits TestGroup
 	#tag Method, Flags = &h21
 		Private Sub CaseSensitiveKeyTest()
 		  dim j as new JSONItem
-		  j.Value( "a" ) = 1
-		  j.Value( "A" ) = 2
 		  
-		  Assert.AreEqual( 2, j.Count, "Should be 2 objects" )
+		  dim storedKeys() as string = array( _
+		  "a", _
+		  "A", _
+		  "a" + &u200B + "A", _
+		  "A" + &u200B + "A", _
+		  "a" + &u200B + "a" _
+		  )
+		  
+		  for i as integer = 0 to storedKeys.Ubound
+		    dim key as string = storedKeys( i )
+		    j.Value( key ) = i + 1
+		  next
+		  
+		  Assert.AreEqual( CType( storedKeys.Ubound, integer ) + 1, j.Count, "Should be 5 objects" )
 		  Assert.AreEqual( 1, j.Value( "a" ).IntegerValue )
 		  
-		  j.Value( "Man" ) = 3
+		  dim keys() as string = j.Names
+		  
+		  for each storedKey as string in storedKeys
+		    dim startingUb as integer = keys.Ubound
+		    for i as integer = keys.Ubound downto 0
+		      if StrComp( keys( i ), storedKey, 0 ) = 0 then
+		        keys.Remove i
+		        exit for i
+		      end if
+		    next
+		    dim endingUb as integer = keys.Ubound
+		    Assert.AreEqual( startingUb - 1, endingUb, storedKey.ToText + " was not found" )
+		  next
+		  
+		  Assert.AreEqual( -1, CType( keys.Ubound, integer ), "keys should be empty" )
+		  
+		  j.Value( "Man" ) = 6
 		  Assert.IsFalse( j.HasName( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
 		  
 		End Sub
@@ -206,6 +233,16 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="IsRunning"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="StopTestOnFail"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Duration"
 			Group="Behavior"
