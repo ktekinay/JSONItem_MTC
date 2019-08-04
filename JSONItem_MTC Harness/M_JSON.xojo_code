@@ -425,6 +425,12 @@ Protected Module M_JSON
 		    dim thisByte as integer = pIn.Byte( inIndex )
 		    
 		    select case thisByte
+		    case kQuote
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = kQuote
+		      outIndex = outIndex + 1
+		      
 		    case 8 // vertical tab
 		      pOut.Byte( outIndex ) = kBackslash
 		      outIndex = outIndex + 1

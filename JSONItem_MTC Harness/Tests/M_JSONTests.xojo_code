@@ -456,6 +456,24 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub QuoteTest()
+		  dim value as string = """this "" will be encoded"""
+		  dim encodedValue as string = value.ReplaceAll( """", "\""" )
+		  
+		  dim s as string = "{""key"":""" + encodedValue + """}"
+		  
+		  dim j as new JSONItem_MTC( s )
+		  Assert.AreEqual j.Value( "key" ).StringValue, value, "JSONItem_MTC"
+		  
+		  dim d as Dictionary = M_JSON.ParseJSON_MTC( s )
+		  Assert.AreEqual d.Value( "key" ).StringValue, value, "M_JSON"
+		  
+		  dim jsonString as string = M_JSON.GenerateJSON_MTC( d )
+		  Assert.AreEqual s, JSONString, "Generate"
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub SurrogatePairTest()
 		  dim arr() as variant = ParseJSON_MTC( "[""ab\u0000\u0020""]" )
 		  
