@@ -375,8 +375,6 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  const kSlash as integer = 47
-		  const kA as integer = 65
 		  const kB as integer = 98
 		  const kF as integer = 102
 		  const kN as integer = 110
@@ -425,10 +423,10 @@ Protected Module M_JSON
 		    dim thisByte as integer = pIn.Byte( inIndex )
 		    
 		    select case thisByte
-		    case kQuote
+		    case kQuote, kBackslash
 		      pOut.Byte( outIndex ) = kBackslash
 		      outIndex = outIndex + 1
-		      pOut.Byte( outIndex ) = kQuote
+		      pOut.Byte( outIndex ) = thisByte
 		      outIndex = outIndex + 1
 		      
 		    case 8 // vertical tab

@@ -2,6 +2,21 @@
 Protected Class M_JSONTests
 Inherits TestGroup
 	#tag Method, Flags = &h0
+		Sub BackslashTest()
+		  dim value as string = "h\ello"
+		  dim encodedValue as string = value.ReplaceAll( "\", "\\" )
+		  
+		  dim s as string = "[""" + encodedValue + """]"
+		  
+		  dim arr() as variant = M_JSON.ParseJSON_MTC( s )
+		  Assert.AreEqual value, arr( 0 ).StringValue, "Parse"
+		  
+		  dim json as string = M_JSON.GenerateJSON_MTC( arr )
+		  Assert.AreEqual s, json, "Generate"
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub BadJSONTest()
 		  #pragma BreakOnExceptions false
 		  
