@@ -8,6 +8,7 @@ Window=WndPlayground;WndPlayground.xojo_window;&h0000000057BC7FF2;&h000000000000
 Folder=XojoUnit;XojoUnit;&h000000002516B04D;&h0000000000000000;false
 Folder=Tests;Tests;&h000000001962C3CC;&h0000000000000000;false
 Class=Stopwatch_MTC;Stopwatch_MTC.xojo_code;&h0000000034CE49A5;&h0000000000000000;false
+Module=FormatCodePreferences;FormatCodePreferences.xojo_code;&h000000002977F6F1;&h0000000000000000;false
 BuildSteps=Build Automation;Build Automation.xojo_code;&h000000007E1DE94C;&h0000000000000000;false
 Class=JSONItem_MTC;../JSONItem_MTC.xojo_xml_code;&h000000002DCCA46D;&h0000000000000000;false
 Class=JSONWebToken_MTC;../JSONWebToken_MTC.xojo_xml_code;&h00000000034117FF;&h0000000000000000;false
