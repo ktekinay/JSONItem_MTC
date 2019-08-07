@@ -1314,7 +1314,7 @@ Protected Module M_JSON
 	#tag Constant, Name = kTab, Type = Double, Dynamic = False, Default = \"9", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kVersion, Type = Double, Dynamic = False, Default = \"4.1", Scope = Protected
+	#tag Constant, Name = kVersion, Type = String, Dynamic = False, Default = \"4.1.1", Scope = Protected
 	#tag EndConstant
 
 
