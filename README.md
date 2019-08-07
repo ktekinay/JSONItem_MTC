@@ -24,7 +24,7 @@ This class implements all the features and functions of its native twin and shou
 
 - This class will properly handle characters with code points > &uFFFF when both encoding and decoding. The native class does not.
 
-- This class will properly reject invalid hex in a "\\uNNNN" structure. 
+- This class will properly reject invalid hex in a "\\uNNNN" structure.
 
 - The native class will load some badly formed JSON strings, e.g., "[true]]". This class will not.
 
@@ -48,7 +48,7 @@ Open the Harness project and copy and paste the module into your own project. _D
 
 # License
 
-This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2018 by Kem Tekinay, all rights reserved.
+This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2019 by Kem Tekinay, all rights reserved.
 
 This project is distributed AS-IS and no warranty of fitness for any particular purpose is expressed or implied. The author disavows any responsibility for bad design, poor execution, or any other faults.
 
@@ -65,6 +65,13 @@ All comments are also welcome.
 This project was created by and is maintained by Kem Tekinay (ktekinay@mactechnologies dot com).
 
 # Release Notes
+
+**4.1.1** (Aug. 7, 2019)
+
+- Added more tests.
+- M_JSON was not encoding embedded quotes or backslashes.
+- kVersion constants are now strings.
+- Added FormatCodePreferences module for the Format Code script.
 
 **4.1** (Jan. 23, 2019)
 
