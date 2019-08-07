@@ -2,21 +2,6 @@
 Protected Class M_JSONTests
 Inherits TestGroup
 	#tag Method, Flags = &h0
-		Sub BackslashTest()
-		  dim value as string = "h\ello"
-		  dim encodedValue as string = value.ReplaceAll( "\", "\\" )
-		  
-		  dim s as string = "[""" + encodedValue + """]"
-		  
-		  dim arr() as variant = M_JSON.ParseJSON_MTC( s )
-		  Assert.AreEqual value, arr( 0 ).StringValue, "Parse"
-		  
-		  dim json as string = M_JSON.GenerateJSON_MTC( arr )
-		  Assert.AreEqual s, json, "Generate"
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Sub BadJSONTest()
 		  #pragma BreakOnExceptions false
 		  
@@ -193,6 +178,40 @@ Inherits TestGroup
 		    
 		    diff = GenerateJSON_MTC( arr )
 		    Assert.AreSame json, diff
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmbeddedBackslashTest()
+		  dim jI as new Dictionary
+		  jI.Value( "name" ) = "John \Doey\ Doe"
+		  
+		  dim raw as String = M_JSON.GenerateJSON_MTC( jI )
+		  
+		  dim jO as Dictionary = M_JSON.ParseJSON_MTC( raw )
+		  
+		  for each k as variant in jI.Keys
+		    dim vI as string = jI.Value( k ).StringValue
+		    dim vO as string = jO.Value( k ).StringValue
+		    Assert.AreSame( vI, vO, k.StringValue.ToText )
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmbeddedQuoteTest()
+		  dim jI as new Dictionary
+		  jI.Value( "name" ) = "John ""Doey"" Doe"
+		  
+		  dim raw as String = M_JSON.GenerateJSON_MTC( jI )
+		  
+		  dim jO as Dictionary = M_JSON.ParseJSON_MTC( raw )
+		  
+		  for each k as variant in jI.Keys
+		    dim vI as string = jI.Value( k ).StringValue
+		    dim vO as string = jO.Value( k ).StringValue
+		    Assert.AreSame( vI, vO, k.StringValue.ToText )
 		  next
 		End Sub
 	#tag EndMethod
@@ -467,24 +486,6 @@ Inherits TestGroup
 		  Assert.IsTrue webAppDict.HasKey( "servlet" )
 		  dim arr() as variant = webAppDict.Value( "servlet" )
 		  Assert.AreNotEqual 0, Ctype( arr.Ubound, integer )
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub QuoteTest()
-		  dim value as string = """this "" will be encoded"""
-		  dim encodedValue as string = value.ReplaceAll( """", "\""" )
-		  
-		  dim s as string = "{""key"":""" + encodedValue + """}"
-		  
-		  dim j as new JSONItem_MTC( s )
-		  Assert.AreEqual j.Value( "key" ).StringValue, value, "JSONItem_MTC"
-		  
-		  dim d as Dictionary = M_JSON.ParseJSON_MTC( s )
-		  Assert.AreEqual d.Value( "key" ).StringValue, value, "M_JSON"
-		  
-		  dim jsonString as string = M_JSON.GenerateJSON_MTC( d )
-		  Assert.AreEqual s, JSONString, "Generate"
 		End Sub
 	#tag EndMethod
 
