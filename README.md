@@ -1,10 +1,10 @@
-#JSONItem_MTC
+# JSONItem\_MTC
 
 This is a drop-in replacements for the native JSONItem. It emulates all its features but should perform certain functions faster.
 
-To use it, search for "JSONItem" within your project and replace it with "JSONItem_MTC". Then drag the JSONItem_MTC class into your project.
+To use it, search for "JSONItem" within your project and replace it with "JSONItem\_MTC". Then drag the JSONItem\_MTC class into your project.
 
-##Differences
+## Differences
 
 This class implements all the features and functions of its native twin and should be indistinguishable except for the following:
 
@@ -24,28 +24,60 @@ This class implements all the features and functions of its native twin and shou
 
 - This class will properly handle characters with code points > &uFFFF when both encoding and decoding. The native class does not.
 
-- This class will properly reject invalid hex in a "\uNNNN" structure. 
+- This class will properly reject invalid hex in a "\\uNNNN" structure.
 
 - The native class will load some badly formed JSON strings, e.g., "[true]]". This class will not.
 
 - When loading a JSON string, this class will figure out its encoding and even strip any BOM that might prefix it.
 
-- As of Xojo 2016r1, ToString and Load are significantly faster in this class than the native version.
+- As of Xojo 2018r2, ToString and Load are significantly faster in this class than the native version.
 
-##License
+# M\_JSON Module
 
-This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2016 by Kem Tekinay, all rights reserved.
+## What It Does
+
+The M\_JSON module includes two functions, `ParseJSON_MTC` and `GenerateJSON_MTC` that emulate the functions found in the `Xojo.Data` module, but produces and uses String, Dictionary and Variant().
+
+**Note**: `GenerateJSON_MTC` has an extra, optional parameter to generate formatted ("pretty") JSON.
+
+While it can generate JSON from any Dictionary subclass, it will produce a M\_JSON.JSONDictionary, a case-sensitive subclass. You can convert that to a regular (case-insensitive) Dictionary with the `ToDictionary` function but keys that are only differentiated by case will be merged. For example, if the JSONDictionary has the keys "a" and "A", the Dictionary created by `ToDictionary` will have just one of those.
+
+## To Install
+
+Open the Harness project and copy and paste the module into your own project. _Do not drag the module file directly into your project._
+
+# License
+
+This class was created by Kem Tekinay, MacTechnologies Consulting (ktekinay@mactechnologies dot com). It is copyright ©2019 by Kem Tekinay, all rights reserved.
 
 This project is distributed AS-IS and no warranty of fitness for any particular purpose is expressed or implied. The author disavows any responsibility for bad design, poor execution, or any other faults.
 
 You may freely use or modify this project or any part within. You may distribute a modified version as long as this notice or any other legal notice is left undisturbed and all modifications are clearly documented and accredited. The author does not actively support this class, although comments and recommendations are welcome.
 
-##Comments and Contributions
+# Comments and Contributions
 
 All contributions to this project will be gratefully considered. Fork this repo to your own, then submit your changes via a Pull Request.
 
 All comments are also welcome.
 
-##Who Did This?!?
+# Who Did This?!?
 
 This project was created by and is maintained by Kem Tekinay (ktekinay@mactechnologies dot com).
+
+# Release Notes
+
+**4.1.1** (Aug. 7, 2019)
+
+- Added more tests.
+- M_JSON was not encoding embedded quotes or backslashes.
+- kVersion constants are now strings.
+- Added FormatCodePreferences module for the Format Code script.
+
+**4.1** (Jan. 23, 2019)
+
+- JSON objects in both JSONItem\_MTC and the JSONDictionary will store keys internally as key-HEX instead of just hex for easier debugging.
+
+**4.0** (Sept. 12, 2018)
+
+- Added M\_JSON module.
+- Updated version to reflect inclusion of M\_JSON.

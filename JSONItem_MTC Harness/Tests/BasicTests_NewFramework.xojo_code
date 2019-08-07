@@ -2,30 +2,30 @@
 Protected Class BasicTests_NewFramework
 Inherits TestGroup
 	#tag Method, Flags = &h21
-		Private Sub ArrayMethodsTest()
+		Sub ArrayMethodsTest()
 		  Using Xojo.Core
-		  
+
 		  dim items() as Auto = ArrayAuto( "a", "A", true, 1.3, 2, nil )
-		  
+
 		  dim j() As Auto = Xojo.Data.ParseJSON( Xojo.Data.GenerateJSON( items ) )
-		  
+
 		  Assert.AreEqual( items.Ubound, j.Ubound )
-		  
+
 		  for i as integer = 0 to items.Ubound
 		    Assert.IsTrue( items( i ) = j( i ) )
 		  next
-		  
+
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub BadlyFormedJSONLoadTest()
+		Sub BadlyFormedJSONLoadTest()
 		  Using Xojo.Core
-		  
+
 		  dim loads() as string = Array( """""", "12", "[1", "2]", "[bad]" )
-		  
+
 		  Assert.Pass "Running tests"
-		  
+
 		  for each load as string in loads
 		    #pragma BreakOnExceptions false
 		    try
@@ -41,33 +41,33 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub CaseSensitiveKeyTest()
+		Sub CaseSensitiveKeyTest()
 		  Using Xojo.Core
-		  
+
 		  dim j as Dictionary = Xojo.Data.ParseJSON( kCaseSensitiveJSON )
-		  
+
 		  Assert.AreEqual( 3, j.Count, "Should be 3 objects" )
 		  dim r as integer = j.Value( "a" )
 		  Assert.AreEqual( 1, r )
-		  
+
 		  Assert.IsFalse( j.HasKey( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
-		  
-		  
+
+
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EmbeddedQuoteTest()
+		Sub EmbeddedQuoteTest()
 		  Using Xojo.Core
-		  
+
 		  Dim jI As Dictionary = NewCaseSensitiveDictionary
-		  
+
 		  jI.Value("name") = "John ""Doey"" Doe"
-		  
+
 		  Dim raw As Text = Xojo.Data.GenerateJSON( jI )
-		  
+
 		  Dim jO As Dictionary = Xojo.Data.ParseJSON( raw )
-		  
+
 		  for each entry as DictionaryEntry in jI
 		    dim k as Auto = entry.Key
 		    Assert.IsTrue( entry.Value = jO.Value(k), k)
@@ -76,84 +76,84 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EmptyStringTest()
+		Sub EmptyStringTest()
 		  Using Xojo.Core
-		  
+
 		  Dim jI As Dictionary = NewCaseSensitiveDictionary
 		  jI.Value("name") = ""
-		  
+
 		  Dim raw As Text = Xojo.Data.GenerateJSON( jI )
 		  Dim jO As Dictionary = Xojo.Data.ParseJSON( raw )
-		  
+
 		  Assert.AreEqual( "", CType( jO.Value("name"), Text ) )
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub EscapedCharactersTest()
+		Sub EscapedCharactersTest()
 		  dim j() as Auto
-		  
+
 		  dim jsonString() as text = Array( "\r", "\n", "\\", "\t", "\f", "\b", "\""", "\/", "\u0020" )
 		  dim expectedString() as string = Array( EndOfLine.Macintosh,  EndOfLine.UNIX, "\", chr( 9 ), chr( 12 ), chr( 8 ), """", "/", " " )
-		  
+
 		  for i as integer = 0 to jsonString.Ubound
 		    j = Xojo.Data.ParseJSON( "[""" + jsonString( i ) + """]" )
 		    dim extracted as text = j( 0 )
 		    dim extractedString as string = extracted
 		    Assert.AreEqual( expectedString( i ), extractedString )
 		  next i
-		  
+
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub IllegalStringTest()
+		Sub IllegalStringTest()
 		  Using Xojo.Core
-		  
+
 		  Assert.Pass( "Running tests" )
-		  
+
 		  dim j() As Auto
-		  
+
 		  dim badStrings() as string = Array( Chr( 13 ), Chr( 9 ), Chr( 8 ), Chr( 5 ), Chr( 29 ) )
-		  
+
 		  for each s as string in badStrings
 		    dim load as text = "[""this" + s.ToText + "that""]"
-		    
+
 		    #pragma BreakOnExceptions false
-		    
+
 		    try
 		      j = Xojo.Data.ParseJSON( load )
 		      Assert.Fail( EncodeHex( s ).ToText + " should have failed" )
 		      return
 		    catch err as Xojo.Data.InvalidJSONException
 		    end try
-		    
+
 		    #pragma BreakOnExceptions true
-		    
+
 		  next
-		  
+
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub UnicodeTest()
+		Sub UnicodeTest()
 		  Using Xojo.Core
-		  
+
 		  dim d as new Dictionary
 		  dim a() as Auto
-		  
+
 		  d.Value( "a" + chr( 1 ) ) = "something" + chr( 2 )
 		  Assert.AreSame( "{""a\u0001"":""something\u0002""}", Xojo.Data.GenerateJSON( d ) )
-		  
+
 		  a.Append( "a" + chr( 1 ) )
 		  Assert.AreSame( "[""a\u0001""]", Xojo.Data.GenerateJSON( a ) )
-		  
+
 		  dim highChar as string = Chr( &h10149 )
 		  dim asEncoded as text = "[""\uD800\uDD49""]"
-		  
+
 		  a = Xojo.Data.ParseJSON( asEncoded )
 		  Assert.AreEqual( EncodeHex( highChar, true ), EncodeHex( a( 0 ), true ) )
-		  
+
 		  redim a( -1 )
 		  #pragma BreakOnExceptions false
 		  try

@@ -14,7 +14,9 @@ Inherits TestController
 		  group = New BasicTests_JSONItem_MTC(Self, "Basic JSONItem_MTC Tests")
 		  group = new BasicTests_NewFramework( Self, "Basic New Framework Tests" )
 		  group = New JsonOrgExampleTests(Self, "Example Documents from json.org/example")
+		  group = new JSONWebTokenTests(Self, "JSONWebToken")
 		  group = new LongTests_JSONItem_MTC( self, "Long JSONItem_MTC Tests" )
+		  group = new M_JSONTests( self, "M_JSON Tests" )
 		  group = New StressTests(Self, "Stress Tests")
 		  group = new XojoJSONItemTests( self, "Xojo's Unit Tests" )
 		  
@@ -44,24 +46,14 @@ Inherits TestController
 			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Index"
-			Visible=true
-			Group="ID"
-			InitialValue="-2147483648"
-			Type="Integer"
+			Name="IsRunning"
+			Group="Behavior"
+			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Left"
-			Visible=true
-			Group="Position"
-			InitialValue="0"
+			Name="NotImplementedCount"
+			Group="Behavior"
 			Type="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Name"
-			Visible=true
-			Group="ID"
-			Type="String"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="PassedCount"
@@ -82,6 +74,26 @@ Inherits TestController
 			Name="SkippedCount"
 			Group="Behavior"
 			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Index"
+			Visible=true
+			Group="ID"
+			InitialValue="-2147483648"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Left"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Name"
+			Visible=true
+			Group="ID"
+			Type="String"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
