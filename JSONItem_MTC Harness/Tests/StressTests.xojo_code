@@ -2,26 +2,26 @@
 Protected Class StressTests
 Inherits TestGroup
 	#tag Method, Flags = &h21
-		Private Sub BigStringTest()
+		Sub BigStringTest()
 		  const kSize = 500 * 1024 * 1024
 		  dim halfSize as integer = ( kSize \ 2 ) + 1
-		  
+
 		  dim s as string = "0123456789"
-		  
+
 		  while s.LenB < halfSize
 		    s = s + s
 		  wend
-		  
+
 		  if s.LenB < kSize then
 		    s = s + s.Mid( 1, kSize - s.LenB )
 		  end if
-		  
+
 		  dim length as integer = s.LenB
 		  #pragma unused length
-		  
+
 		  dim j as new JSONItem_MTC
 		  j.Compact = true
-		  
+
 		  try
 		    j.Append s
 		    Assert.Pass
@@ -29,7 +29,7 @@ Inherits TestGroup
 		    Assert.Fail "Ran out of memory"
 		    return
 		  end try
-		  
+
 		  dim expect as string = "[""" + s + """]"
 		  dim jString as string
 		  try
@@ -40,9 +40,9 @@ Inherits TestGroup
 		    Assert.Fail "Ran out of memory creating string"
 		    return
 		  end try
-		  
+
 		  Assert.IsTrue jString.Encoding = Encodings.UTF8, "Encoding isn't UTF8"
-		  
+
 		  return
 		End Sub
 	#tag EndMethod

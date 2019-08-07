@@ -2,32 +2,32 @@
 Protected Class JsonOrgExampleTests
 Inherits TestGroup
 	#tag Method, Flags = &h21
-		Private Sub BackAndForthTest()
+		Sub BackAndForthTest()
 		  dim j1 as new JSONItem_MTC( kExampleWebApp )
 		  dim j2 as new JSONItem_MTC( j1.ToString )
-		  
+
 		  j2.Compact = false
 		  j1 = new JSONItem_MTC( j2.ToString )
-		  
+
 		  j1.EncodeUnicode = JSONItem_MTC.EncodeType.All
 		  j2 = new JSONItem_MTC( j1.ToString )
-		  
+
 		  RecurseJSONItems( j1, j2 )
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub GlossaryTest()
+		Sub GlossaryTest()
 		  Dim j1 As New JSONItem_MTC(kExampleGlossary)
 		  Dim jG1 As JSONItem_MTC = j1.Value("glossary")
-		  
+
 		  Assert.AreEqual("example glossary", jG1.Value("title").StringValue)
-		  
+
 		  Dim j2 As New JSONItem(kExampleGlossary)
 		  Dim jG2 As JSONItem = j2.Value("glossary")
-		  
+
 		  Assert.AreEqual("example glossary", jG2.Value("title").StringValue)
-		  
+
 		End Sub
 	#tag EndMethod
 
@@ -37,14 +37,14 @@ Inherits TestGroup
 		  if item1.IsArray <> item2.IsArray then
 		    return
 		  end if
-		  
+
 		  Assert.AreEqual( item1.Count, item2.Count )
 		  if item1.Count <> item2.Count then
 		    return
 		  end if
-		  
+
 		  if item1.IsArray then
-		    
+
 		    dim lastIndex as integer = item1.Count - 1
 		    for i as integer = 0 to lastIndex
 		      dim value1 as variant = item1.Value( i )
@@ -53,7 +53,7 @@ Inherits TestGroup
 		      if value1.Type <> value2.Type then
 		        return
 		      end if
-		      
+
 		      if value1 IsA JSONItem_MTC then
 		        Assert.IsTrue( value2 IsA JSONItem_MTC )
 		        if value2 IsA JSONItem_MTC then
@@ -65,29 +65,29 @@ Inherits TestGroup
 		        Assert.IsTrue( value1 =value2 )
 		      end if
 		    next i
-		    
+
 		  else // Object
-		    
+
 		    dim names1() as string = item1.Names
 		    dim names2() as string = item2.Names
 		    Assert.AreEqual( names1.Ubound, names2.Ubound )
 		    if names1.Ubound <> names2.Ubound then
 		      return
 		    end if
-		    
+
 		    for i as integer = 0 to names1.Ubound
 		      Assert.AreSame( names1( i ), names2( i ) )
 		      if StrComp( names1( i ), names2( i ), 0 ) <> 0 then
 		        return
 		      end if
-		      
+
 		      dim value1 as variant = item1.Value( names1( i ) )
 		      dim value2 as variant = item2.Value( names2( i ) )
 		      Assert.AreEqual( value1.Type, value2.Type )
 		      if value1.Type <> value2.Type then
 		        return
 		      end if
-		      
+
 		      if value1 IsA JSONItem_MTC then
 		        Assert.IsTrue( value2 IsA JSONItem_MTC )
 		        if value2 IsA JSONItem_MTC then
@@ -100,7 +100,7 @@ Inherits TestGroup
 		      end if
 		    next
 		  end if
-		  
+
 		End Sub
 	#tag EndMethod
 
