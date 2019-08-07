@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2018r4" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2019r1.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
  <ObjContainerID>0</ObjContainerID>
@@ -2861,8 +2861,8 @@
   <Visible>1</Visible>
   <PartID>1097842687</PartID>
   <TextEncoding>134217984</TextEncoding>
-  <ItemType>2</ItemType>
-  <ItemDef>4.1</ItemDef>
+  <ItemType>0</ItemType>
+  <ItemDef>4.1.1</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>

@@ -375,8 +375,6 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  const kSlash as integer = 47
-		  const kA as integer = 65
 		  const kB as integer = 98
 		  const kF as integer = 102
 		  const kN as integer = 110
@@ -425,6 +423,12 @@ Protected Module M_JSON
 		    dim thisByte as integer = pIn.Byte( inIndex )
 		    
 		    select case thisByte
+		    case kQuote, kBackslash
+		      pOut.Byte( outIndex ) = kBackslash
+		      outIndex = outIndex + 1
+		      pOut.Byte( outIndex ) = thisByte
+		      outIndex = outIndex + 1
+		      
 		    case 8 // vertical tab
 		      pOut.Byte( outIndex ) = kBackslash
 		      outIndex = outIndex + 1
@@ -1310,7 +1314,7 @@ Protected Module M_JSON
 	#tag Constant, Name = kTab, Type = Double, Dynamic = False, Default = \"9", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kVersion, Type = Double, Dynamic = False, Default = \"4.1", Scope = Protected
+	#tag Constant, Name = kVersion, Type = String, Dynamic = False, Default = \"4.1.1", Scope = Protected
 	#tag EndConstant
 
 

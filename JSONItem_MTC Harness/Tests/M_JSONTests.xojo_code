@@ -183,6 +183,40 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub EmbeddedBackslashTest()
+		  dim jI as new Dictionary
+		  jI.Value( "name" ) = "John \Doey\ Doe"
+		  
+		  dim raw as String = M_JSON.GenerateJSON_MTC( jI )
+		  
+		  dim jO as Dictionary = M_JSON.ParseJSON_MTC( raw )
+		  
+		  for each k as variant in jI.Keys
+		    dim vI as string = jI.Value( k ).StringValue
+		    dim vO as string = jO.Value( k ).StringValue
+		    Assert.AreSame( vI, vO, k.StringValue.ToText )
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmbeddedQuoteTest()
+		  dim jI as new Dictionary
+		  jI.Value( "name" ) = "John ""Doey"" Doe"
+		  
+		  dim raw as String = M_JSON.GenerateJSON_MTC( jI )
+		  
+		  dim jO as Dictionary = M_JSON.ParseJSON_MTC( raw )
+		  
+		  for each k as variant in jI.Keys
+		    dim vI as string = jI.Value( k ).StringValue
+		    dim vO as string = jO.Value( k ).StringValue
+		    Assert.AreSame( vI, vO, k.StringValue.ToText )
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub EmptyArrayTest()
 		  dim arr() as variant = ParseJSON_MTC( "[  ]" )
 		  Assert.AreEqual -1, Ctype( arr.Ubound, integer ), "With spaces"

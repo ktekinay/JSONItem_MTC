@@ -1,8 +1,8 @@
 #tag Class
 Protected Class BasicTests_JSONItem
 Inherits TestGroup
-	#tag Method, Flags = &h21
-		Private Sub CaseSensitiveKeyTest()
+	#tag Method, Flags = &h0
+		Sub CaseSensitiveKeyTest()
 		  dim j as new JSONItem
 		  
 		  dim storedKeys() as string = array( _
@@ -43,8 +43,38 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub IllegalStringTest()
+	#tag Method, Flags = &h0
+		Sub EmbeddedBackslashTest()
+		  dim jI as new JSONItem
+		  jI.Value( "name" ) = "John \Doey\ Doe"
+		  
+		  dim raw as String = jI.ToString
+		  
+		  dim jO as new JSONItem( raw )
+		  
+		  for each k as String in jI.Names
+		    Assert.IsTrue( jI.Value( k ) = jO.Value( k ), k.ToText )
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmbeddedQuoteTest()
+		  dim jI as new JSONItem
+		  jI.Value( "name" ) = "John ""Doey"" Doe"
+		  
+		  dim raw as String = jI.ToString
+		  
+		  dim jO as new JSONItem( raw )
+		  
+		  for each k as String in jI.Names
+		    Assert.IsTrue( jI.Value( k ) = jO.Value( k ), k.ToText )
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub IllegalStringTest()
 		  dim j as JSONItem
 		  
 		  dim badStrings() as string = Array( Chr( 13 ), Chr( 9 ), Chr( 8 ), Chr( 5 ), Chr( 29 ) )
@@ -65,8 +95,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub LoadAdditionalTest()
+	#tag Method, Flags = &h0
+		Sub LoadAdditionalTest()
 		  dim j as new JSONItem
 		  j.Value( "one" ) = 1.0
 		  
@@ -76,8 +106,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub LoadEncodingTest()
+	#tag Method, Flags = &h0
+		Sub LoadEncodingTest()
 		  #pragma BreakOnExceptions false
 		  
 		  const kOriginal = "[""abc""]"
@@ -132,8 +162,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub LoadInterruptionTest()
+	#tag Method, Flags = &h0
+		Sub LoadInterruptionTest()
 		  dim j as JSONItem
 		  dim load as string = "{""first"" : 1.0, ""second"" : interrupt}"
 		  
@@ -144,7 +174,7 @@ Inherits TestGroup
 		    Assert.Fail( "Loading through the Constructor should have failed" )
 		    return
 		  catch err as JSONException
-		  end 
+		  end
 		  
 		  Assert.IsTrue( j is nil, "An interrupted load in the Constructor should lead to a nil object" )
 		  
@@ -173,8 +203,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub TextTest()
+	#tag Method, Flags = &h0
+		Sub TextTest()
 		  dim j as new JSONItem
 		  
 		  dim t1 as text = "hi"
@@ -205,8 +235,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub UnicodeTest()
+	#tag Method, Flags = &h0
+		Sub UnicodeTest()
 		  dim j as new JSONItem
 		  
 		  j.Value( "a" + chr( 1 ) ) = "something" + chr( 2 )
