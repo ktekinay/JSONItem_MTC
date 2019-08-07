@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2016r1.1" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2019r1.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
  <ObjContainerID>0</ObjContainerID>
@@ -11,6 +11,7 @@
   <ItemName>AdvancePastWhiteSpace</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1595070463</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub AdvancePastWhiteSpace(inMB As MemoryBlock, ByRef pos As Integer)</SourceLine>
@@ -19,7 +20,7 @@
    <SourceLine></SourceLine>
    <SourceLine>do</SourceLine>
    <SourceLine>if pos &gt; lastPos then</SourceLine>
-   <SourceLine>raise new JSONException( "A parsing error occurred at", 2, pos )</SourceLine>
+   <SourceLine>raise new JSONException( "A parsing error occurred", 2, pos )</SourceLine>
    <SourceLine>return</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -44,6 +45,7 @@
   <ItemName>Append</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>338456575</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Append(value As Variant)</SourceLine>
@@ -69,6 +71,7 @@
   <ItemName>Child</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1240612863</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Child(index As Integer) As JSONItem_MTC</SourceLine>
@@ -88,6 +91,7 @@
   <ItemName>Child</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>148371455</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Child(index As Integer, Assigns obj As JSONItem_MTC)</SourceLine>
@@ -106,6 +110,7 @@
   <ItemName>Child</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1350766591</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Child(name As String) As JSONItem_MTC</SourceLine>
@@ -125,6 +130,7 @@
   <ItemName>Child</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1153255423</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Child(name As String, Assigns obj As JSONItem_MTC)</SourceLine>
@@ -143,6 +149,7 @@
   <ItemName>Clear</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>844138495</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Clear()</SourceLine>
@@ -162,6 +169,7 @@
   <ItemName>Constructor</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1090279423</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor()</SourceLine>
@@ -183,6 +191,7 @@
   <ItemName>Constructor</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1303343103</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Constructor(JSONString As String, isStrict As Boolean = False)</SourceLine>
@@ -204,6 +213,7 @@
   <ItemName>DecodeString</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1646084095</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeString(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As String</SourceLine>
@@ -291,7 +301,7 @@
    <SourceLine>outPtr.Byte( outIndex ) = 12</SourceLine>
    <SourceLine>outIndex = outIndex + 1</SourceLine>
    <SourceLine>pos = pos + 1</SourceLine>
-   <SourceLine>case 117 /// u</SourceLine>
+   <SourceLine>case 117 // u</SourceLine>
    <SourceLine>if ( pos + 5 ) &gt; lastPos then</SourceLine>
    <SourceLine>raise new JSONException( "Improperly formed JSON string", 0 )</SourceLine>
    <SourceLine>return ""</SourceLine>
@@ -433,6 +443,7 @@
   <ItemName>DecodeValue</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1663215615</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function DecodeValue(inMB As MemoryBlock, ByRef pos As Integer, current As JSONItem_MTC, outMB As MemoryBlock) As Variant</SourceLine>
@@ -592,6 +603,7 @@
   <ItemName>EncodeString</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1035366399</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeString(s As String, settings As JSONItem_MTC, outMBs() As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
@@ -804,6 +816,7 @@
   <ItemName>EncodeValue</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>60155903</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeValue(value As Variant, settings As JSONItem_MTC, level As Integer, outMBs() As MemoryBlock, ByRef outIndex As Integer, inMB As MemoryBlock)</SourceLine>
@@ -877,6 +890,7 @@
   <ItemName>EnsureArray</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>53555199</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function EnsureArray() As Boolean</SourceLine>
@@ -901,6 +915,7 @@
   <ItemName>EnsureObject</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1343256575</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function EnsureObject() As Boolean</SourceLine>
@@ -925,6 +940,7 @@
   <ItemName>HasName</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>458487807</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function HasName(name As String) As Boolean</SourceLine>
@@ -949,6 +965,7 @@
   <ItemName>Insert</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1100691455</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Insert(index As Integer, value As Variant)</SourceLine>
@@ -972,6 +989,7 @@
   <ItemName>Load</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>646508543</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Load(JSONString As String)</SourceLine>
@@ -1162,6 +1180,7 @@
   <ItemName>Lookup</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>916008959</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Lookup(name As String, defaultValue As Variant) As Variant</SourceLine>
@@ -1185,6 +1204,7 @@
   <ItemName>Name</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1322094591</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Name(index As Integer) As String</SourceLine>
@@ -1209,6 +1229,7 @@
   <ItemName>Names</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>145336319</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Names() As String()</SourceLine>
@@ -1241,6 +1262,7 @@
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1717555199</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Operator_Convert(d As Dictionary)</SourceLine>
@@ -1264,6 +1286,7 @@
   <ItemName>Operator_Subscript</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>992323583</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Operator_Subscript(index As Integer) As Variant</SourceLine>
@@ -1282,6 +1305,7 @@
   <ItemName>Remove</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>232185855</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Remove(index As Integer)</SourceLine>
@@ -1304,6 +1328,7 @@
   <ItemName>Remove</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>26384383</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Remove(name As String)</SourceLine>
@@ -1327,6 +1352,7 @@
   <ItemName>Serialize</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1024897023</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Serialize(data As JSONItem_MTC) As String</SourceLine>
@@ -1408,6 +1434,7 @@
   <ItemName>Serialize</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1886904319</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Serialize(outMBs() As MemoryBlock, ByRef outIndex As Integer, settings As JSONItem_MTC, level As Integer, inMB As MemoryBlock)</SourceLine>
@@ -1623,6 +1650,7 @@
   <ItemName>Value</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>2141319167</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Value(index As Integer) As Variant</SourceLine>
@@ -1645,6 +1673,7 @@
   <ItemName>Value</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1970421759</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Value(index As Integer, Assigns value As Variant)</SourceLine>
@@ -1674,6 +1703,7 @@
   <ItemName>Value</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>396521471</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Value(name As String) As Variant</SourceLine>
@@ -1697,6 +1727,7 @@
   <ItemName>Value</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>41064447</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Value(name As String, Assigns value As Variant)</SourceLine>
@@ -1723,12 +1754,13 @@
   <ItemName>NameToKey</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1782718463</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function NameToKey(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>r = EncodeHex( r )</SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>name = name.ConvertEncoding( Encodings.UTF8 )</SourceLine>
+   <SourceLine>dim key as string = name + "-" + EncodeHex( name )</SourceLine>
+   <SourceLine>return key</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
@@ -1743,25 +1775,27 @@
   <ItemName>KeyToName</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>826953727</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function KeyToName(name As String) As String</SourceLine>
-   <SourceLine>dim r as string = DecodeHex( name )</SourceLine>
-   <SourceLine>r = r.DefineEncoding( Encodings.UTF8 )</SourceLine>
-   <SourceLine>return r</SourceLine>
+   <SourceLine>Function KeyToName(key As String) As String</SourceLine>
+   <SourceLine>dim hex as string = key.NthField( "-", key.CountFields( "-" ) )</SourceLine>
+   <SourceLine>dim name as string = key.LeftB( key.LenB - hex.LenB - 1 )</SourceLine>
+   <SourceLine>return name</SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>name As String</ItemParams>
+  <ItemParams>key As String</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
   <ItemName>Validate</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1620037631</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Validate(value As Variant)</SourceLine>
@@ -1804,6 +1838,7 @@
   <ItemName>JSONStringToUTF8</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1223368703</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function JSONStringToUTF8(s As String) As String</SourceLine>
@@ -1891,6 +1926,7 @@
   <ItemName>LoadObject</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>119379967</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub LoadObject(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
@@ -1935,7 +1971,7 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>value = DecodeValue( inMB, pos, current, outMB )</SourceLine>
-   <SourceLine>key = EncodeHex( name )</SourceLine>
+   <SourceLine>key = NameToKey( name )</SourceLine>
    <SourceLine>current.ObjectValues.Value( key ) = value</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if value IsA JSONItem_MTC then</SourceLine>
@@ -1966,6 +2002,7 @@
   <ItemName>LoadArray</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>740392959</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub LoadArray(inMB As MemoryBlock, ByRef pos As Integer, ByRef current As JSONItem_MTC, stack() As JSONItem_MTC, outMB As MemoryBlock)</SourceLine>
@@ -2032,6 +2069,7 @@
   <ItemName>ParseNumber</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1864783871</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function ParseNumber(mb As MemoryBlock, startPos As Integer, endPos As Integer, ByRef result As Variant) As Boolean</SourceLine>
@@ -2147,6 +2185,7 @@
   <ItemName>EncodeCodepoint</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>172034047</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub EncodeCodepoint(value As Integer, outPtr As Ptr, pos As Integer)</SourceLine>
@@ -2171,6 +2210,7 @@
   <ItemName>IsLoading</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1337812991</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function IsLoading() As Boolean</SourceLine>
@@ -2189,6 +2229,7 @@
   <ItemName>Operator_Subscript</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1431545855</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Operator_Subscript(index As Integer, Assigns value As Variant)</SourceLine>
@@ -2206,6 +2247,7 @@
   <ItemName>AppendOutMB</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>711995391</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function AppendOutMB(outMBs() As MemoryBlock, ByRef outIndex As Integer) As MemoryBlock</SourceLine>
@@ -2229,6 +2271,7 @@
   <ItemName>Legal</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>220936191</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <NoteLine>Legal</NoteLine>
@@ -2250,6 +2293,7 @@
   <ItemName>About</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>2034724863</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <NoteLine>About</NoteLine>
@@ -2290,6 +2334,7 @@
   <ItemName>Acknowledgements</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>2077947903</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <NoteLine>Acknowledgements</NoteLine>
@@ -2304,6 +2349,7 @@
   <ItemName>Specs (RFC)</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>957755391</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <NoteLine>Specs (RFC)</NoteLine>
@@ -2318,6 +2364,7 @@
   <ItemName>ArrayValues()</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>380983295</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>ArrayValues() As Variant</SourceLine>
@@ -2332,9 +2379,10 @@
   <ItemName>Compact</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1741629439</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Compact As Boolean</SourceLine>
+   <SourceLine>Compact As Boolean = True</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2346,6 +2394,7 @@
   <ItemName>DecimalFormat</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1761923071</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>DecimalFormat As String</SourceLine>
@@ -2360,9 +2409,10 @@
   <ItemName>EscapeSlashes</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1982945279</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EscapeSlashes As Boolean</SourceLine>
+   <SourceLine>EscapeSlashes As Boolean = True</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2374,6 +2424,7 @@
   <ItemName>HasSetType</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1829965823</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>HasSetType As Integer</SourceLine>
@@ -2388,9 +2439,10 @@
   <ItemName>IndentSpacing</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>991193087</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>IndentSpacing As Integer</SourceLine>
+   <SourceLine>IndentSpacing As Integer = 2</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2402,6 +2454,7 @@
   <ItemName>IsArray</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>877072383</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>IsArray As Boolean</SourceLine>
@@ -2429,6 +2482,7 @@
   <ItemName>IsObject</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1241823231</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>IsObject As Boolean</SourceLine>
@@ -2456,6 +2510,7 @@
   <ItemName>ObjectValues</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>183478271</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>ObjectValues As Dictionary</SourceLine>
@@ -2470,9 +2525,10 @@
   <ItemName>EncodeUnicode</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1680922623</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>EncodeUnicode As EncodeType</SourceLine>
+   <SourceLine>EncodeUnicode As EncodeType = EncodeType.JavaScriptCompatible</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2484,6 +2540,7 @@
   <ItemName>Count</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1905690623</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Count As Integer</SourceLine>
@@ -2517,6 +2574,7 @@
   <ItemName>Strict</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1549398015</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Strict As Boolean</SourceLine>
@@ -2531,6 +2589,7 @@
   <ItemName>LoadCS</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1467363327</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>LoadCS As CriticalSection</SourceLine>
@@ -2545,6 +2604,7 @@
   <ItemName>mIsLoading</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>813780991</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>mIsLoading As Boolean</SourceLine>
@@ -2559,6 +2619,7 @@
   <ItemName>ToString</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>31318015</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>ToString As String</SourceLine>
@@ -2678,6 +2739,7 @@
   <ItemName>kBackSlash</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>763668479</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>92</ItemDef>
@@ -2687,6 +2749,7 @@
   <ItemName>kCloseCurlyBrace</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1277224959</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>125</ItemDef>
@@ -2696,6 +2759,7 @@
   <ItemName>kCloseSquareBracket</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1223139327</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>93</ItemDef>
@@ -2705,6 +2769,7 @@
   <ItemName>kColon</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>884340735</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>58</ItemDef>
@@ -2714,6 +2779,7 @@
   <ItemName>kComma</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1194700799</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>44</ItemDef>
@@ -2723,6 +2789,7 @@
   <ItemName>kForwardSlash</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1722542079</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>47</ItemDef>
@@ -2732,6 +2799,7 @@
   <ItemName>kHasSetArray</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>961742847</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>1</ItemDef>
@@ -2741,6 +2809,7 @@
   <ItemName>kHasSetNone</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>545648639</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>0</ItemDef>
@@ -2750,6 +2819,7 @@
   <ItemName>kHasSetObject</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1818718207</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>2</ItemDef>
@@ -2759,6 +2829,7 @@
   <ItemName>kOpenCurlyBrace</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>216090623</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>123</ItemDef>
@@ -2768,6 +2839,7 @@
   <ItemName>kOpenSquareBracket</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1391450111</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>91</ItemDef>
@@ -2777,6 +2849,7 @@
   <ItemName>kQuote</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1988024319</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>34</ItemDef>
@@ -2786,15 +2859,17 @@
   <ItemName>Version</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1097842687</PartID>
   <TextEncoding>134217984</TextEncoding>
-  <ItemType>2</ItemType>
-  <ItemDef>2.9</ItemDef>
+  <ItemType>0</ItemType>
+  <ItemDef>4.1.1</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
   <ItemName>kHyphen</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1902444543</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>45</ItemDef>
@@ -2804,6 +2879,7 @@
   <ItemName>kPlus</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>547260415</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>43</ItemDef>
@@ -2813,6 +2889,7 @@
   <ItemName>kDot</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>217178111</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>46</ItemDef>
@@ -2822,6 +2899,7 @@
   <ItemName>kDefaultDecimalFormat</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1628862463</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>-0.0##############</ItemDef>
@@ -2831,6 +2909,7 @@
   <ItemName>kInMBSize</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1991727103</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>2048</ItemDef>
@@ -2840,6 +2919,7 @@
   <ItemName>kOutMBSize</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>322291711</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>2</ItemType>
   <ItemDef>2097152</ItemDef>
@@ -2853,6 +2933,7 @@
   <ItemName>EncodeType</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>619845631</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>None = 0</SourceLine>

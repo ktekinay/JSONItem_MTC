@@ -1,8 +1,8 @@
 #tag Class
 Protected Class BasicTests_JSONItem_MTC
 Inherits TestGroup
-	#tag Method, Flags = &h21
-		Private Sub ArrayMethodsTest()
+	#tag Method, Flags = &h0
+		Sub ArrayMethodsTest()
 		  dim items() as Variant = Array( "a", "A", true, 1.3, 2, nil )
 		  
 		  dim j as new JSONItem_MTC
@@ -44,8 +44,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub BadlyFormedJSONLoadTest()
+	#tag Method, Flags = &h0
+		Sub BadlyFormedJSONLoadTest()
 		  dim j as JSONItem_MTC
 		  dim loads() as string = Array( """""", "12", "[1", "2]", "[bad]" )
 		  
@@ -64,23 +64,51 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub CaseSensitiveKeyTest()
+	#tag Method, Flags = &h0
+		Sub CaseSensitiveKeyTest()
 		  dim j as new JSONItem_MTC
-		  j.Value( "a" ) = 1
-		  j.Value( "A" ) = 2
 		  
-		  Assert.AreEqual( 2, j.Count, "Should be 2 objects" )
+		  dim storedKeys() as string = array( _
+		  "a", _
+		  "A", _
+		  "a" + &u200B + "A", _
+		  "A" + &u200B + "A", _
+		  "a" + &u200B + "a" _
+		  )
+		  
+		  for i as integer = 0 to storedKeys.Ubound
+		    dim key as string = storedKeys( i )
+		    j.Value( key ) = i + 1
+		  next
+		  
+		  Assert.AreEqual( CType( storedKeys.Ubound, integer ) + 1, j.Count, "Should be 5 objects" )
 		  Assert.AreEqual( 1, j.Value( "a" ).IntegerValue )
 		  
-		  j.Value( "Man" ) = 3
+		  dim keys() as string = j.Names
+		  
+		  for each storedKey as string in storedKeys
+		    dim startingUb as integer = keys.Ubound
+		    for i as integer = keys.Ubound downto 0
+		      if StrComp( keys( i ), storedKey, 0 ) = 0 then
+		        keys.Remove i
+		        exit for i
+		      end if
+		    next
+		    dim endingUb as integer = keys.Ubound
+		    Assert.AreEqual( startingUb - 1, endingUb, storedKey.ToText + " was not found" )
+		  next
+		  
+		  Assert.AreEqual( -1, CType( keys.Ubound, integer ), "keys should be empty" )
+		  
+		  j.Value( "Man" ) = 6
 		  Assert.IsFalse( j.HasName( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
+		  
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub DictionaryMethodsTest()
+	#tag Method, Flags = &h0
+		Sub DictionaryMethodsTest()
 		  dim j as new JSONItem_MTC
 		  
 		  j.Value( "a" ) = "a"
@@ -112,23 +140,38 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub EmbeddedQuoteTest()
-		  Dim jI As New JSONItem_MTC
-		  jI.Value( "name" ) = "John ""Doey"" Doe"
+	#tag Method, Flags = &h0
+		Sub EmbeddedBackslashTest()
+		  dim jI as new JSONItem_MTC
+		  jI.Value( "name" ) = "John \Doey\ Doe"
 		  
-		  Dim raw As String = jI.ToString
+		  dim raw as String = jI.ToString
 		  
-		  Dim jO As New JSONItem_MTC(raw)
+		  dim jO as new JSONItem_MTC( raw )
 		  
-		  For Each k As String In jI.Names
-		    Assert.IsTrue( jI.Value(k) = jO.Value( k ), k.ToText )
-		  Next
+		  for each k as String in jI.Names
+		    Assert.IsTrue( jI.Value( k ) = jO.Value( k ), k.ToText )
+		  next
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub EmptyStringTest()
+	#tag Method, Flags = &h0
+		Sub EmbeddedQuoteTest()
+		  dim jI as new JSONItem_MTC
+		  jI.Value( "name" ) = "John ""Doey"" Doe"
+		  
+		  dim raw as String = jI.ToString
+		  
+		  dim jO as new JSONItem_MTC( raw )
+		  
+		  for each k as String in jI.Names
+		    Assert.IsTrue( jI.Value( k ) = jO.Value( k ), k.ToText )
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub EmptyStringTest()
 		  Dim jI As New JSONItem_MTC
 		  jI.Value("name") = ""
 		  
@@ -139,8 +182,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub EscapedCharactersTest()
+	#tag Method, Flags = &h0
+		Sub EscapedCharactersTest()
 		  dim j as JSONItem_MTC
 		  dim jsonString() as string = Array( "\r", "\n", "\\", "\t", "\f", "\b", "\""", "\/", "\u0020", "\G" )
 		  dim expectedString() as string = Array( EndOfLine.Macintosh,  EndOfLine.UNIX, "\", chr( 9 ), chr( 12 ), chr( 8 ), """", "/", " ", "G" )
@@ -153,8 +196,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub IllegalStringTest()
+	#tag Method, Flags = &h0
+		Sub IllegalStringTest()
 		  Assert.Pass( "Running tests" )
 		  
 		  dim j as JSONItem_MTC
@@ -207,8 +250,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub LoadAdditionalTest()
+	#tag Method, Flags = &h0
+		Sub LoadAdditionalTest()
 		  dim j as new JSONItem_MTC
 		  j.Value( "one" ) = 1.0
 		  
@@ -218,12 +261,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub LoadEncodingTest()
-		  #if Target64Bit
-		    Assert.Message "NOTE: Some of these tests may fail in 64-bit due to Xojo issues"
-		  #endif
-		  
+	#tag Method, Flags = &h0
+		Sub LoadEncodingTest()
 		  const kOriginal = "[""abc""]"
 		  
 		  dim testString as string
@@ -352,8 +391,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub LoadInterruptionTest()
+	#tag Method, Flags = &h0
+		Sub LoadInterruptionTest()
 		  dim j as JSONItem_MTC
 		  dim load as string = "{""first"" : 1.0, ""second"" : interrupt}"
 		  
@@ -406,8 +445,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub ObjectsTest()
+	#tag Method, Flags = &h0
+		Sub ObjectsTest()
 		  #pragma BreakOnExceptions false
 		  
 		  dim j as new JSONItem_MTC
@@ -447,8 +486,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub SimpleToFromTest()
+	#tag Method, Flags = &h0
+		Sub SimpleToFromTest()
 		  Dim jI As New JSONItem_MTC
 		  jI.Value("name") = "John Doe"
 		  jI.Value("age") = 32
@@ -462,8 +501,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub StrictTest()
+	#tag Method, Flags = &h0
+		Sub StrictTest()
 		  #pragma BreakOnExceptions false
 		  
 		  dim j as new JSONItem_MTC
@@ -502,8 +541,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub TextTest()
+	#tag Method, Flags = &h0
+		Sub TextTest()
 		  dim j as new JSONItem_MTC
 		  
 		  dim t1 as text = "hi"
@@ -527,8 +566,8 @@ Inherits TestGroup
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub UnicodeTest()
+	#tag Method, Flags = &h0
+		Sub UnicodeTest()
 		  dim j as new JSONItem_MTC
 		  
 		  j.Value( "a" + chr( 1 ) ) = "something" + chr( 2 )
@@ -615,6 +654,16 @@ Inherits TestGroup
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="IsRunning"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="StopTestOnFail"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Duration"
 			Group="Behavior"

@@ -1,49 +1,41 @@
 #tag Class
-Protected Class StressTests
+Protected Class JSONWebTokenTests
 Inherits TestGroup
-	#tag Method, Flags = &h21
-		Sub BigStringTest()
-		  const kSize = 500 * 1024 * 1024
-		  dim halfSize as integer = ( kSize \ 2 ) + 1
+	#tag Method, Flags = &h0
+		Sub Base64URLTest()
+		  dim s as string = Repeat("This is a test! ", 10)
+		  
+		  dim encoded as string = JSONWebToken_MTC.EncodeBase64URL(s)
+		  Assert.AreSame Encodings.UTF8, encoded.Encoding, "Encoding doesn't match of encoded"
+		  Assert.AreEqual 0, encoded.InStr("/"), "Slash"
+		  Assert.AreEqual 0, encoded.InStr("+"), "Plus"
+		  
+		  dim decoded as string = JSONWebToken_MTC.DecodeBase64URL(encoded, Encodings.UTF8)
+		  Assert.AreSame s, decoded, "Decoded doesn't match"
+		  
+		  s = ChrB(&b11111111) + ChrB(&b11100000) + "abc"
+		  s = s.Repeat_MTC(100)
+		  
+		  encoded = JSONWebToken_MTC.EncodeBase64URL(s)
+		  Assert.AreSame s, DecodeBase64(encoded.ReplaceAllB("-", "+").ReplaceAllB("_", "/")), _
+		  "DecodeBase64 fails"
+		End Sub
+	#tag EndMethod
 
-		  dim s as string = "0123456789"
-
-		  while s.LenB < halfSize
-		    s = s + s
-		  wend
-
-		  if s.LenB < kSize then
-		    s = s + s.Mid( 1, kSize - s.LenB )
-		  end if
-
-		  dim length as integer = s.LenB
-		  #pragma unused length
-
-		  dim j as new JSONItem_MTC
-		  j.Compact = true
-
-		  try
-		    j.Append s
-		    Assert.Pass
-		  catch err as OutOfMemoryException
-		    Assert.Fail "Ran out of memory"
-		    return
-		  end try
-
-		  dim expect as string = "[""" + s + """]"
-		  dim jString as string
-		  try
-		    jString = j.ToString
-		    Assert.AreEqual expect.LenB, jString.LenB, "Lengths don't match"
-		    Assert.AreEqual 0, StrComp( expect, jString, 0 ), "Strings don't match"
-		  catch err as OutOfMemoryException
-		    Assert.Fail "Ran out of memory creating string"
-		    return
-		  end try
-
-		  Assert.IsTrue jString.Encoding = Encodings.UTF8, "Encoding isn't UTF8"
-
-		  return
+	#tag Method, Flags = &h0
+		Sub CreateTest()
+		  const kSecret = "123"
+		  
+		  self.StopTestOnFail = true
+		  
+		  dim wt as new JSONWebToken_MTC
+		  wt.ExpirationSeconds = 30
+		  
+		  dim token as string = wt.ToToken(JSONWebToken_MTC.kAlgorithmHS256, kSecret)
+		  
+		  dim wt2 as JSONWebToken_MTC = JSONWebToken_MTC.Validate(token, kSecret)
+		  Assert.IsNotNil wt2, "Could not validate"
+		  Assert.IsTrue wt2.IsCurrent, "Is not current"
 		End Sub
 	#tag EndMethod
 
