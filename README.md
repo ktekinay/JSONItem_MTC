@@ -66,6 +66,10 @@ This project was created by and is maintained by Kem Tekinay (ktekinay@mactechno
 
 # Release Notes
 
+**4.2** (__, 2019)
+
+- ParseJSON will take an optional parameter to make the result case-INsensitive (regular Dictionary).
+
 **4.1.1** (Aug. 7, 2019)
 
 - Added more tests.
