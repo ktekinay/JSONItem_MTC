@@ -45,6 +45,81 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub AssignArrayTest()
+		  dim j as new JSONItem_MTC
+		  dim key as string
+		  
+		  key = "StringArray"
+		  try
+		    dim arr() as string = array( "a", "b", "c" )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "TextArray"
+		  try
+		    dim arr() as text = array( "a", "b", "c" )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "IntegerArray"
+		  try
+		    dim arr() as integer = array( 1, 2, 3 )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "BooleanArray"
+		  try
+		    dim arr() as boolean = array( true, true, false )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "DoubleArray"
+		  try
+		    dim arr() as double = array( 1.1, 2.2, 3.3 )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "SingleArray"
+		  try
+		    dim arr() as single
+		    arr.Append 1.1
+		    arr.Append 2.2
+		    arr.Append 3.3
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "VariantArray"
+		  try
+		    dim arr() as variant = array( true, nil, 3 )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  return
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub BadlyFormedJSONLoadTest()
 		  dim j as JSONItem_MTC
 		  dim loads() as string = Array( """""", "12", "[1", "2]", "[bad]" )
@@ -656,29 +731,43 @@ Inherits TestGroup
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="IsRunning"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="StopTestOnFail"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Duration"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IncludeGroup"
+			Visible=false
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
@@ -686,6 +775,7 @@ Inherits TestGroup
 			Group="ID"
 			InitialValue="-2147483648"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"
@@ -693,43 +783,63 @@ Inherits TestGroup
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="NotImplementedCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="PassedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="RunTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="SkippedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="TestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
@@ -737,6 +847,7 @@ Inherits TestGroup
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
