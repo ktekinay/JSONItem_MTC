@@ -69,7 +69,7 @@ This project was created by and is maintained by Kem Tekinay (ktekinay@mactechno
 **4.2** (__, 2020)
 
 - ParseJSON will take an optional parameter to make the result case-INsensitive (regular Dictionary).
-- JSONItem_MTC will roperly deal with assignments of arrays.
+- JSONItem_MTC will properly deal with assignments of arrays.
 
 **4.1.1** (Aug. 7, 2019)
 

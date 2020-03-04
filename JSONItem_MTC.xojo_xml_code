@@ -898,7 +898,7 @@
    <SourceLine>return true</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>raise new JSONException( "This JSONItem_MTC is an obect", 13 )</SourceLine>
+   <SourceLine>raise new JSONException( "This JSONItem_MTC is an object", 13 )</SourceLine>
    <SourceLine>return false</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
