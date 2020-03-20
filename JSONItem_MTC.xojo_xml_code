@@ -1270,7 +1270,7 @@
    <SourceLine></SourceLine>
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
    <SourceLine>for each name as string in keys</SourceLine>
-   <SourceLine>self.Value( name ) = d.Value( name )</SourceLine>
+   <SourceLine>self.Value( NameToKey( name ) ) = d.Value( name )</SourceLine>
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -2582,7 +2582,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Operator_Convert() As Dictionary</SourceLine>
    <SourceLine>if EnsureObject then</SourceLine>
-   <SourceLine>dim dict as Dictionary = ParseJSON( ToString )</SourceLine>
+   <SourceLine>return Dictionary( ToNativeValue )</SourceLine>
    <SourceLine>return dict</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
