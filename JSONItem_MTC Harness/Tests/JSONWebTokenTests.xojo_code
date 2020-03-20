@@ -33,7 +33,7 @@ Inherits TestGroup
 		  
 		  dim token as string = wt.ToToken(JSONWebToken_MTC.kAlgorithmHS256, kSecret)
 		  
-		  dim wt2 as JSONWebToken_MTC = JSONWebToken_MTC.Validate(token, kSecret, true)
+		  dim wt2 as JSONWebToken_MTC = JSONWebToken_MTC.Validate( token, kSecret )
 		  Assert.IsNotNil wt2, "Could not validate"
 		  Assert.IsTrue wt2.IsCurrent, "Is not current"
 		End Sub
@@ -50,9 +50,70 @@ Inherits TestGroup
 		  
 		  dim token as string = wt.ToToken( JSONWebToken_MTC.kAlgorithmRS256, privateKey )
 		  
-		  dim newToken as JSONWebToken_MTC = JSONWebToken_MTC.Validate( token, publicKey, true )
+		  dim newToken as JSONWebToken_MTC = JSONWebToken_MTC.Validate( token, publicKey )
 		  Assert.IsNotNil newToken
-		   
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ToTokenTest()
+		  dim wt as new JSONWebToken_MTC
+		  wt.ExpirationSeconds = 30
+		  
+		  dim token as string
+		  
+		  token = wt.ToToken( JSONWebToken_MTC.kAlgorithmNone, "" )
+		  Assert.AreNotEqual( "", token )
+		  
+		  token = wt.ToToken( JSONWebToken_MTC.kAlgorithmHS256, "something" )
+		  Assert.AreNotEqual( "", token )
+		  
+		  #pragma BreakOnExceptions false
+		  try
+		    token = wt.ToToken( JSONWebToken_MTC.kAlgorithmHS256, "" )
+		    Assert.Fail "No secret with some algorithm"
+		  catch err as Xojo.Core.BadDataException
+		    Assert.Pass
+		  end try
+		  
+		  try
+		    token = wt.ToToken( JSONWebToken_MTC.kAlgorithmNone, "something" )
+		    Assert.Fail "A secret with no algorithm"
+		  catch err as Xojo.Core.BadDataException
+		    Assert.Pass
+		  end try
+		  
+		  #pragma BreakOnExceptions default
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ValidateTest()
+		  dim wt as new JSONWebToken_MTC
+		  wt.ExpirationSeconds = 30
+		  
+		  dim token as string
+		  dim validated as JSONWebToken_MTC
+		  
+		  token = wt.ToToken( JSONWebToken_MTC.kAlgorithmNone, "" )
+		  validated = JSONWebToken_MTC.Validate( token, "" )
+		  Assert.IsNotNil validated, "No algorithm, no secret"
+		  
+		  validated = JSONWebToken_MTC.Validate( token, "something" )
+		  Assert.IsNil validated, "No algorithm with secret"
+		  
+		  token = wt.ToToken( JSONWebToken_MTC.kAlgorithmHS256, "something" )
+		  validated = JSONWebToken_MTC.Validate( token, "" )
+		  Assert.IsNil validated, "Algorithmm, no secret"
+		  
+		  validated = JSONWebToken_MTC.Validate( token, "something" )
+		  Assert.IsNotNil validated, "Algorithm, right secret"
+		  
+		  validated = JSONWebToken_MTC.Validate( token, "bad secret" )
+		  Assert.IsNil validated, "Algorithm, wrong secret"
+		  
 		End Sub
 	#tag EndMethod
 

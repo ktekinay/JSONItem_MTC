@@ -351,6 +351,12 @@
    <SourceLine>raise err</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>if algorithm = kAlgorithmNone and secretOrPrivateKey &lt;&gt; "" then</SourceLine>
+   <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
+   <SourceLine>err.Message = "Algorithm NONE with a secret or private key is contradictory"</SourceLine>
+   <SourceLine>raise err</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim nowSecs as Int64 = DateTime.Now.SecondsFrom1970</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>self.Header.Value( kKeyAlgorithm ) = algorithm</SourceLine>
@@ -458,9 +464,9 @@
   <PartID>1017251839</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Shared Function Validate(token As String, secretOrPublicKey As String, isSignatureRequired As Boolean) As JSONWebToken_MTC</SourceLine>
+   <SourceLine>Shared Function Validate(token As String, secretOrPublicKey As String) As JSONWebToken_MTC</SourceLine>
    <SourceLine>dim result as new JSONWebToken_MTC</SourceLine>
-   <SourceLine>if ValidateInto( result, token, secretOrPublicKey, isSignatureRequired ) then</SourceLine>
+   <SourceLine>if ValidateInto( result, token, secretOrPublicKey ) then</SourceLine>
    <SourceLine>return result</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>return nil</SourceLine>
@@ -473,7 +479,7 @@
   <AliasName></AliasName>
   <ItemFlags>0</ItemFlags>
   <IsShared>1</IsShared>
-  <ItemParams>token As String, secretOrPublicKey As String, isSignatureRequired As Boolean</ItemParams>
+  <ItemParams>token As String, secretOrPublicKey As String</ItemParams>
   <ItemResult>JSONWebToken_MTC</ItemResult>
  </Method>
  <Method>
@@ -483,7 +489,7 @@
   <PartID>154222591</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Shared Function ValidateInto(result As JSONWebToken_MTC, token As String, secretOrPublicKey As String, isSignatureRequired As Boolean) As Boolean</SourceLine>
+   <SourceLine>Shared Function ValidateInto(result As JSONWebToken_MTC, token As String, secretOrPublicKey As String) As Boolean</SourceLine>
    <SourceLine>if DecodeInto( result, token ) = false then</SourceLine>
    <SourceLine>return false</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -491,6 +497,11 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// Validate the signature</SourceLine>
    <SourceLine>//</SourceLine>
+   <SourceLine>// Assumption is that a given secret or public keys means</SourceLine>
+   <SourceLine>// that a signature is expected</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim isSignatureRequired as boolean = secretOrPublicKey &lt;&gt; ""</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim signature as string = DecodeBase64URL( result.LoadedSignaturePart )</SourceLine>
    <SourceLine>if isSignatureRequired and signature = "" then</SourceLine>
    <SourceLine>return false</SourceLine>
@@ -555,7 +566,7 @@
   <AliasName></AliasName>
   <ItemFlags>1</ItemFlags>
   <IsShared>1</IsShared>
-  <ItemParams>result As JSONWebToken_MTC, token As String, secretOrPublicKey As String, isSignatureRequired As Boolean</ItemParams>
+  <ItemParams>result As JSONWebToken_MTC, token As String, secretOrPublicKey As String</ItemParams>
   <ItemResult>Boolean</ItemResult>
  </Method>
  <Method>
@@ -831,7 +842,7 @@
   <PartID>1336307711</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property LoadedExpiresAt As DateTime</SourceLine>
+   <SourceLine>LoadedExpiresAt As DateTime</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -866,7 +877,7 @@
   <PartID>1135536127</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property LoadedIssuedAt As DateTime</SourceLine>
+   <SourceLine>LoadedIssuedAt As DateTime</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1019,7 +1030,7 @@
   <PartID>1878114303</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property NotBeforeDate As DateTime</SourceLine>
+   <SourceLine>NotBeforeDate As DateTime</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
