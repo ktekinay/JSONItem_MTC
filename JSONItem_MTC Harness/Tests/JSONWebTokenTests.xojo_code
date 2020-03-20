@@ -33,29 +33,70 @@ Inherits TestGroup
 		  
 		  dim token as string = wt.ToToken(JSONWebToken_MTC.kAlgorithmHS256, kSecret)
 		  
-		  dim wt2 as JSONWebToken_MTC = JSONWebToken_MTC.Validate(token, kSecret)
+		  dim wt2 as JSONWebToken_MTC = JSONWebToken_MTC.Validate(token, kSecret, true)
 		  Assert.IsNotNil wt2, "Could not validate"
 		  Assert.IsTrue wt2.IsCurrent, "Is not current"
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub RSASignatureTest()
+		  dim privateKey as string
+		  dim publicKey as string
+		  Assert.IsTrue Crypto.RSAGenerateKeyPair( 2048, privateKey, publicKey )
+		  
+		  dim wt as new JSONWebToken_MTC
+		  wt.ExpirationSeconds = 30
+		  
+		  dim token as string = wt.ToToken( JSONWebToken_MTC.kAlgorithmRS256, privateKey )
+		  
+		  dim newToken as JSONWebToken_MTC = JSONWebToken_MTC.Validate( token, publicKey, true )
+		  Assert.IsNotNil newToken
+		   
 		End Sub
 	#tag EndMethod
 
 
 	#tag ViewBehavior
 		#tag ViewProperty
-			Name="Duration"
+			Name="IsRunning"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="StopTestOnFail"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Duration"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IncludeGroup"
+			Visible=false
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
@@ -63,6 +104,7 @@ Inherits TestGroup
 			Group="ID"
 			InitialValue="-2147483648"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"
@@ -70,43 +112,63 @@ Inherits TestGroup
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="NotImplementedCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="PassedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="RunTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="SkippedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="TestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
@@ -114,6 +176,7 @@ Inherits TestGroup
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
