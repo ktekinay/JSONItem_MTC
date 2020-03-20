@@ -183,6 +183,19 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ConvertToDictionaryTest()
+		  dim j as new JSONItem_MTC
+		  
+		  j.Value( "a" ) = 1
+		  j.Value( "A" ) = 2
+		  
+		  dim d as Dictionary = j
+		  Assert.AreEqual 1, d.Value( "a" ).IntegerValue
+		  Assert.AreEqual 2, d.Value( "A" ).IntegerValue
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub DictionaryMethodsTest()
 		  dim j as new JSONItem_MTC
 		  
