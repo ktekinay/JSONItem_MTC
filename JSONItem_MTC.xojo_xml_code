@@ -1269,8 +1269,11 @@
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
-   <SourceLine>for each name as string in keys</SourceLine>
-   <SourceLine>self.Value( NameToKey( name ) ) = d.Value( name )</SourceLine>
+   <SourceLine>dim values() as variant = d.Values</SourceLine>
+   <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
+   <SourceLine>dim name as string = keys( i )</SourceLine>
+   <SourceLine>dim value as variant = values( i )</SourceLine>
+   <SourceLine>self.Value( name ) = value</SourceLine>
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -2582,8 +2585,15 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Operator_Convert() As Dictionary</SourceLine>
    <SourceLine>if EnsureObject then</SourceLine>
-   <SourceLine>return Dictionary( ToNativeValue )</SourceLine>
-   <SourceLine>return dict</SourceLine>
+   <SourceLine>dim d as Dictionary = Dictionary( ToNativeValue )</SourceLine>
+   <SourceLine>if d is nil then</SourceLine>
+   <SourceLine>#if XojoVersion &lt; 2019.031</SourceLine>
+   <SourceLine>d = new Dictionary</SourceLine>
+   <SourceLine>#else</SourceLine>
+   <SourceLine>d = ParseJSON( "{}" )</SourceLine>
+   <SourceLine>#endIf</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>return d</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Function</SourceLine>
@@ -2994,7 +3004,13 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
    <SourceLine>if IsObject then</SourceLine>
-   <SourceLine>dim d as new Dictionary</SourceLine>
+   <SourceLine>dim d as Dictionary</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>#if XojoVersion &lt; 2019.031</SourceLine>
+   <SourceLine>d = new Dictionary</SourceLine>
+   <SourceLine>#else</SourceLine>
+   <SourceLine>d = Xojo.ParseJSON( "{}" )</SourceLine>
+   <SourceLine>#endif</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim rawKeys() as variant = ObjectValues.Keys</SourceLine>
    <SourceLine>dim values() as variant = ObjectValues.Values</SourceLine>

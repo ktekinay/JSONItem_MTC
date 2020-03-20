@@ -189,9 +189,19 @@ Inherits TestGroup
 		  j.Value( "a" ) = 1
 		  j.Value( "A" ) = 2
 		  
+		  j.Value( "b" ) = array( 1, 2, 3 )
+		  
 		  dim d as Dictionary = j
 		  Assert.AreEqual 1, d.Value( "a" ).IntegerValue
 		  Assert.AreEqual 2, d.Value( "A" ).IntegerValue
+		  
+		  dim arr() as variant = d.Value( "b" )
+		  Assert.AreEqual 2, CType( arr.Ubound, Integer )
+		  
+		  j = new JSONItem_MTC
+		  d = j
+		  Assert.IsNotNil d
+		  Assert.AreEqual 0, d.Count
 		End Sub
 	#tag EndMethod
 
