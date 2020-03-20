@@ -40,18 +40,36 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub RSASignatureTest()
-		  dim privateKey as string
-		  dim publicKey as string
-		  Assert.IsTrue Crypto.RSAGenerateKeyPair( 2048, privateKey, publicKey )
+		Sub JavaScriptOutputTest()
+		  //
+		  // Tokens below were generated via JavaScript's jsonwebtoken library
+		  // https://www.npmjs.com/package/jsonwebtoken
+		  //
+		  // It has no expiration date and a claim property of "userId"
+		  //
 		  
-		  dim wt as new JSONWebToken_MTC
-		  wt.ExpirationSeconds = 30
+		  // Default HS256
+		  dim token as string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTU4NDcxMzA0NX0.qIqL_EqlNcea9N93CIECCRx2EbdyWg5R47UjOxBfS2g"
+		  dim wt as JSONWebToken_MTC
 		  
-		  dim token as string = wt.ToToken( JSONWebToken_MTC.kAlgorithmRS256, privateKey )
+		  wt = wt.Validate( token, "" )
+		  Assert.IsNil wt, "No secret"
 		  
-		  dim newToken as JSONWebToken_MTC = JSONWebToken_MTC.Validate( token, publicKey )
-		  Assert.IsNotNil newToken
+		  wt = wt.Validate( token, "bad secret" )
+		  Assert.IsNil wt, "Bad secret" 
+		  
+		  wt = wt.Validate( token, "secret" )
+		  Assert.IsNotNil wt, "Right secret"
+		  
+		  Assert.IsTrue wt.HasKey( "userId" ), "Doesn't have userId"
+		  if not Assert.Failed then
+		    Assert.AreEqual 1, wt.Lookup( "userId", 0 ).IntegerValue
+		  end if
+		  
+		  // HS512
+		  token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTU4NDcxMzgyM30.jP1HTJ_kIUDBde7a_UZgbnzHWR7Jc9e4CeotiTYKGsT9N1ZZnyifg4-GJWM0yN_6T9bsjRllqOozbRysk0EePA"
+		  wt = wt.Validate( token, "secret" )
+		  Assert.IsNotNil wt, "HS512"
 		  
 		End Sub
 	#tag EndMethod

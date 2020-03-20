@@ -382,24 +382,17 @@
    <SourceLine>dim data as string = headerEncoded + "." + claimEncoded</SourceLine>
    <SourceLine>dim signature as string</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if algorithm &lt;&gt; kAlgorithmNone then</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>select case algorithm</SourceLine>
+   <SourceLine>case kAlgorithmNone</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// No signature verification</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS256</SourceLine>
    <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secretOrPrivateKey, data, Crypto.Algorithm.SHA256 ) )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS512</SourceLine>
    <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secretOrPrivateKey, data, Crypto.Algorithm.SHA512 ) )</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>case kAlgorithmRS256, kAlgorithmRS512</SourceLine>
-   <SourceLine>if not Crypto.RSAVerifyKey( secretOrPrivateKey ) then</SourceLine>
-   <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
-   <SourceLine>err.Message = "Cannot verify key"</SourceLine>
-   <SourceLine>raise err</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>signature = Crypto.RSASign( data, secretOrPrivateKey )</SourceLine>
-   <SourceLine>signature = EncodeBase64URL( signature )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case else</SourceLine>
    <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
@@ -407,7 +400,6 @@
    <SourceLine>raise err</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
-   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>mSignature = signature</SourceLine>
    <SourceLine>dim token as string = data + if( signature &lt;&gt; "", "." + signature, "" )</SourceLine>
@@ -524,13 +516,6 @@
    <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS512</SourceLine>
    <SourceLine>compareSignature = Crypto.HMAC( secretOrPublicKey, result.LoadedDataPart, Crypto.Algorithm.SHA512 )</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>case kAlgorithmRS256, kAlgorithmRS512</SourceLine>
-   <SourceLine>if Crypto.RSAVerifySignature( result.LoadedDataPart, signature, secretOrPublicKey ) then</SourceLine>
-   <SourceLine>compareSignature = signature</SourceLine>
-   <SourceLine>else</SourceLine>
-   <SourceLine>compareSignature = ""</SourceLine>
-   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case else</SourceLine>
    <SourceLine>//</SourceLine>
@@ -1297,7 +1282,7 @@
   <PartID>993470463</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
-  <ItemDef>HAS512</ItemDef>
+  <ItemDef>HS512</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
@@ -1409,26 +1394,6 @@
   <ItemType>0</ItemType>
   <ItemDef>JWT</ItemDef>
   <ItemFlags>1</ItemFlags>
- </Constant>
- <Constant>
-  <ItemName>kAlgorithmRS256</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <PartID>1116372991</PartID>
-  <TextEncoding>134217984</TextEncoding>
-  <ItemType>0</ItemType>
-  <ItemDef>RS256</ItemDef>
-  <ItemFlags>0</ItemFlags>
- </Constant>
- <Constant>
-  <ItemName>kAlgorithmRS512</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <PartID>607127551</PartID>
-  <TextEncoding>134217984</TextEncoding>
-  <ItemType>0</ItemType>
-  <ItemDef>RS512</ItemDef>
-  <ItemFlags>0</ItemFlags>
  </Constant>
 </block>
 </RBProject>
