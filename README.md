@@ -69,7 +69,11 @@ This project was created by and is maintained by Kem Tekinay (ktekinay@mactechno
 **4.2** (__, 2020)
 
 - ParseJSON will take an optional parameter to make the result case-INsensitive (regular Dictionary).
-- JSONItem_MTC will properly deal with assignments of arrays.
+- JSONItem\_MTC will properly deal with assignments of arrays.
+- JSONItem\_MTC will auto-convert to Dictionary and Variant().
+- JSONItem\_MTC implements compare against other JSONItem\_MTC.
+- JSONWebToken\_MTC no longer depends on JSONItem\_MTC.
+- JSONWebToken\_MTC has various fixes and no longer depends on JSONItem\_MTC.
 
 **4.1.1** (Aug. 7, 2019)
 
