@@ -1266,7 +1266,7 @@
   <PartID>1717555199</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(d As Dictionary)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(d As Dictionary)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
@@ -2355,7 +2355,7 @@
   <PartID>1871661055</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As String)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As String)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as string in arr</SourceLine>
@@ -2379,7 +2379,7 @@
   <PartID>1799974911</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Int32)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Int32)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as Int32 in arr</SourceLine>
@@ -2403,7 +2403,7 @@
   <PartID>1891786751</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Int64)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Int64)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as Int64 in arr</SourceLine>
@@ -2427,7 +2427,7 @@
   <PartID>775534591</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Boolean)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Boolean)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as boolean in arr</SourceLine>
@@ -2451,7 +2451,7 @@
   <PartID>2086141951</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Double)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Double)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as double in arr</SourceLine>
@@ -2475,7 +2475,7 @@
   <PartID>1175330815</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Single)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Single)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as single in arr</SourceLine>
@@ -2499,7 +2499,7 @@
   <PartID>509423615</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Currency)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Currency)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as currency in arr</SourceLine>
@@ -2523,7 +2523,7 @@
   <PartID>1201774591</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Text)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Text)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as text in arr</SourceLine>
@@ -2547,7 +2547,7 @@
   <PartID>257023999</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Variant)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Variant)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as variant in arr</SourceLine>
@@ -2571,7 +2571,7 @@
   <PartID>742680575</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(arr() As Object)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Object)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>for each v as object in arr</SourceLine>
@@ -2595,7 +2595,7 @@
   <PartID>1756710911</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function Operator_Convert() As Dictionary</SourceLine>
+   <SourceLine>Attributes( hidden )  Function Operator_Convert() As Dictionary</SourceLine>
    <SourceLine>if IsArray then</SourceLine>
    <SourceLine>raise new TypeMismatchException</SourceLine>
    <SourceLine>else</SourceLine>
@@ -2623,7 +2623,7 @@
   <PartID>182622207</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function Operator_Convert() As Variant()</SourceLine>
+   <SourceLine>Attributes( hidden )  Function Operator_Convert() As Variant()</SourceLine>
    <SourceLine>if IsObject then</SourceLine>
    <SourceLine>raise new TypeMismatchException</SourceLine>
    <SourceLine>else</SourceLine>
