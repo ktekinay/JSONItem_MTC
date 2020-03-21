@@ -1,55 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2017r3" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2019r3.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1069731839">
  <ObjName>JSONWebToken_MTC</ObjName>
- <ObjContainerID>1219351307</ObjContainerID>
+ <ObjContainerID>0</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
  <Compatibility></Compatibility>
  <Method>
-  <ItemName>Constructor</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Constructor(claimValues As JSONItem_MTC = Nil, headerValues As JSONItem_MTC = Nil)</SourceLine>
-   <SourceLine>if headerValues is nil then</SourceLine>
-   <SourceLine>Header = new JSONItem_MTC( "{}" )</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if claimValues is nil then</SourceLine>
-   <SourceLine>Claim = new JSONItem_MTC( "{}" )</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>LoadValues claimValues, headerValues</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if not Header.HasName( kKeyType ) then</SourceLine>
-   <SourceLine>Header.Value( kKeyType ) = kTypeJWT</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>dim nowSecs as Int64 = Xojo.Core.Date.Now.SecondsFrom1970</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>dim issuedAt as Int64 = Claim.Lookup( kKeyIssuedAt, nowSecs )</SourceLine>
-   <SourceLine>dim expiresAt as Int64 = Claim.Lookup( kKeyExpiration, nowSecs )</SourceLine>
-   <SourceLine>ExpirationSeconds = expiresAt - issuedAt</SourceLine>
-   <SourceLine>if ExpirationSeconds &lt; 0 then</SourceLine>
-   <SourceLine>ExpirationSeconds = 0</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>End Sub</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>0</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams>claimValues As JSONItem_MTC = Nil, headerValues As JSONItem_MTC = Nil</ItemParams>
-  <ItemResult></ItemResult>
- </Method>
- <Method>
   <ItemName>Decode</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>662667263</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Shared Function Decode(token As String) As JSONWebToken_MTC</SourceLine>
@@ -77,6 +39,7 @@
   <ItemName>DecodeBase64URL</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>713641983</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Shared Function DecodeBase64URL(value As String, encoding As TextEncoding = Nil) As String</SourceLine>
@@ -108,6 +71,7 @@
   <ItemName>DecodeInto</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>875315199</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Shared Function DecodeInto(result As JSONWebToken_MTC, token As String) As Boolean</SourceLine>
@@ -152,9 +116,9 @@
    <SourceLine>return false</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim header as new JSONItem_MTC( headerJSON )</SourceLine>
+   <SourceLine>dim header as Dictionary = ParseJSON( headerJSON )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if header.HasName( kKeyType ) then</SourceLine>
+   <SourceLine>if header.HasKey( kKeyType ) then</SourceLine>
    <SourceLine>dim type as string = header.Value( kKeyType )</SourceLine>
    <SourceLine>if StrComp( type, kTypeJWT, 0 ) &lt;&gt; 0 then</SourceLine>
    <SourceLine>return false</SourceLine>
@@ -167,10 +131,10 @@
    <SourceLine>if claimJSON = "" then</SourceLine>
    <SourceLine>claimJSON = "{}"</SourceLine>
    <SourceLine>end if</SourceLine>
-   <SourceLine>dim claim as JSONItem_MTC = new JSONItem_MTC( claimJSON )</SourceLine>
+   <SourceLine>dim claim as Dictionary = ParseJSON( claimJSON )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>result.LoadValues claim, header</SourceLine>
-   <SourceLine>result.IncludeIssuedAt = claim.HasName( kKeyIssuedAt )</SourceLine>
+   <SourceLine>result.IncludeIssuedAt = claim.HasKey( kKeyIssuedAt )</SourceLine>
    <SourceLine>result.mSignature = signatureEncoded</SourceLine>
    <SourceLine>result.mLoadedSignaturePart = signatureEncoded</SourceLine>
    <SourceLine>result.mLoadedDataPart = headerEncoded + "." + claimEncoded</SourceLine>
@@ -199,6 +163,7 @@
   <ItemName>EncodeBase64URL</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>2058168319</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Shared Function EncodeBase64URL(value As String) As String</SourceLine>
@@ -232,10 +197,11 @@
   <ItemName>HasKey</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>354381823</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function HasKey(key As String) As Boolean</SourceLine>
-   <SourceLine>return Claim.HasName( key )</SourceLine>
+   <SourceLine>return Claim.HasKey( key )</SourceLine>
    <SourceLine>End Function</SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -246,33 +212,10 @@
   <ItemResult>Boolean</ItemResult>
  </Method>
  <Method>
-  <ItemName>LoadValues</ItemName>
-  <Compatibility></Compatibility>
-  <Visible>1</Visible>
-  <ItemSource>
-   <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub LoadValues(claimValues As JSONItem_MTC, headerValues As JSONItem_MTC)</SourceLine>
-   <SourceLine>if claimValues isa object then</SourceLine>
-   <SourceLine>Claim = new JSONItem_MTC( claimValues.ToString )</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if headerValues isa object then</SourceLine>
-   <SourceLine>Header = new JSONItem_MTC( headerValues.ToString )</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>End Sub</SourceLine>
-  </ItemSource>
-  <TextEncoding>134217984</TextEncoding>
-  <AliasName></AliasName>
-  <ItemFlags>33</ItemFlags>
-  <IsShared>0</IsShared>
-  <ItemParams>claimValues As JSONItem_MTC, headerValues As JSONItem_MTC</ItemParams>
-  <ItemResult></ItemResult>
- </Method>
- <Method>
   <ItemName>Lookup</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1304158207</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Lookup(key As String, defaultValue As Variant) As Variant</SourceLine>
@@ -291,6 +234,7 @@
   <ItemName>Remove</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>990867455</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Remove(key As String)</SourceLine>
@@ -308,10 +252,11 @@
   <ItemName>RemoveValue</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1622056959</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub RemoveValue(key As String, json As JSONItem_MTC)</SourceLine>
-   <SourceLine>if json.HasName( key ) then</SourceLine>
+   <SourceLine>Sub RemoveValue(key As String, json As Dictionary)</SourceLine>
+   <SourceLine>if json.HasKey( key ) then</SourceLine>
    <SourceLine>json.Remove key</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
@@ -321,33 +266,40 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>key As String, json As JSONItem_MTC</ItemParams>
+  <ItemParams>key As String, json As Dictionary</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
   <ItemName>ToToken</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1795526655</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Function ToToken(algorithm As String, secret As String) As String</SourceLine>
+   <SourceLine>Function ToToken(algorithm As String, secretOrPrivateKey As String) As String</SourceLine>
    <SourceLine>//</SourceLine>
    <SourceLine>// Check parameters</SourceLine>
    <SourceLine>//</SourceLine>
-   <SourceLine>if algorithm &lt;&gt; kAlgorithmNone and secret = "" then</SourceLine>
+   <SourceLine>if algorithm &lt;&gt; kAlgorithmNone and secretOrPrivateKey = "" then</SourceLine>
    <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
-   <SourceLine>err.Message = "A secret must be specified"</SourceLine>
+   <SourceLine>err.Message = "A secret or private key must be specified"</SourceLine>
    <SourceLine>raise err</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim nowSecs as Int64 = Xojo.Core.Date.Now.SecondsFrom1970</SourceLine>
+   <SourceLine>if algorithm = kAlgorithmNone and secretOrPrivateKey &lt;&gt; "" then</SourceLine>
+   <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
+   <SourceLine>err.Message = "Algorithm NONE with a secret or private key is contradictory"</SourceLine>
+   <SourceLine>raise err</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim nowSecs as Int64 = DateTime.Now.SecondsFrom1970</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>self.Header.Value( kKeyAlgorithm ) = algorithm</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim header as string = Header.ToString</SourceLine>
+   <SourceLine>dim header as string = GenerateJSON( self.Header )</SourceLine>
    <SourceLine>dim headerEncoded as string = EncodeBase64URL( header )</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim claimJSON as JSONItem_MTC = RawClaim</SourceLine>
+   <SourceLine>dim claimJSON as Dictionary = RawClaim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if ExpirationSeconds &gt; 0 then</SourceLine>
    <SourceLine>claimJSON.Value( kKeyExpiration ) = nowSecs + ExpirationSeconds</SourceLine>
@@ -359,23 +311,30 @@
    <SourceLine>RemoveValue kKeyIssuedAt, claimJSON</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim claim as string = claimJSON.ToString</SourceLine>
+   <SourceLine>dim claim as string = GenerateJSON( claimJSON )</SourceLine>
    <SourceLine>dim claimEncoded as string = EncodeBase64URL( claim )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim data as string = headerEncoded + "." + claimEncoded</SourceLine>
    <SourceLine>dim signature as string</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if algorithm &lt;&gt; kAlgorithmNone then</SourceLine>
-   <SourceLine></SourceLine>
    <SourceLine>select case algorithm</SourceLine>
+   <SourceLine>case kAlgorithmNone</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// No signature verification</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS256</SourceLine>
-   <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secret, data, Crypto.Algorithm.SHA256 ) )</SourceLine>
+   <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secretOrPrivateKey, data, Crypto.Algorithm.SHA256 ) )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS512</SourceLine>
-   <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secret, data, Crypto.Algorithm.SHA512 ) )</SourceLine>
+   <SourceLine>signature = EncodeBase64URL( Crypto.HMAC( secretOrPrivateKey, data, Crypto.Algorithm.SHA512 ) )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case else</SourceLine>
+   <SourceLine>dim err as new Xojo.Core.BadDataException</SourceLine>
+   <SourceLine>err.Message = "Unknown algorithm " + algorithm</SourceLine>
+   <SourceLine>raise err</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end select</SourceLine>
-   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>mSignature = signature</SourceLine>
    <SourceLine>dim token as string = data + if( signature &lt;&gt; "", "." + signature, "" )</SourceLine>
@@ -387,13 +346,14 @@
   <AliasName></AliasName>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>algorithm As String, secret As String</ItemParams>
+  <ItemParams>algorithm As String, secretOrPrivateKey As String</ItemParams>
   <ItemResult>String</ItemResult>
  </Method>
  <Method>
   <ItemName>ToUTF8</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>291985407</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Shared Function ToUTF8(s As String) As String</SourceLine>
@@ -428,11 +388,12 @@
   <ItemName>Validate</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1017251839</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Shared Function Validate(token As String, secret As String) As JSONWebToken_MTC</SourceLine>
+   <SourceLine>Shared Function Validate(token As String, secretOrPublicKey As String) As JSONWebToken_MTC</SourceLine>
    <SourceLine>dim result as new JSONWebToken_MTC</SourceLine>
-   <SourceLine>if ValidateInto( result, token, secret ) then</SourceLine>
+   <SourceLine>if ValidateInto( result, token, secretOrPublicKey ) then</SourceLine>
    <SourceLine>return result</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>return nil</SourceLine>
@@ -445,16 +406,17 @@
   <AliasName></AliasName>
   <ItemFlags>0</ItemFlags>
   <IsShared>1</IsShared>
-  <ItemParams>token As String, secret As String</ItemParams>
+  <ItemParams>token As String, secretOrPublicKey As String</ItemParams>
   <ItemResult>JSONWebToken_MTC</ItemResult>
  </Method>
  <Method>
   <ItemName>ValidateInto</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>154222591</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Shared Function ValidateInto(result As JSONWebToken_MTC, token As String, secret As String) As Boolean</SourceLine>
+   <SourceLine>Shared Function ValidateInto(result As JSONWebToken_MTC, token As String, secretOrPublicKey As String) As Boolean</SourceLine>
    <SourceLine>if DecodeInto( result, token ) = false then</SourceLine>
    <SourceLine>return false</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -462,7 +424,16 @@
    <SourceLine>//</SourceLine>
    <SourceLine>// Validate the signature</SourceLine>
    <SourceLine>//</SourceLine>
+   <SourceLine>// Assumption is that a given secret or public keys means</SourceLine>
+   <SourceLine>// that a signature is expected</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim isSignatureRequired as boolean = secretOrPublicKey &lt;&gt; ""</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim signature as string = DecodeBase64URL( result.LoadedSignaturePart )</SourceLine>
+   <SourceLine>if isSignatureRequired and signature = "" then</SourceLine>
+   <SourceLine>return false</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim compareSignature as string</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim algorithm as string = result.Header.Lookup( kKeyAlgorithm, "" )</SourceLine>
@@ -476,11 +447,16 @@
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS256</SourceLine>
-   <SourceLine>compareSignature = Crypto.HMAC( secret, result.LoadedDataPart, Crypto.Algorithm.SHA256 )</SourceLine>
+   <SourceLine>compareSignature = Crypto.HMAC( secretOrPublicKey, result.LoadedDataPart, Crypto.Algorithm.SHA256 )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case kAlgorithmHS512</SourceLine>
-   <SourceLine>compareSignature = Crypto.HMAC( secret, result.LoadedDataPart, Crypto.Algorithm.SHA512 )</SourceLine>
+   <SourceLine>compareSignature = Crypto.HMAC( secretOrPublicKey, result.LoadedDataPart, Crypto.Algorithm.SHA512 )</SourceLine>
    <SourceLine></SourceLine>
+   <SourceLine>case else</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Unknown algorithm</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>return false</SourceLine>
    <SourceLine>end select</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if StrComp( signature, compareSignature, 0 ) &lt;&gt; 0 then</SourceLine>
@@ -510,13 +486,14 @@
   <AliasName></AliasName>
   <ItemFlags>1</ItemFlags>
   <IsShared>1</IsShared>
-  <ItemParams>result As JSONWebToken_MTC, token As String, secret As String</ItemParams>
+  <ItemParams>result As JSONWebToken_MTC, token As String, secretOrPublicKey As String</ItemParams>
   <ItemResult>Boolean</ItemResult>
  </Method>
  <Method>
   <ItemName>Value</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1504856063</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Value(key As String) As Variant</SourceLine>
@@ -534,6 +511,7 @@
   <ItemName>Value</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>304093183</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Sub Value(key As String, Assigns value As Variant)</SourceLine>
@@ -547,10 +525,76 @@
   <ItemParams>key As String, Assigns value As Variant</ItemParams>
   <ItemResult></ItemResult>
  </Method>
+ <Method>
+  <ItemName>LoadValues</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>1863450623</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub LoadValues(claimValues As Dictionary, headerValues As Dictionary)</SourceLine>
+   <SourceLine>if claimValues isa object then</SourceLine>
+   <SourceLine>Claim = ParseJSON( GenerateJSON( claimValues ) )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if headerValues isa object then</SourceLine>
+   <SourceLine>Header = ParseJSON( GenerateJSON( headerValues ) )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>claimValues As Dictionary, headerValues As Dictionary</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Constructor</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>608192511</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Sub Constructor(claimValues As Dictionary = Nil, headerValues As Dictionary = Nil)</SourceLine>
+   <SourceLine>if headerValues is nil then</SourceLine>
+   <SourceLine>Header = ParseJSON( "{}" )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if claimValues is nil then</SourceLine>
+   <SourceLine>Claim = ParseJSON( "{}" )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>LoadValues claimValues, headerValues</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not Header.HasKey( kKeyType ) then</SourceLine>
+   <SourceLine>Header.Value( kKeyType ) = kTypeJWT</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim nowSecs as Int64 = DateTime.Now.SecondsFrom1970</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim issuedAt as Int64 = Claim.Lookup( kKeyIssuedAt, nowSecs )</SourceLine>
+   <SourceLine>dim expiresAt as Int64 = Claim.Lookup( kKeyExpiration, nowSecs )</SourceLine>
+   <SourceLine>ExpirationSeconds = expiresAt - issuedAt</SourceLine>
+   <SourceLine>if ExpirationSeconds &lt; 0 then</SourceLine>
+   <SourceLine>ExpirationSeconds = 0</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>claimValues As Dictionary = Nil, headerValues As Dictionary = Nil</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
  <Property>
   <ItemName>Audience</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>578672639</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Audience As String</SourceLine>
@@ -584,13 +628,14 @@
   <ItemName>Claim</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>358094847</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Claim As JSONItem_MTC</SourceLine>
+   <SourceLine>Claim As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>Claim As JSONItem_MTC</ItemDeclaration>
+  <ItemDeclaration>Claim As Dictionary</ItemDeclaration>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
@@ -598,6 +643,7 @@
   <ItemName>ExpirationSeconds</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>583677951</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>ExpirationSeconds As Int64</SourceLine>
@@ -612,13 +658,14 @@
   <ItemName>Header</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>321060863</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Header As JSONItem_MTC</SourceLine>
+   <SourceLine>Header As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>Header As JSONItem_MTC</ItemDeclaration>
+  <ItemDeclaration>Header As Dictionary</ItemDeclaration>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
  </Property>
@@ -626,6 +673,7 @@
   <ItemName>IncludeIssuedAt</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1940387839</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>IncludeIssuedAt As Boolean = True</SourceLine>
@@ -640,6 +688,7 @@
   <ItemName>IsCurrent</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1055793151</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>IsCurrent As Boolean</SourceLine>
@@ -658,13 +707,13 @@
   <GetAccessor>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
-   <SourceLine>dim nowSecs as Int64 = Xojo.Core.Date.Now.SecondsFrom1970</SourceLine>
+   <SourceLine>dim nowSecs as Int64 = DateTime.Now.SecondsFrom1970</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>if NotBeforeDate isa Xojo.Core.Date and NotBeforeDate.SecondsFrom1970 &gt; nowSecs then</SourceLine>
+   <SourceLine>if NotBeforeDate isa object and NotBeforeDate.SecondsFrom1970 &gt; nowSecs then</SourceLine>
    <SourceLine>return false</SourceLine>
    <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim claim as Dictionary = self.Claim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim expireAt as Int64 = claim.Lookup( kKeyExpiration, nowSecs )</SourceLine>
    <SourceLine>if expireAt &lt; nowSecs then</SourceLine>
@@ -680,6 +729,7 @@
   <ItemName>Issuer</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>684345343</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Issuer As String</SourceLine>
@@ -713,6 +763,7 @@
   <ItemName>JWTId</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>2008930303</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>JWTId As String</SourceLine>
@@ -746,6 +797,7 @@
   <ItemName>LoadedDataPart</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1004107775</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>LoadedDataPart As String</SourceLine>
@@ -772,13 +824,14 @@
   <ItemName>LoadedExpiresAt</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1336307711</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>LoadedExpiresAt As Xojo.Core.Date</SourceLine>
+   <SourceLine>LoadedExpiresAt As DateTime</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>LoadedExpiresAt As Xojo.Core.Date</ItemDeclaration>
+  <ItemDeclaration>LoadedExpiresAt As DateTime</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
   <SetAccessor>
@@ -790,12 +843,12 @@
   <GetAccessor>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
-   <SourceLine>dim d as Xojo.Core.Date</SourceLine>
-   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine>dim d as DateTime</SourceLine>
+   <SourceLine>dim claim as Dictionary = self.Claim</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if claim.HasName( kKeyExpiration ) then</SourceLine>
+   <SourceLine>if claim.HasKey( kKeyExpiration ) then</SourceLine>
    <SourceLine>dim rawSecs as Int64 = claim.Value( kKeyExpiration )</SourceLine>
-   <SourceLine>d = new Xojo.Core.Date( rawSecs, Xojo.Core.TimeZone.Current )</SourceLine>
+   <SourceLine>d = new DateTime( rawSecs, Timezone.Current )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return d</SourceLine>
@@ -806,13 +859,14 @@
   <ItemName>LoadedIssuedAt</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1135536127</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>LoadedIssuedAt As Xojo.Core.Date</SourceLine>
+   <SourceLine>LoadedIssuedAt As DateTime</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>LoadedIssuedAt As Xojo.Core.Date</ItemDeclaration>
+  <ItemDeclaration>LoadedIssuedAt As DateTime</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
   <SetAccessor>
@@ -824,12 +878,12 @@
   <GetAccessor>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
-   <SourceLine>dim d as Xojo.Core.Date</SourceLine>
-   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine>dim d as DateTime</SourceLine>
+   <SourceLine>dim claim as Dictionary = self.Claim</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if claim.HasName( kKeyIssuedAt ) then</SourceLine>
+   <SourceLine>if claim.HasKey( kKeyIssuedAt ) then</SourceLine>
    <SourceLine>dim rawSecs as Int64 = claim.Value( kKeyIssuedAt )</SourceLine>
-   <SourceLine>d = new Xojo.Core.Date( rawSecs, Xojo.Core.TimeZone.Current )</SourceLine>
+   <SourceLine>d = new DateTime( rawSecs, TimeZone.Current )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return d</SourceLine>
@@ -840,6 +894,7 @@
   <ItemName>LoadedSignaturePart</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>93935615</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>LoadedSignaturePart As String</SourceLine>
@@ -866,6 +921,7 @@
   <ItemName>LoadedToken</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>676532223</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>LoadedToken As String</SourceLine>
@@ -893,9 +949,10 @@
   <Compatibility></Compatibility>
   <Attributes>hidden</Attributes>
   <Visible>1</Visible>
+  <PartID>585160703</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Attributes( hidden ) Private mLoadedDataPart As String</SourceLine>
+   <SourceLine>mLoadedDataPart As String</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -908,9 +965,10 @@
   <Compatibility></Compatibility>
   <Attributes>hidden</Attributes>
   <Visible>1</Visible>
+  <PartID>588943359</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Attributes( hidden ) Private mLoadedSignaturePart As String</SourceLine>
+   <SourceLine>mLoadedSignaturePart As String</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -923,9 +981,10 @@
   <Compatibility></Compatibility>
   <Attributes>hidden</Attributes>
   <Visible>1</Visible>
+  <PartID>891521023</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Attributes( hidden ) Private mLoadedToken As String</SourceLine>
+   <SourceLine>mLoadedToken As String</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -938,9 +997,10 @@
   <Compatibility></Compatibility>
   <Attributes>hidden</Attributes>
   <Visible>1</Visible>
+  <PartID>602986495</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Attributes( hidden ) Private mSignature As String</SourceLine>
+   <SourceLine>mSignature As String</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -952,13 +1012,14 @@
   <ItemName>NotBeforeDate</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1878114303</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>NotBeforeDate As Xojo.Core.Date</SourceLine>
+   <SourceLine>NotBeforeDate As DateTime</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>NotBeforeDate As Xojo.Core.Date</ItemDeclaration>
+  <ItemDeclaration>NotBeforeDate As DateTime</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
   <SetAccessor>
@@ -974,15 +1035,15 @@
   <GetAccessor>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
-   <SourceLine>dim d as Xojo.Core.Date</SourceLine>
-   <SourceLine>dim claim as JSONItem_MTC = self.Claim</SourceLine>
+   <SourceLine>dim d as DateTime</SourceLine>
+   <SourceLine>dim claim as Dictionary = self.Claim</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim key as string = kKeyNotBefore</SourceLine>
-   <SourceLine>dim hasKey as boolean = claim.HasName( key )</SourceLine>
+   <SourceLine>dim hasKey as boolean = claim.HasKey( key )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if hasKey then</SourceLine>
    <SourceLine>dim rawSecs as Int64 = claim.Value( key )</SourceLine>
-   <SourceLine>d = new Xojo.Core.Date( rawSecs, Xojo.Core.TimeZone.Current )</SourceLine>
+   <SourceLine>d = new DateTime( rawSecs, TimeZone.Current )</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>return d</SourceLine>
@@ -994,13 +1055,14 @@
   <ItemName>RawClaim</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>185184255</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>RawClaim As JSONItem_MTC</SourceLine>
+   <SourceLine>Property RawClaim As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>RawClaim As JSONItem_MTC</ItemDeclaration>
+  <ItemDeclaration>RawClaim As Dictionary</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
   <SetAccessor>
@@ -1012,7 +1074,11 @@
   <GetAccessor>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
-   <SourceLine>return new JSONItem_MTC( Claim.ToString )</SourceLine>
+   <SourceLine>if Claim is nil then</SourceLine>
+   <SourceLine>return ParseJSON( "{}" )</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return ParseJSON( GenerateJSON( Claim ) )</SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
  </Property>
@@ -1020,13 +1086,14 @@
   <ItemName>RawHeader</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>716843007</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>RawHeader As JSONItem_MTC</SourceLine>
+   <SourceLine>Property RawHeader As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
-  <ItemDeclaration>RawHeader As JSONItem_MTC</ItemDeclaration>
+  <ItemDeclaration>RawHeader As Dictionary</ItemDeclaration>
   <ItemFlags>0</ItemFlags>
   <IsShared>0</IsShared>
   <SetAccessor>
@@ -1038,7 +1105,12 @@
   <GetAccessor>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
-   <SourceLine>return new JSONItem_MTC( Header.ToString )</SourceLine>
+   <SourceLine>if Header is nil then</SourceLine>
+   <SourceLine>return ParseJSON( "{}" )</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>return ParseJSON( GenerateJSON( Header ) )</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>End Get</SourceLine>
   </GetAccessor>
  </Property>
@@ -1046,6 +1118,7 @@
   <ItemName>Signature</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1539252223</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Signature As String</SourceLine>
@@ -1072,6 +1145,7 @@
   <ItemName>Subject</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>561240063</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Subject As String</SourceLine>
@@ -1204,6 +1278,7 @@
   <ItemName>kAlgorithmHS256</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>866867199</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>HS256</ItemDef>
@@ -1213,15 +1288,17 @@
   <ItemName>kAlgorithmHS512</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>993470463</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
-  <ItemDef>HAS512</ItemDef>
+  <ItemDef>HS512</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
   <ItemName>kAlgorithmNone</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1014652927</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>none</ItemDef>
@@ -1231,6 +1308,7 @@
   <ItemName>kKeyAlgorithm</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>61986815</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>alg</ItemDef>
@@ -1240,6 +1318,7 @@
   <ItemName>kKeyAudience</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>585844735</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>aud</ItemDef>
@@ -1249,6 +1328,7 @@
   <ItemName>kKeyExpiration</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1957689343</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>exp</ItemDef>
@@ -1258,6 +1338,7 @@
   <ItemName>kKeyIssuedAt</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>693133311</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>iat</ItemDef>
@@ -1267,6 +1348,7 @@
   <ItemName>kKeyIssuer</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1814245375</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>iss</ItemDef>
@@ -1276,6 +1358,7 @@
   <ItemName>kKeyJWTId</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>345833471</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>jti</ItemDef>
@@ -1285,6 +1368,7 @@
   <ItemName>kKeyNotBefore</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1978437631</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>nbf</ItemDef>
@@ -1294,6 +1378,7 @@
   <ItemName>kKeySubject</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>404981759</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>sub</ItemDef>
@@ -1303,6 +1388,7 @@
   <ItemName>kKeyType</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>1214185471</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>typ</ItemDef>
@@ -1312,10 +1398,21 @@
   <ItemName>kTypeJWT</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>180834303</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
   <ItemDef>JWT</ItemDef>
   <ItemFlags>1</ItemFlags>
+ </Constant>
+ <Constant>
+  <ItemName>kVersion</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>782811135</PartID>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>4.2</ItemDef>
+  <ItemFlags>0</ItemFlags>
  </Constant>
 </block>
 </RBProject>
