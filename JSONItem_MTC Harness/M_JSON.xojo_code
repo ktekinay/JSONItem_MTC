@@ -702,7 +702,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseArray(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As Variant()
+		Private Function ParseArray(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean) As Variant()
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -748,7 +748,7 @@ Protected Module M_JSON
 		    
 		    foundComma = false
 		    
-		    dim value as variant = ParseValue( mb, p, bytePos )
+		    dim value as variant = ParseValue( mb, p, bytePos, isCaseSensitive )
 		    result.Append value
 		    
 		    expectingComma = true
@@ -759,7 +759,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function ParseJSON_MTC(json As String) As Variant
+		Function ParseJSON_MTC(json As String, isCaseSensitive As Boolean = True) As Variant
 		  //
 		  // Takes in JSON and returns either a Dictionary or Variant array
 		  //
@@ -813,9 +813,9 @@ Protected Module M_JSON
 		  bytePos = bytePos + 1
 		  
 		  if thisByte = kSquareBracket then
-		    result = ParseArray( mbJSON, pJSON, bytePos )
+		    result = ParseArray( mbJSON, pJSON, bytePos, isCaseSensitive )
 		  elseif thisByte = kCurlyBrace then
-		    result = ParseObject( mbJSON, pJSON, bytePos )
+		    result = ParseObject( mbJSON, pJSON, bytePos, isCaseSensitive )
 		  else
 		    raise new JSONException( "Illegal value", 10, 1 )
 		  end if
@@ -951,7 +951,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseObject(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As Dictionary
+		Private Function ParseObject(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean) As Dictionary
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -961,7 +961,12 @@ Protected Module M_JSON
 		  
 		  const kColon as integer = 58
 		  
-		  dim result as new M_JSON.JSONDictionary
+		  dim result as Dictionary
+		  if isCaseSensitive then
+		    result = new M_JSON.JSONDictionary
+		  else
+		    result = new Dictionary
+		  end if
 		  
 		  dim key as string
 		  dim value as variant
@@ -1025,7 +1030,7 @@ Protected Module M_JSON
 		    if expectingValue then
 		      expectingValue = false
 		      expectingComma = true
-		      value = ParseValue( mb, p, bytePos )
+		      value = ParseValue( mb, p, bytePos, isCaseSensitive )
 		      
 		      result.Value( key ) = value
 		      
@@ -1194,7 +1199,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseValue(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As Variant
+		Private Function ParseValue(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean) As Variant
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -1222,11 +1227,11 @@ Protected Module M_JSON
 		  select case thisByte
 		  case kSquareBracket
 		    bytePos = bytePos + 1
-		    return ParseArray( mb, p, bytePos )
+		    return ParseArray( mb, p, bytePos, isCaseSensitive )
 		    
 		  case kCurlyBrace 
 		    bytePos = bytePos + 1
-		    return ParseObject( mb, p, bytePos )
+		    return ParseObject( mb, p, bytePos, isCaseSensitive )
 		    
 		  case kN // Should be null
 		    if ( bytePos + 4 ) < mb.Size and p.Byte( bytePos + 1 ) = kU and p.Byte( bytePos + 2 ) = kL and p.Byte( bytePos + 3 ) = kL then
@@ -1275,7 +1280,7 @@ Protected Module M_JSON
 	#tag EndProperty
 
 
-	#tag Constant, Name = kAllowBackgroudTasks, Type = Boolean, Dynamic = False, Default = \"True", Scope = Private
+	#tag Constant, Name = kAllowBackgroudTasks, Type = Boolean, Dynamic = False, Default = \"False", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kBackslash, Type = Double, Dynamic = False, Default = \"92", Scope = Private
@@ -1314,7 +1319,7 @@ Protected Module M_JSON
 	#tag Constant, Name = kTab, Type = Double, Dynamic = False, Default = \"9", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kVersion, Type = String, Dynamic = False, Default = \"4.1.1", Scope = Protected
+	#tag Constant, Name = kVersion, Type = String, Dynamic = False, Default = \"4.2", Scope = Protected
 	#tag EndConstant
 
 
@@ -1323,7 +1328,9 @@ Protected Module M_JSON
 			Name="Name"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
@@ -1331,12 +1338,15 @@ Protected Module M_JSON
 			Group="ID"
 			InitialValue="-2147483648"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"
@@ -1344,6 +1354,7 @@ Protected Module M_JSON
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
@@ -1351,6 +1362,7 @@ Protected Module M_JSON
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Module

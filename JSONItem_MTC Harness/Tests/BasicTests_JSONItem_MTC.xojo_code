@@ -45,6 +45,86 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub AssignArrayTest()
+		  dim j as new JSONItem_MTC
+		  dim key as string
+		  
+		  key = "StringArray"
+		  try
+		    dim arr() as string = array( "a", "b", "c" )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "TextArray"
+		  try
+		    dim arr() as text = array( "a", "b", "c" )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "IntegerArray"
+		  try
+		    dim arr() as integer = array( 1, 2, 3 )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "BooleanArray"
+		  try
+		    dim arr() as boolean = array( true, true, false )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "DoubleArray"
+		  try
+		    dim arr() as double = array( 1.1, 2.2, 3.3 )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "SingleArray"
+		  try
+		    dim arr() as single
+		    arr.Append 1.1
+		    arr.Append 2.2
+		    arr.Append 3.3
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  key = "VariantArray"
+		  try
+		    dim d as new Dictionary
+		    d.Value( 1 ) = 2
+		    dim arr() as variant = array( true, nil, 3, d )
+		    j.Value( key ) = arr
+		    Assert.Pass key.ToText
+		    Assert.IsTrue j.Value( key ) isa JSONItem_MTC
+		    dim subj as JSONItem_MTC = j.Value( key )
+		    Assert.IsTrue subj.Value( 3 ) isa JSONItem_MTC
+		  catch err as RuntimeException
+		    Assert.Fail key.ToText + ": " + err.Reason
+		  end try
+		  
+		  return
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub BadlyFormedJSONLoadTest()
 		  dim j as JSONItem_MTC
 		  dim loads() as string = Array( """""", "12", "[1", "2]", "[bad]" )
@@ -104,6 +184,201 @@ Inherits TestGroup
 		  Assert.IsFalse( j.HasName( "MaT" ), "Keys with same Base64 encoding return incorrect results" )
 		  
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CompareTest()
+		  dim j1 as new JSONItem_MTC
+		  dim j2 as JSONItem_MTC
+		  Assert.IsFalse j1 = j2, "Right is nil"
+		  
+		  j2 = j1
+		  j1 = nil
+		  Assert.IsFalse j1 = j2, "Left is nil"
+		  
+		  j1 = new JSONItem_MTC
+		  Assert.IsTrue j1 = j2, "Both empty"
+		  
+		  j1.Append( 1 )
+		  Assert.IsFalse j1 = j2, "Left has 1 element"
+		  
+		  j2.Append( 1 )
+		  Assert.IsTrue j1 = j2, "Both have 1 element"
+		  
+		  dim d1 as new Dictionary
+		  dim d2 as new Dictionary
+		  
+		  j1.Append d1
+		  Assert.IsFalse j1 = j2, "Left added empty dictionary"
+		  
+		  j2.Append d2
+		  Assert.IsTrue j1 = j2, "Both added empty dictionary"
+		  
+		  d1.Value( "1" ) = true
+		  d1.Value( "2" ) = nil
+		  d2.Value( "2" ) = nil
+		  j1.Append d1
+		  j2.Append d2
+		  Assert.IsFalse j1 = j2, "Left added dict with 2 values, right added dict with 1 value"
+		  
+		  d2.Value( "1" ) = true
+		  j1 = d1
+		  j2 = d2
+		  Assert.IsTrue j1 = j2, "Both converted from dicts with same values"
+		  
+		  j1 = new JSONItem_MTC
+		  j2 = new JSONItem_MTC
+		  j1.Append 1
+		  j2.Append "1"
+		  Assert.IsFalse j1 = j2, "Same value but different types"
+		  
+		  j1 = new JSONItem_MTC
+		  j2 = new JSONItem_MTC
+		  j1.Append CType( 1, Int32 )
+		  j2.Append CType( 1, Int64 )
+		  Assert.IsTrue j1 = j2, "Same value with different Int types"
+		  
+		  j1 = new JSONItem_MTC
+		  j2 = new JSONItem_MTC
+		  dim s as string = "1"
+		  j1.Append s
+		  j2.Append s.ToText
+		  Assert.IsTrue j1 = j2, "Same value with different Text types"
+		  
+		  j1 = new JSONItem_MTC
+		  j2 = new JSONItem_MTC
+		  j1.Append 1
+		  j1.Append "2"
+		  j2.Append "2"
+		  j2.Append 1
+		  Assert.IsFalse j1 = j2, "Same values but different order"
+		  
+		  j1 = new JSONItem_MTC
+		  j2 = new JSONItem_MTC
+		  d2.Value( "4" ) = nil
+		  j1.Append "1"
+		  j1.Append d1
+		  j2.Append "1"
+		  j2.Append d2
+		  Assert.IsFalse j1 = j2, "Right Dictionary has more values"
+		  
+		  d1 = new Dictionary
+		  d2 = new Dictionary
+		  d1.Value( "1" ) = 1
+		  d1.Value( "2" ) = 2
+		  d2.Value( "2" ) = 2
+		  d2.Value( "3" ) = 3
+		  j1 = d1
+		  j2 = d2
+		  Assert.IsFalse j1 = j2, "Dictionaries with same count, different values"
+		  
+		  d1 = new Dictionary
+		  d2 = new Dictionary
+		  d1.Value( "a" ) = 1
+		  d2.Value( "A" ) = 1
+		  j1 = d1
+		  j2 = d2
+		  Assert.IsFalse j1 = j2, "Keys of different case"
+		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ConvertFromArrayTest()
+		  dim arr() as variant
+		  arr.Append 1
+		  arr.Append nil
+		  arr.Append new Dictionary
+		  
+		  dim j as JSONItem_MTC = arr
+		  Assert.AreEqual 3, j.Count
+		  Assert.IsTrue j( 2 ) isa JSONItem_MTC
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ConvertFromDictionaryTest()
+		  dim d as new Dictionary
+		  d.Value( "1" ) = true
+		  d.Value( "2" ) = new Dictionary
+		  
+		  dim arr() as string
+		  d.Value( 3 )  = arr
+		  
+		  dim j as JSONItem_MTC = d
+		  Assert.AreEqual 3, j.Count
+		  
+		  Assert.IsTrue j.Value( "2" ) isa JSONItem_MTC
+		  
+		  dim expected as new JSONItem_MTC( "{""1"":true,""2"":{},""3"":[]}" )
+		  Assert.IsTrue j = expected
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ConvertToArrayTest()
+		  dim j as new JSONItem_MTC
+		  j.Append 1
+		  j.Append true
+		  j.Append nil
+		  
+		  dim arr() as variant = j
+		  Assert.AreEqual 2, CType( arr.Ubound, Integer )
+		  
+		  j = new JSONItem_MTC
+		  arr = j
+		  Assert.IsTrue arr <> nil, "Should have been an empty array"
+		  Assert.AreEqual -1, CType( arr.Ubound, Integer )
+		  
+		  j = new JSONItem_MTC
+		  j.Value( "a" ) = 1
+		  
+		  #pragma BreakOnExceptions false
+		  try
+		    arr = j
+		    Assert.Fail "Should have raised an exception"
+		  catch err as TypeMismatchException
+		    Assert.Pass
+		  end try
+		  #pragma BreakOnExceptions default 
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ConvertToDictionaryTest()
+		  dim j as new JSONItem_MTC
+		  
+		  j.Value( "a" ) = 1
+		  j.Value( "b" ) = 2
+		  
+		  j.Value( "c" ) = array( 1, 2, 3 )
+		  
+		  dim d as Dictionary = j
+		  Assert.AreEqual 1, d.Value( "a" ).IntegerValue
+		  Assert.AreEqual 2, d.Value( "b" ).IntegerValue
+		  
+		  dim arr() as variant = d.Value( "c" )
+		  Assert.AreEqual 2, CType( arr.Ubound, Integer )
+		  
+		  j = new JSONItem_MTC
+		  d = j
+		  Assert.IsNotNil d
+		  Assert.AreEqual 0, d.Count
+		  
+		  j = new JSONItem_MTC
+		  j.Append 1
+		  
+		  #pragma BreakOnExceptions false
+		  try
+		    d = j
+		    Assert.Fail "Should have raised an exception"
+		  catch err as TypeMismatchException
+		    Assert.Pass
+		  end try
+		  #pragma BreakOnExceptions default 
 		End Sub
 	#tag EndMethod
 
@@ -656,29 +931,43 @@ Inherits TestGroup
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="IsRunning"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="StopTestOnFail"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Duration"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="FailedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IncludeGroup"
+			Visible=false
 			Group="Behavior"
 			InitialValue="True"
 			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
@@ -686,6 +975,7 @@ Inherits TestGroup
 			Group="ID"
 			InitialValue="-2147483648"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"
@@ -693,43 +983,63 @@ Inherits TestGroup
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="NotImplementedCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="PassedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="RunTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="SkippedTestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="TestCount"
+			Visible=false
 			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
@@ -737,6 +1047,7 @@ Inherits TestGroup
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

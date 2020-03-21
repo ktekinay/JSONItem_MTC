@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2016r4.1" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2019r3.1" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1729940940">
  <ObjName>JSONItem_MTC</ObjName>
- <ObjContainerID>1447604198</ObjContainerID>
+ <ObjContainerID>0</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
@@ -898,7 +898,7 @@
    <SourceLine>return true</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>raise new JSONException( "This JSONItem_MTC is an obect", 13 )</SourceLine>
+   <SourceLine>raise new JSONException( "This JSONItem_MTC is an object", 13 )</SourceLine>
    <SourceLine>return false</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>end if</SourceLine>
@@ -1261,16 +1261,20 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1717555199</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Operator_Convert(d As Dictionary)</SourceLine>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(d As Dictionary)</SourceLine>
    <SourceLine>self.Constructor()</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim keys() as variant = d.Keys</SourceLine>
-   <SourceLine>for each name as string in keys</SourceLine>
-   <SourceLine>self.Value( name ) = d.Value( name )</SourceLine>
+   <SourceLine>dim values() as variant = d.Values</SourceLine>
+   <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
+   <SourceLine>dim name as string = keys( i )</SourceLine>
+   <SourceLine>dim value as variant = values( i )</SourceLine>
+   <SourceLine>self.Value( name ) = value</SourceLine>
    <SourceLine>next</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>End Sub</SourceLine>
@@ -1798,8 +1802,61 @@
   <PartID>1620037631</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Sub Validate(value As Variant)</SourceLine>
+   <SourceLine>Sub Validate(ByRef value As Variant)</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// If value holds a Dictionary or Array,</SourceLine>
+   <SourceLine>// this will do the conversion and allow the new</SourceLine>
+   <SourceLine>// object to raise an exception if needed</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine></SourceLine>
    <SourceLine>dim isGood as boolean = true // Assume it is</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if value.IsArray then</SourceLine>
+   <SourceLine>dim jsonArr as JSONItem_MTC</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>select case value.ArrayElementType</SourceLine>
+   <SourceLine>case Variant.TypeBoolean</SourceLine>
+   <SourceLine>dim arr() as boolean = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeDouble</SourceLine>
+   <SourceLine>dim arr() as double = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeInt32</SourceLine>
+   <SourceLine>dim arr() as Int32 = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeInt64</SourceLine>
+   <SourceLine>dim arr() as Int64 = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeSingle</SourceLine>
+   <SourceLine>dim arr() as single = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeString</SourceLine>
+   <SourceLine>dim arr() as string = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeText</SourceLine>
+   <SourceLine>dim arr() as text = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeObject</SourceLine>
+   <SourceLine>dim arr() as object = value</SourceLine>
+   <SourceLine>jsonArr = arr</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case else</SourceLine>
+   <SourceLine>isGood = false</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if isGood then</SourceLine>
+   <SourceLine>value = jsonArr</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>select case value.Type</SourceLine>
    <SourceLine>case Variant.TypeNil, Variant.TypeBoolean</SourceLine>
@@ -1808,12 +1865,14 @@
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeDouble, Variant.TypeSingle, Variant.TypeCurrency</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>case Variant.TypeInteger, Variant.TypeInt64</SourceLine>
+   <SourceLine>case Variant.TypeInt32, Variant.TypeInt64, Variant.TypeInteger</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>case Variant.TypeObject</SourceLine>
    <SourceLine>select case value</SourceLine>
    <SourceLine>case IsA JSONItem_MTC</SourceLine>
    <SourceLine>case IsA Dictionary</SourceLine>
+   <SourceLine>dim dictJSON as JSONItem_MTC = Dictionary( value )</SourceLine>
+   <SourceLine>value = dictJSON</SourceLine>
    <SourceLine>else</SourceLine>
    <SourceLine>raise new JSONException( "Unrecognized Object", 11 )</SourceLine>
    <SourceLine>end select</SourceLine>
@@ -1821,6 +1880,8 @@
    <SourceLine>else</SourceLine>
    <SourceLine>isGood = false</SourceLine>
    <SourceLine>end</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if not isGood then</SourceLine>
    <SourceLine>raise new JSONException( "Illegal Value", 10 )</SourceLine>
@@ -1831,7 +1892,7 @@
   <AliasName></AliasName>
   <ItemFlags>33</ItemFlags>
   <IsShared>0</IsShared>
-  <ItemParams>value As Variant</ItemParams>
+  <ItemParams>ByRef value As Variant</ItemParams>
   <ItemResult></ItemResult>
  </Method>
  <Method>
@@ -2271,6 +2332,7 @@
   <ItemName>ParseJSON</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>484835327</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Shared Function ParseJSON(s As String) As Variant</SourceLine>
@@ -2284,6 +2346,478 @@
   <IsShared>1</IsShared>
   <ItemParams>s As String</ItemParams>
   <ItemResult>Variant</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>1871661055</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As String)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as string in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As String</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>1799974911</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Int32)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as Int32 in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Int32</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>1891786751</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Int64)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as Int64 in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Int64</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>775534591</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Boolean)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as boolean in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Boolean</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>2086141951</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Double)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as double in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Double</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>1175330815</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Single)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as single in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Single</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>509423615</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Currency)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as currency in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Currency</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>1201774591</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Text)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as text in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Text</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>257023999</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Variant)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as variant in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Variant</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>742680575</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Sub Operator_Convert(arr() As Object)</SourceLine>
+   <SourceLine>self.Constructor()</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for each v as object in arr</SourceLine>
+   <SourceLine>self.Append v</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Sub</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>arr() As Object</ItemParams>
+  <ItemResult></ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>1756710911</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Function Operator_Convert() As Dictionary</SourceLine>
+   <SourceLine>if IsArray then</SourceLine>
+   <SourceLine>raise new TypeMismatchException</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>dim d as Dictionary = Dictionary( ToNativeValue )</SourceLine>
+   <SourceLine>if d is nil then</SourceLine>
+   <SourceLine>d = new Dictionary</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>return d</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams></ItemParams>
+  <ItemResult>Dictionary</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>182622207</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Function Operator_Convert() As Variant()</SourceLine>
+   <SourceLine>if IsObject then</SourceLine>
+   <SourceLine>raise new TypeMismatchException</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>dim arr() as variant</SourceLine>
+   <SourceLine>dim native as variant = ToNativeValue</SourceLine>
+   <SourceLine>if not native.IsNull then</SourceLine>
+   <SourceLine>arr = native</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>return arr</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams></ItemParams>
+  <ItemResult>Variant()</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Compare</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>336379903</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Attributes( hidden )  Function Operator_Compare(compare As JSONItem_MTC) As Integer</SourceLine>
+   <SourceLine>if compare is nil then</SourceLine>
+   <SourceLine>return 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if Count &lt;&gt; compare.Count then</SourceLine>
+   <SourceLine>return Count - compare.Count</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>elseif Count = 0 then</SourceLine>
+   <SourceLine>return 0</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if IsObject &lt;&gt; compare.IsObject then</SourceLine>
+   <SourceLine>return -1 // Meaningless, really</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Same count, same type, let's dive in</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim result as integer</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if IsArray then</SourceLine>
+   <SourceLine>dim arr1() as variant = self.ArrayValues</SourceLine>
+   <SourceLine>dim arr2() as variant = compare.ArrayValues</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>for i as integer = 0 to arr1.Ubound</SourceLine>
+   <SourceLine>dim v1 as variant = arr1( i )</SourceLine>
+   <SourceLine>dim v2 as variant = arr2( i )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>result = CompareValues( v1, v2 )</SourceLine>
+   <SourceLine>if result &lt;&gt; 0 then</SourceLine>
+   <SourceLine>exit</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else // IsObject</SourceLine>
+   <SourceLine>dim d1 as Dictionary = self.ObjectValues</SourceLine>
+   <SourceLine>dim d2 as Dictionary = compare.ObjectValues</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Since we know the count is the same, every key and value must match</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>dim keys() as variant = d1.Keys</SourceLine>
+   <SourceLine>dim values() as variant = d1.Values</SourceLine>
+   <SourceLine>for i as integer = 0 to keys.Ubound</SourceLine>
+   <SourceLine>dim key as variant = keys( i )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if not d2.HasKey( key ) then</SourceLine>
+   <SourceLine>result = 1 // Meaningless</SourceLine>
+   <SourceLine>exit</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim v1 as variant = values( i )</SourceLine>
+   <SourceLine>dim v2 as variant = d2.Value( key )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>result = CompareValues( v1, v2 )</SourceLine>
+   <SourceLine>if result &lt;&gt; 0 then</SourceLine>
+   <SourceLine>exit</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>next</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return result</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>compare As JSONItem_MTC</ItemParams>
+  <ItemResult>Integer</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>CompareValues</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>293853183</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function CompareValues(v1 As Variant, v2 As Variant) As Integer</SourceLine>
+   <SourceLine>if v1.IsNull and v2.IsNull then</SourceLine>
+   <SourceLine>return 0</SourceLine>
+   <SourceLine>elseif v1.IsNull then</SourceLine>
+   <SourceLine>return -1</SourceLine>
+   <SourceLine>elseif v2.IsNull then</SourceLine>
+   <SourceLine>return 1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim result as integer</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if v1 isa JSONItem_MTC and v2 isa JSONItem_MTC then</SourceLine>
+   <SourceLine>result = JSONItem_MTC( v1 ).Operator_Compare( JSONItem_MTC( v2 ) )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>dim type1 as integer = v1.Type</SourceLine>
+   <SourceLine>dim type2 as integer = v2.Type</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>// Normalize the types</SourceLine>
+   <SourceLine>//</SourceLine>
+   <SourceLine>if type1 = Variant.TypeInt32 or type1 = Variant.TypeInteger then</SourceLine>
+   <SourceLine>type1 = Variant.TypeInt64</SourceLine>
+   <SourceLine>elseif type1 = Variant.TypeCurrency then</SourceLine>
+   <SourceLine>dim d as double = v1.CurrencyValue</SourceLine>
+   <SourceLine>v1 = d</SourceLine>
+   <SourceLine>type1 = Variant.TypeDouble </SourceLine>
+   <SourceLine>elseif type1 = Variant.TypeSingle then</SourceLine>
+   <SourceLine>type1 = Variant.TypeDouble</SourceLine>
+   <SourceLine>elseif type1 = Variant.TypeText then</SourceLine>
+   <SourceLine>dim s as string = v1.TextValue</SourceLine>
+   <SourceLine>v1 = s</SourceLine>
+   <SourceLine>type1 = Variant.TypeString</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if type2 = Variant.TypeInt32 or type2 = Variant.TypeInteger then</SourceLine>
+   <SourceLine>type2 = Variant.TypeInt64</SourceLine>
+   <SourceLine>elseif type2 = Variant.TypeCurrency then</SourceLine>
+   <SourceLine>dim d as double = v2.CurrencyValue</SourceLine>
+   <SourceLine>v2 = d</SourceLine>
+   <SourceLine>type2 = Variant.TypeCurrency</SourceLine>
+   <SourceLine>elseif type2 = Variant.TypeSingle then</SourceLine>
+   <SourceLine>type2 = Variant.TypeDouble</SourceLine>
+   <SourceLine>elseif type2 = Variant.TypeText then</SourceLine>
+   <SourceLine>dim s as string = v2.TextValue</SourceLine>
+   <SourceLine>v2 = s</SourceLine>
+   <SourceLine>type2 = Variant.TypeString</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>if type1 = type2 then</SourceLine>
+   <SourceLine>select case type1</SourceLine>
+   <SourceLine>case Variant.TypeInt64</SourceLine>
+   <SourceLine>result = v1.IntegerValue - v1.IntegerValue</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case Variant.TypeBoolean</SourceLine>
+   <SourceLine>if v1.BooleanValue = v2.BooleanValue then</SourceLine>
+   <SourceLine>result = 0</SourceLine>
+   <SourceLine>elseif v1.BooleanValue then</SourceLine>
+   <SourceLine>result = 1</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>result = -1</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>case else // Strings, doubles, singles</SourceLine>
+   <SourceLine>result = StrComp( v1.StringValue, v2.StringValue, 0 )</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end select</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>result = type1 - type2</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>return result</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>33</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams>v1 As Variant, v2 As Variant</ItemParams>
+  <ItemResult>Integer</ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
@@ -2664,9 +3198,10 @@
   <ItemName>ToNativeValue</ItemName>
   <Compatibility></Compatibility>
   <Visible>1</Visible>
+  <PartID>659066879</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property ToNativeValue As Variant</SourceLine>
+   <SourceLine>ToNativeValue As Variant</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -2683,7 +3218,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
    <SourceLine>if IsObject then</SourceLine>
-   <SourceLine>dim d as new Dictionary</SourceLine>
+   <SourceLine>dim d as Dictionary = new Dictionary</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim rawKeys() as variant = ObjectValues.Keys</SourceLine>
    <SourceLine>dim values() as variant = ObjectValues.Values</SourceLine>
@@ -2944,7 +3479,7 @@
   <PartID>1097842687</PartID>
   <TextEncoding>134217984</TextEncoding>
   <ItemType>0</ItemType>
-  <ItemDef>4.1.1</ItemDef>
+  <ItemDef>4.2</ItemDef>
   <ItemFlags>0</ItemFlags>
  </Constant>
  <Constant>
