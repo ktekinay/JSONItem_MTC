@@ -1261,6 +1261,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1717555199</PartID>
   <ItemSource>
@@ -2349,6 +2350,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1871661055</PartID>
   <ItemSource>
@@ -2372,6 +2374,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1799974911</PartID>
   <ItemSource>
@@ -2395,6 +2398,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1891786751</PartID>
   <ItemSource>
@@ -2418,6 +2422,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>775534591</PartID>
   <ItemSource>
@@ -2441,6 +2446,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>2086141951</PartID>
   <ItemSource>
@@ -2464,6 +2470,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1175330815</PartID>
   <ItemSource>
@@ -2487,6 +2494,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>509423615</PartID>
   <ItemSource>
@@ -2510,6 +2518,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1201774591</PartID>
   <ItemSource>
@@ -2533,6 +2542,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>257023999</PartID>
   <ItemSource>
@@ -2556,6 +2566,7 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>742680575</PartID>
   <ItemSource>
@@ -2579,19 +2590,18 @@
  <Method>
   <ItemName>Operator_Convert</ItemName>
   <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
   <Visible>1</Visible>
   <PartID>1756710911</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Function Operator_Convert() As Dictionary</SourceLine>
-   <SourceLine>if EnsureObject then</SourceLine>
+   <SourceLine>if IsArray then</SourceLine>
+   <SourceLine>raise new TypeMismatchException</SourceLine>
+   <SourceLine>else</SourceLine>
    <SourceLine>dim d as Dictionary = Dictionary( ToNativeValue )</SourceLine>
    <SourceLine>if d is nil then</SourceLine>
-   <SourceLine>#if XojoVersion &lt; 2019.031</SourceLine>
    <SourceLine>d = new Dictionary</SourceLine>
-   <SourceLine>#else</SourceLine>
-   <SourceLine>d = ParseJSON( "{}" )</SourceLine>
-   <SourceLine>#endIf</SourceLine>
    <SourceLine>end if</SourceLine>
    <SourceLine>return d</SourceLine>
    <SourceLine>end if</SourceLine>
@@ -2604,6 +2614,35 @@
   <IsShared>0</IsShared>
   <ItemParams></ItemParams>
   <ItemResult>Dictionary</ItemResult>
+ </Method>
+ <Method>
+  <ItemName>Operator_Convert</ItemName>
+  <Compatibility></Compatibility>
+  <Attributes>hidden</Attributes>
+  <Visible>1</Visible>
+  <PartID>182622207</PartID>
+  <ItemSource>
+   <TextEncoding>134217984</TextEncoding>
+   <SourceLine>Function Operator_Convert() As Variant()</SourceLine>
+   <SourceLine>if IsObject then</SourceLine>
+   <SourceLine>raise new TypeMismatchException</SourceLine>
+   <SourceLine>else</SourceLine>
+   <SourceLine>dim arr() as variant</SourceLine>
+   <SourceLine>dim native as variant = ToNativeValue</SourceLine>
+   <SourceLine>if not native.IsNull then</SourceLine>
+   <SourceLine>arr = native</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine>return arr</SourceLine>
+   <SourceLine>end if</SourceLine>
+   <SourceLine></SourceLine>
+   <SourceLine>End Function</SourceLine>
+  </ItemSource>
+  <TextEncoding>134217984</TextEncoding>
+  <AliasName></AliasName>
+  <ItemFlags>0</ItemFlags>
+  <IsShared>0</IsShared>
+  <ItemParams></ItemParams>
+  <ItemResult>Variant()</ItemResult>
  </Method>
  <Note>
   <ItemName>Legal</ItemName>
@@ -3004,13 +3043,7 @@
    <TextEncoding>134217984</TextEncoding>
    <SourceLine>Get</SourceLine>
    <SourceLine>if IsObject then</SourceLine>
-   <SourceLine>dim d as Dictionary</SourceLine>
-   <SourceLine></SourceLine>
-   <SourceLine>#if XojoVersion &lt; 2019.031</SourceLine>
-   <SourceLine>d = new Dictionary</SourceLine>
-   <SourceLine>#else</SourceLine>
-   <SourceLine>d = Xojo.ParseJSON( "{}" )</SourceLine>
-   <SourceLine>#endif</SourceLine>
+   <SourceLine>dim d as Dictionary = new Dictionary</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>dim rawKeys() as variant = ObjectValues.Keys</SourceLine>
    <SourceLine>dim values() as variant = ObjectValues.Values</SourceLine>

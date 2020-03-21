@@ -183,25 +183,66 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub ConvertToArrayTest()
+		  dim j as new JSONItem_MTC
+		  j.Append 1
+		  j.Append true
+		  j.Append nil
+		  
+		  dim arr() as variant = j
+		  Assert.AreEqual 2, CType( arr.Ubound, Integer )
+		  
+		  j = new JSONItem_MTC
+		  arr = j
+		  Assert.IsTrue arr <> nil, "Should have been an empty array"
+		  Assert.AreEqual -1, CType( arr.Ubound, Integer )
+		  
+		  j = new JSONItem_MTC
+		  j.Value( "a" ) = 1
+		  
+		  #pragma BreakOnExceptions false
+		  try
+		    arr = j
+		    Assert.Fail "Should have raised an exception"
+		  catch err as TypeMismatchException
+		    Assert.Pass
+		  end try
+		  #pragma BreakOnExceptions default 
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub ConvertToDictionaryTest()
 		  dim j as new JSONItem_MTC
 		  
 		  j.Value( "a" ) = 1
-		  j.Value( "A" ) = 2
+		  j.Value( "b" ) = 2
 		  
-		  j.Value( "b" ) = array( 1, 2, 3 )
+		  j.Value( "c" ) = array( 1, 2, 3 )
 		  
 		  dim d as Dictionary = j
 		  Assert.AreEqual 1, d.Value( "a" ).IntegerValue
-		  Assert.AreEqual 2, d.Value( "A" ).IntegerValue
+		  Assert.AreEqual 2, d.Value( "b" ).IntegerValue
 		  
-		  dim arr() as variant = d.Value( "b" )
+		  dim arr() as variant = d.Value( "c" )
 		  Assert.AreEqual 2, CType( arr.Ubound, Integer )
 		  
 		  j = new JSONItem_MTC
 		  d = j
 		  Assert.IsNotNil d
 		  Assert.AreEqual 0, d.Count
+		  
+		  j = new JSONItem_MTC
+		  j.Append 1
+		  
+		  #pragma BreakOnExceptions false
+		  try
+		    d = j
+		    Assert.Fail "Should have raised an exception"
+		  catch err as TypeMismatchException
+		    Assert.Pass
+		  end try
+		  #pragma BreakOnExceptions default 
 		End Sub
 	#tag EndMethod
 
