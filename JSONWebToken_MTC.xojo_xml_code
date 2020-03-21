@@ -1404,5 +1404,15 @@
   <ItemDef>JWT</ItemDef>
   <ItemFlags>1</ItemFlags>
  </Constant>
+ <Constant>
+  <ItemName>kVersion</ItemName>
+  <Compatibility></Compatibility>
+  <Visible>1</Visible>
+  <PartID>782811135</PartID>
+  <TextEncoding>134217984</TextEncoding>
+  <ItemType>0</ItemType>
+  <ItemDef>4.2</ItemDef>
+  <ItemFlags>0</ItemFlags>
+ </Constant>
 </block>
 </RBProject>
