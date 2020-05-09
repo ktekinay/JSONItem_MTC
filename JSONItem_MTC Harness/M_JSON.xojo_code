@@ -293,8 +293,6 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  const kColon as integer = 58
-		  
 		  dim prettyPrint as boolean = level > -1
 		  
 		  dim keys() as variant = dict.Keys
@@ -959,8 +957,6 @@ Protected Module M_JSON
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  const kColon as integer = 58
-		  
 		  dim result as Dictionary
 		  if isCaseSensitive then
 		    result = new M_JSON.JSONDictionary
@@ -1055,7 +1051,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseString(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As String
+		Private Function ParseString(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, endQuote As Integer = kQuote) As String
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -1164,7 +1160,19 @@ Protected Module M_JSON
 		    elseif expectingSurrogate then
 		      raise new JSONException( "Improperly formed JSON string", 0, bytePos + 1 )
 		      
-		    elseif thisByte = kQuote then
+		      //
+		      // If given an endQuote, see if it matches
+		      // If not, test to see if it is any valid json token
+		      //
+		    elseif ( _
+		      endQuote = 0 and ( _
+		      thisByte = kCloseSquareBracket or thisByte = kCloseCurlyBrace or _
+		      thisByte = kComma or thisByte = kColon or _
+		      _ // EOL
+		      thisByte = 10 or thisByte = 13 _
+		      ) _
+		      ) or _
+		      ( endQuote <> 0 and thisByte = endQuote ) then
 		      //
 		      // We're done with this string
 		      //
@@ -1174,7 +1182,17 @@ Protected Module M_JSON
 		        s = mb.StringValue( startPos, diff )
 		      end if
 		      
-		      bytePos = bytePos + 1
+		      if endQuote = 0 then
+		        //
+		        // Free string
+		        //
+		        s = s.Trim
+		      else
+		        //
+		        // Advance past the quote
+		        //
+		        bytePos = bytePos + 1
+		      end if
 		      
 		      if builder.Ubound <> -1 then
 		        builder.Append s
@@ -1290,6 +1308,9 @@ Protected Module M_JSON
 	#tag EndConstant
 
 	#tag Constant, Name = kCloseSquareBracket, Type = Double, Dynamic = False, Default = \"93", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kColon, Type = Double, Dynamic = False, Default = \"58", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kComma, Type = Double, Dynamic = False, Default = \"44", Scope = Private
