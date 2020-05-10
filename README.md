@@ -66,9 +66,15 @@ This project was created by and is maintained by Kem Tekinay (ktekinay@mactechno
 
 # Release Notes
 
+**4.3** (May __, 2020)
+
+- ParseJSON\_MTC will take an optional parameter, isLoose, that will let it parse JavaScript-style JSON, e.g., `{a:b, [1, null, xxx]}`.
+- ParseJSON\_MTC will ignore embedded comments.
+- Added unit tests for Basic API 2.0.
+
 **4.2** (Mar. 21, 2020)
 
-- ParseJSON will take an optional parameter to make the result case-INsensitive (regular Dictionary).
+- ParseJSON\_MTC will take an optional parameter to make the result case-INsensitive (regular Dictionary).
 - JSONItem\_MTC will properly deal with assignments of arrays.
 - JSONItem\_MTC will auto-convert to Dictionary and Variant().
 - JSONItem\_MTC implements compare against other JSONItem\_MTC.
