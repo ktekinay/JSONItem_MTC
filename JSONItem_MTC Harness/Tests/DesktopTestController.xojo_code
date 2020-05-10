@@ -13,6 +13,7 @@ Inherits TestController
 		  group = New BasicTests_JSONItem(Self, "Native JSONItem Tests")
 		  group = New BasicTests_JSONItem_MTC(Self, "Basic JSONItem_MTC Tests")
 		  group = new BasicTests_NewFramework( Self, "Basic New Framework Tests" )
+		  group = new BasicTests_API2( Self, "Basic API 2.0 Tests" )
 		  group = New JsonOrgExampleTests(Self, "Example Documents from json.org/example")
 		  group = new JSONWebTokenTests(Self, "JSONWebToken")
 		  group = new LongTests_JSONItem_MTC( self, "Long JSONItem_MTC Tests" )

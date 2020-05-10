@@ -8,6 +8,13 @@ Protected Module M_Global
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function ArrayVariant(ParamArray arr() As Variant) As Variant()
+		  return arr
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function NewCaseSensitiveDictionary() As Xojo.Core.Dictionary
 		  return Xojo.Data.ParseJSON( "{}" )
 		End Function
@@ -54,6 +61,7 @@ Protected Module M_Global
 			Group="ID"
 			InitialValue="-2147483648"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Left"
@@ -61,18 +69,23 @@ Protected Module M_Global
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
 			Visible=true
 			Group="ID"
+			InitialValue=""
 			Type="String"
+			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Top"
@@ -80,6 +93,7 @@ Protected Module M_Global
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Module
