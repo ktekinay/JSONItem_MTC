@@ -10,14 +10,32 @@ Protected Module M_JSON
 		  #endif
 		  
 		  dim mbSize as integer = mb.Size
+		  dim inComment as boolean
 		  while bytePos < mbSize
 		    dim thisByte as integer = p.Byte( bytePos )
-		    select case thisByte
-		    case kTab, kLinefeed, kReturn, kSpace
+		    
+		    if inComment then
+		      if thisByte = kLineFeed or thisByte = kReturn then
+		        inComment = false
+		      end if
 		      bytePos = bytePos + 1
-		    case else
-		      return
-		    end select
+		      
+		    else
+		      
+		      select case thisByte
+		      case kHash
+		        inComment = true
+		        bytePos = bytePos + 1
+		        
+		      case kTab, kLinefeed, kReturn, kSpace
+		        bytePos = bytePos + 1
+		        
+		      case else
+		        return
+		        
+		      end select
+		      
+		    end if
 		  wend
 		  
 		  raise new JSONException( "Unexpected end of data", 2, bytePos )
@@ -1144,7 +1162,6 @@ Protected Module M_JSON
 		          
 		        end if
 		        
-		        
 		      case else
 		        //
 		        // If we were strict, we would...
@@ -1178,7 +1195,7 @@ Protected Module M_JSON
 		      thisByte = kCloseSquareBracket or thisByte = kCloseCurlyBrace or _
 		      thisByte = kComma or thisByte = kColon or _
 		      _ // EOL
-		      thisByte = 10 or thisByte = 13 _
+		      thisByte = kLinefeed or thisByte = kReturn _
 		      ) _
 		      ) or _
 		      ( endQuote <> 0 and thisByte = endQuote ) then
@@ -1362,6 +1379,9 @@ Protected Module M_JSON
 	#tag EndConstant
 
 	#tag Constant, Name = kDefaultIndent, Type = String, Dynamic = False, Default = \"  ", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kHash, Type = Double, Dynamic = False, Default = \"35", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kLineFeed, Type = Double, Dynamic = False, Default = \"10", Scope = Private

@@ -154,6 +154,20 @@ Inherits TestGroup
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub CommentedJSONTest()
+		  dim j as string
+		  dim arr() as variant
+		  
+		  j = "[""a"",# comment" + &uA + """b""]"
+		  
+		  arr = ParseJSON_MTC( j )
+		  Assert.AreEqual 1, CType( arr.Ubound, integer )
+		  Assert.AreEqual "a", arr( 0 ).StringValue
+		  Assert.AreEqual "b", arr( 1 ).StringValue
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub DifferentEncodingsTest()
 		  dim json as string = "[1,2,""©""]"
 		  
@@ -482,6 +496,12 @@ Inherits TestGroup
 		  Assert.AreEqual Variant.TypeInt64, d.Value( "d" ).Type, "d is a integer"
 		  Assert.AreEqual 5, d.Value( "d" ).IntegerValue, "d = 5"
 		  Assert.AreEqual "xxx", d.Value( "e" ).StringValue, "e = xxx"
+		  
+		  j = "[aaa, #comment" + &uA + "   bbb ,]"
+		  arr = ParseJSON_MTC( j, true, true )
+		  
+		  Assert.AreEqual 1, CType( arr.Ubound, integer ), "Commented array"
+		  Assert.AreEqual "bbb", arr( 1 ).StringValue, "bbb"
 		  
 		End Sub
 	#tag EndMethod
