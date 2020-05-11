@@ -1141,7 +1141,9 @@ Protected Module M_JSON
 		      
 		      startPos = bytePos + 1
 		      
-		    elseif thisByte = kBackslash and endQuote <> 0 then
+		    elseif ( thisByte = kBackslash and endQuote = kQuote ) _ // Only interpreted in double-quoted strings
+		      or ( thisByte = kSingleQuote and endQuote = kSingleQuote and p.Byte( bytePos + 1 ) = kSingleQuote ) _ // Treat the double-single-quote as a backslash
+		      then
 		      dim diff as integer = bytePos - startPos
 		      if diff <> 0 then
 		        builder.Append mb.StringValue( startPos, diff)
