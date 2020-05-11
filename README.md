@@ -68,7 +68,7 @@ This project was created by and is maintained by Kem Tekinay (ktekinay@mactechno
 
 **4.3** (May __, 2020)
 
-- ParseJSON\_MTC will take an optional parameter, isLoose, that will let it parse JavaScript-style JSON, e.g., `{a:b, [1, null, xxx]}`.
+- ParseJSON\_MTC will take an optional parameter, useBestEffort, that will let it parse JavaScript-style JSON, e.g., `{a:b, [1, null, 'xxx']}`.
 - ParseJSON\_MTC will ignore embedded comments.
 - Added unit tests for Basic API 2.0.
 
