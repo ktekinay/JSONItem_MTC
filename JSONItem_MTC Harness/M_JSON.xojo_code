@@ -779,41 +779,7 @@ Protected Module M_JSON
 		  //
 		  // Takes in JSON and returns either a Dictionary or Variant array
 		  //
-		  
-		  if json = "" then
-		    return nil
-		  end if
-		  
-		  //
-		  // First make sure we have a well encoded string.
-		  // We'll try to be tolerant here.
-		  //
-		  if json.Encoding is nil then
-		    dim threeNulls as string = ChrB( 0 ) + ChrB( 0 ) + ChrB( 0 )
-		    dim oneNull as string = ChrB( 0 )
-		    
-		    dim firstFour as string = json.LeftB( 4 )
-		    dim firstTwo as string = json.LeftB( 2 )
-		    
-		    if firstFour = ( "[" + threeNulls ) or firstFour = ( "{" + threeNulls ) then
-		      json = json.DefineEncoding( Encodings.UTF32LE )
-		    elseif firstFour = ( threeNulls + "[" ) or firstFour = ( threeNulls + "{" ) then
-		      json = json.DefineEncoding( Encodings.UTF32BE )
-		    elseif firstTwo = ( "[" + oneNull ) or firstTwo = ( "{" + oneNull ) then
-		      json = json.DefineEncoding( Encodings.UTF16LE )
-		    elseif firstTwo = ( oneNull + "[" ) or firstTwo = ( oneNull + "{" ) then
-		      json = json.DefineEncoding( Encodings.UTF16BE )
-		    elseif Encodings.UTF8.IsValidData( json ) then
-		      json = json.DefineEncoding( Encodings.UTF8 )
-		    else
-		      //
-		      // Best guess
-		      //
-		      json = json.DefineEncoding( Encodings.SystemDefault )
-		    end if
-		  end if
-		  
-		  json = json.ConvertEncoding( Encodings.UTF8 )
+		  json = PrepareInputString( json )
 		  json = json.Trim
 		  
 		  if json = "" then
@@ -1347,6 +1313,44 @@ Protected Module M_JSON
 		  //
 		  raise new JSONException( "Illegal value", 10, bytePos + 1 )
 		  
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function PrepareInputString(s As String) As String
+		  //
+		  // Make sure we have a well encoded string.
+		  // We'll try to be tolerant here.
+		  //
+		  if s.Encoding is nil then
+		    dim threeNulls as string = ChrB( 0 ) + ChrB( 0 ) + ChrB( 0 )
+		    dim oneNull as string = ChrB( 0 )
+		    
+		    dim firstFour as string = s.LeftB( 4 )
+		    dim firstTwo as string = s.LeftB( 2 )
+		    
+		    if firstFour = ( "[" + threeNulls ) or firstFour = ( "{" + threeNulls ) then
+		      s = s.DefineEncoding( Encodings.UTF32LE )
+		    elseif firstFour = ( threeNulls + "[" ) or firstFour = ( threeNulls + "{" ) then
+		      s = s.DefineEncoding( Encodings.UTF32BE )
+		    elseif firstTwo = ( "[" + oneNull ) or firstTwo = ( "{" + oneNull ) then
+		      s = s.DefineEncoding( Encodings.UTF16LE )
+		    elseif firstTwo = ( oneNull + "[" ) or firstTwo = ( oneNull + "{" ) then
+		      s = s.DefineEncoding( Encodings.UTF16BE )
+		    elseif Encodings.UTF8.IsValidData( s ) then
+		      s = s.DefineEncoding( Encodings.UTF8 )
+		    else
+		      //
+		      // Best guess
+		      //
+		      s = s.DefineEncoding( Encodings.SystemDefault )
+		    end if
+		  end if
+		  
+		  s = s.ConvertEncoding( Encodings.UTF8 )
+		  
+		  return s
 		  
 		End Function
 	#tag EndMethod
