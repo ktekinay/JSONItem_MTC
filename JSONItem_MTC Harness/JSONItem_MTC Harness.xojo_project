@@ -18,6 +18,7 @@ Class=DesktopTestController;Tests/DesktopTestController.xojo_code;&h000000003FC7
 Class=BasicTests_JSONItem;Tests/BasicTests_JSONItem.xojo_code;&h000000006BEECF33;&h000000001962C3CC;false
 Class=BasicTests_JSONItem_MTC;Tests/BasicTests_JSONItem_MTC.xojo_code;&h000000002324D4BF;&h000000001962C3CC;false
 Class=BasicTests_NewFramework;Tests/BasicTests_NewFramework.xojo_code;&h00000000028A07FF;&h000000001962C3CC;false
+Class=BasicTests_API2;Tests/BasicTests_API2.xojo_code;&h0000000039594FFF;&h000000001962C3CC;false
 Class=CompareTests;Tests/CompareTests.xojo_code;&h0000000030843965;&h000000001962C3CC;false
 Class=LongTests_JSONItem_MTC;Tests/LongTests_JSONItem_MTC.xojo_code;&h00000000513E8F7E;&h000000001962C3CC;false
 Class=JsonOrgExampleTests;Tests/JsonOrgExampleTests.xojo_code;&h00000000260C54C7;&h000000001962C3CC;false

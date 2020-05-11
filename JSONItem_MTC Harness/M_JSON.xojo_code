@@ -10,14 +10,32 @@ Protected Module M_JSON
 		  #endif
 		  
 		  dim mbSize as integer = mb.Size
+		  dim inComment as boolean
 		  while bytePos < mbSize
 		    dim thisByte as integer = p.Byte( bytePos )
-		    select case thisByte
-		    case kTab, kLinefeed, kReturn, kSpace
+		    
+		    if inComment then
+		      if thisByte = kLineFeed or thisByte = kReturn then
+		        inComment = false
+		      end if
 		      bytePos = bytePos + 1
-		    case else
-		      return
-		    end select
+		      
+		    else
+		      
+		      select case thisByte
+		      case kHash
+		        inComment = true
+		        bytePos = bytePos + 1
+		        
+		      case kTab, kLinefeed, kReturn, kSpace
+		        bytePos = bytePos + 1
+		        
+		      case else
+		        return
+		        
+		      end select
+		      
+		    end if
 		  wend
 		  
 		  raise new JSONException( "Unexpected end of data", 2, bytePos )
@@ -292,8 +310,6 @@ Protected Module M_JSON
 		    #pragma NilObjectChecking false
 		    #pragma StackOverflowChecking false
 		  #endif
-		  
-		  const kColon as integer = 58
 		  
 		  dim prettyPrint as boolean = level > -1
 		  
@@ -702,7 +718,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseArray(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean) As Variant()
+		Private Function ParseArray(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean, useBestEffort As Boolean) As Variant()
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -734,7 +750,7 @@ Protected Module M_JSON
 		    end if
 		    
 		    if thisByte = kCloseSquareBracket then
-		      if foundComma then 
+		      if foundComma and not useBestEffort then 
 		        raise new JSONException( "Illegal value", 10, bytePos + 1 )
 		      end if
 		      
@@ -748,7 +764,7 @@ Protected Module M_JSON
 		    
 		    foundComma = false
 		    
-		    dim value as variant = ParseValue( mb, p, bytePos, isCaseSensitive )
+		    dim value as variant = ParseValue( mb, p, bytePos, isCaseSensitive, useBestEffort )
 		    result.Append value
 		    
 		    expectingComma = true
@@ -759,45 +775,11 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function ParseJSON_MTC(json As String, isCaseSensitive As Boolean = True) As Variant
+		Function ParseJSON_MTC(json As String, isCaseSensitive As Boolean = True, useBestEffort As Boolean = False) As Variant
 		  //
 		  // Takes in JSON and returns either a Dictionary or Variant array
 		  //
-		  
-		  if json = "" then
-		    return nil
-		  end if
-		  
-		  //
-		  // First make sure we have a well encoded string.
-		  // We'll try to be tolerant here.
-		  //
-		  if json.Encoding is nil then
-		    dim threeNulls as string = ChrB( 0 ) + ChrB( 0 ) + ChrB( 0 )
-		    dim oneNull as string = ChrB( 0 )
-		    
-		    dim firstFour as string = json.LeftB( 4 )
-		    dim firstTwo as string = json.LeftB( 2 )
-		    
-		    if firstFour = ( "[" + threeNulls ) or firstFour = ( "{" + threeNulls ) then
-		      json = json.DefineEncoding( Encodings.UTF32LE )
-		    elseif firstFour = ( threeNulls + "[" ) or firstFour = ( threeNulls + "{" ) then
-		      json = json.DefineEncoding( Encodings.UTF32BE )
-		    elseif firstTwo = ( "[" + oneNull ) or firstTwo = ( "{" + oneNull ) then
-		      json = json.DefineEncoding( Encodings.UTF16LE )
-		    elseif firstTwo = ( oneNull + "[" ) or firstTwo = ( oneNull + "{" ) then
-		      json = json.DefineEncoding( Encodings.UTF16BE )
-		    elseif Encodings.UTF8.IsValidData( json ) then
-		      json = json.DefineEncoding( Encodings.UTF8 )
-		    else
-		      //
-		      // Best guess
-		      //
-		      json = json.DefineEncoding( Encodings.SystemDefault )
-		    end if
-		  end if
-		  
-		  json = json.ConvertEncoding( Encodings.UTF8 )
+		  json = PrepareInputString( json )
 		  json = json.Trim
 		  
 		  if json = "" then
@@ -813,9 +795,9 @@ Protected Module M_JSON
 		  bytePos = bytePos + 1
 		  
 		  if thisByte = kSquareBracket then
-		    result = ParseArray( mbJSON, pJSON, bytePos, isCaseSensitive )
+		    result = ParseArray( mbJSON, pJSON, bytePos, isCaseSensitive, useBestEffort )
 		  elseif thisByte = kCurlyBrace then
-		    result = ParseObject( mbJSON, pJSON, bytePos, isCaseSensitive )
+		    result = ParseObject( mbJSON, pJSON, bytePos, isCaseSensitive, useBestEffort )
 		  else
 		    raise new JSONException( "Illegal value", 10, 1 )
 		  end if
@@ -951,15 +933,13 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseObject(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean) As Dictionary
+		Private Function ParseObject(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean, useBestEffort As Boolean) As Dictionary
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
 		    #pragma NilObjectChecking false
 		    #pragma StackOverflowChecking false
 		  #endif
-		  
-		  const kColon as integer = 58
 		  
 		  dim result as Dictionary
 		  if isCaseSensitive then
@@ -1030,21 +1010,26 @@ Protected Module M_JSON
 		    if expectingValue then
 		      expectingValue = false
 		      expectingComma = true
-		      value = ParseValue( mb, p, bytePos, isCaseSensitive )
+		      value = ParseValue( mb, p, bytePos, isCaseSensitive, useBestEffort )
 		      
 		      result.Value( key ) = value
 		      
-		    elseif thisByte <> kQuote then
+		    elseif thisByte <> kQuote and not useBestEffort then
 		      raise new JSONException( "Illegal value", 10, bytePos + 1 )
 		      
 		    else
 		      
 		      //
-		      // It's a quote as expected for the key
+		      // It's a quote as expected for the key, or this is a loose parse
 		      //
 		      expectingColon = true
-		      bytePos = bytePos + 1
-		      key = ParseString( mb, p, bytePos )
+		      if useBestEffort and thisByte = kSingleQuote then
+		        bytePos = bytePos + 1
+		      elseif thisByte = kQuote then
+		        bytePos = bytePos + 1
+		      end if
+		      
+		      key = ParseString( mb, p, bytePos, thisByte )
 		      
 		    end if
 		  wend
@@ -1055,7 +1040,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseString(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As String
+		Private Function ParseString(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, endQuote As Integer) As String
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -1077,6 +1062,10 @@ Protected Module M_JSON
 		  dim inBackslash as boolean
 		  dim expectingSurrogate as boolean
 		  dim surrogateFirstHalf as integer
+		  
+		  if endQuote <> kQuote and endQuote <> kSingleQuote then
+		    endQuote = 0
+		  end if
 		  
 		  dim mbSize as integer = mb.Size
 		  while bytePos < mbSize
@@ -1139,7 +1128,6 @@ Protected Module M_JSON
 		          
 		        end if
 		        
-		        
 		      case else
 		        //
 		        // If we were strict, we would...
@@ -1153,7 +1141,9 @@ Protected Module M_JSON
 		      
 		      startPos = bytePos + 1
 		      
-		    elseif thisByte = kBackslash then
+		    elseif ( thisByte = kBackslash and endQuote = kQuote ) _ // Only interpreted in double-quoted strings
+		      or ( thisByte = kSingleQuote and endQuote = kSingleQuote and p.Byte( bytePos + 1 ) = kSingleQuote ) _ // Treat the double-single-quote as a backslash
+		      then
 		      dim diff as integer = bytePos - startPos
 		      if diff <> 0 then
 		        builder.Append mb.StringValue( startPos, diff)
@@ -1164,7 +1154,19 @@ Protected Module M_JSON
 		    elseif expectingSurrogate then
 		      raise new JSONException( "Improperly formed JSON string", 0, bytePos + 1 )
 		      
-		    elseif thisByte = kQuote then
+		      //
+		      // If given an endQuote, see if it matches
+		      // If not, test to see if it is any valid json token
+		      //
+		    elseif ( _
+		      endQuote = 0 and ( _
+		      thisByte = kCloseSquareBracket or thisByte = kCloseCurlyBrace or _
+		      thisByte = kComma or thisByte = kColon or _
+		      _ // EOL
+		      thisByte = kLinefeed or thisByte = kReturn _
+		      ) _
+		      ) or _
+		      ( endQuote <> 0 and thisByte = endQuote ) then
 		      //
 		      // We're done with this string
 		      //
@@ -1174,7 +1176,17 @@ Protected Module M_JSON
 		        s = mb.StringValue( startPos, diff )
 		      end if
 		      
-		      bytePos = bytePos + 1
+		      if endQuote = 0 then
+		        //
+		        // Free string
+		        //
+		        s = s.Trim
+		      else
+		        //
+		        // Advance past the quote
+		        //
+		        bytePos = bytePos + 1
+		      end if
 		      
 		      if builder.Ubound <> -1 then
 		        builder.Append s
@@ -1199,7 +1211,7 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ParseValue(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean) As Variant
+		Private Function ParseValue(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, isCaseSensitive As Boolean, useBestEffort As Boolean) As Variant
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -1224,52 +1236,123 @@ Protected Module M_JSON
 		  
 		  dim thisByte as integer = p.Byte( bytePos )
 		  
-		  select case thisByte
-		  case kSquareBracket
-		    bytePos = bytePos + 1
-		    return ParseArray( mb, p, bytePos, isCaseSensitive )
-		    
-		  case kCurlyBrace 
-		    bytePos = bytePos + 1
-		    return ParseObject( mb, p, bytePos, isCaseSensitive )
-		    
-		  case kN // Should be null
-		    if ( bytePos + 4 ) < mb.Size and p.Byte( bytePos + 1 ) = kU and p.Byte( bytePos + 2 ) = kL and p.Byte( bytePos + 3 ) = kL then
-		      bytePos = bytePos + 4
-		      return nil
+		  if useBestEffort and thisByte <> kSquareBracket and thisByte <> kCurlyBrace then
+		    dim isQuoted as boolean = thisByte = kQuote or thisByte = kSingleQuote
+		    if isQuoted then
+		      bytePos = bytePos + 1
 		    end if
 		    
-		  case kT // Should be true
-		    if ( bytePos + 4 ) < mb.Size and p.Byte( bytePos + 1 ) = kR and p.Byte( bytePos + 2 ) = kU and p.Byte( bytePos + 3 ) = kE then
-		      bytePos = bytePos + 4
+		    dim value as string = ParseString( mb, p, bytePos, thisByte )
+		    //
+		    // Test the value to see what it is
+		    //
+		    
+		    if isQuoted then
+		      return value
+		    elseif value = "true" then
 		      return true
-		    end if
-		    
-		  case kF // Should be false
-		    if ( bytePos + 5 ) < mb.Size and p.Byte( bytePos + 1 ) = kA and p.Byte( bytePos + 2 ) = kL and p.Byte( bytePos + 3 ) = kS _
-		      and p.Byte( bytePos + 4 ) = kE then
-		      bytePos = bytePos + 5
+		    elseif value = "false" then
 		      return false
+		    elseif value = "null" then
+		      return nil
+		    elseif IsNumeric( value ) then
+		      if value.InStr( "." ) <> 0 or value.InStr( "e" ) <> 0 then
+		        return value.Val
+		      else
+		        dim i as integer = value.Val
+		        return i
+		      end if
+		    else
+		      return value
 		    end if
 		    
-		  case kQuote 
-		    bytePos = bytePos + 1
-		    return ParseString( mb, p, bytePos )
+		  else
 		    
-		  case else
-		    //
-		    // Should be a number since everything else failed
-		    //
-		    return ParseNumber( mb, p, bytePos )
+		    select case thisByte
+		    case kSquareBracket
+		      bytePos = bytePos + 1
+		      return ParseArray( mb, p, bytePos, isCaseSensitive, useBestEffort )
+		      
+		    case kCurlyBrace 
+		      bytePos = bytePos + 1
+		      return ParseObject( mb, p, bytePos, isCaseSensitive, useBestEffort )
+		      
+		    case kN // Should be null
+		      if ( bytePos + 4 ) < mb.Size and p.Byte( bytePos + 1 ) = kU and p.Byte( bytePos + 2 ) = kL and p.Byte( bytePos + 3 ) = kL then
+		        bytePos = bytePos + 4
+		        return nil
+		      end if
+		      
+		    case kT // Should be true
+		      if ( bytePos + 4 ) < mb.Size and p.Byte( bytePos + 1 ) = kR and p.Byte( bytePos + 2 ) = kU and p.Byte( bytePos + 3 ) = kE then
+		        bytePos = bytePos + 4
+		        return true
+		      end if
+		      
+		    case kF // Should be false
+		      if ( bytePos + 5 ) < mb.Size and p.Byte( bytePos + 1 ) = kA and p.Byte( bytePos + 2 ) = kL and p.Byte( bytePos + 3 ) = kS _
+		        and p.Byte( bytePos + 4 ) = kE then
+		        bytePos = bytePos + 5
+		        return false
+		      end if
+		      
+		    case kQuote 
+		      bytePos = bytePos + 1
+		      return ParseString( mb, p, bytePos, kQuote )
+		      
+		    case else
+		      //
+		      // Should be a number since everything else failed
+		      //
+		      return ParseNumber( mb, p, bytePos )
+		      
+		    end select
 		    
-		  end select
-		  
+		  end if
 		  
 		  //
 		  // If we get here
 		  //
 		  raise new JSONException( "Illegal value", 10, bytePos + 1 )
 		  
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function PrepareInputString(s As String) As String
+		  //
+		  // Make sure we have a well encoded string.
+		  // We'll try to be tolerant here.
+		  //
+		  if s.Encoding is nil then
+		    dim threeNulls as string = ChrB( 0 ) + ChrB( 0 ) + ChrB( 0 )
+		    dim oneNull as string = ChrB( 0 )
+		    
+		    dim firstFour as string = s.LeftB( 4 )
+		    dim firstTwo as string = s.LeftB( 2 )
+		    
+		    if firstFour = ( "[" + threeNulls ) or firstFour = ( "{" + threeNulls ) then
+		      s = s.DefineEncoding( Encodings.UTF32LE )
+		    elseif firstFour = ( threeNulls + "[" ) or firstFour = ( threeNulls + "{" ) then
+		      s = s.DefineEncoding( Encodings.UTF32BE )
+		    elseif firstTwo = ( "[" + oneNull ) or firstTwo = ( "{" + oneNull ) then
+		      s = s.DefineEncoding( Encodings.UTF16LE )
+		    elseif firstTwo = ( oneNull + "[" ) or firstTwo = ( oneNull + "{" ) then
+		      s = s.DefineEncoding( Encodings.UTF16BE )
+		    elseif Encodings.UTF8.IsValidData( s ) then
+		      s = s.DefineEncoding( Encodings.UTF8 )
+		    else
+		      //
+		      // Best guess
+		      //
+		      s = s.DefineEncoding( Encodings.SystemDefault )
+		    end if
+		  end if
+		  
+		  s = s.ConvertEncoding( Encodings.UTF8 )
+		  
+		  return s
 		  
 		End Function
 	#tag EndMethod
@@ -1292,6 +1375,9 @@ Protected Module M_JSON
 	#tag Constant, Name = kCloseSquareBracket, Type = Double, Dynamic = False, Default = \"93", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = kColon, Type = Double, Dynamic = False, Default = \"58", Scope = Private
+	#tag EndConstant
+
 	#tag Constant, Name = kComma, Type = Double, Dynamic = False, Default = \"44", Scope = Private
 	#tag EndConstant
 
@@ -1301,6 +1387,9 @@ Protected Module M_JSON
 	#tag Constant, Name = kDefaultIndent, Type = String, Dynamic = False, Default = \"  ", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = kHash, Type = Double, Dynamic = False, Default = \"35", Scope = Private
+	#tag EndConstant
+
 	#tag Constant, Name = kLineFeed, Type = Double, Dynamic = False, Default = \"10", Scope = Private
 	#tag EndConstant
 
@@ -1308,6 +1397,9 @@ Protected Module M_JSON
 	#tag EndConstant
 
 	#tag Constant, Name = kReturn, Type = Double, Dynamic = False, Default = \"13", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kSingleQuote, Type = Double, Dynamic = False, Default = \"39", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kSpace, Type = Double, Dynamic = False, Default = \"32", Scope = Private
