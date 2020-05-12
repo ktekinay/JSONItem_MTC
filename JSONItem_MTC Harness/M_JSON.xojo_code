@@ -1,7 +1,7 @@
 #tag Module
 Protected Module M_JSON
 	#tag Method, Flags = &h21
-		Private Sub AdvancePastWhiteSpace(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer)
+		Private Sub AdvancePastWhiteSpace(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, stopAtEOL As Boolean = False)
 		  #if not DebugBuild
 		    #pragma BackgroundTasks kAllowBackgroudTasks
 		    #pragma BoundsChecking false
@@ -17,6 +17,7 @@ Protected Module M_JSON
 		    if inComment then
 		      if thisByte = kLineFeed or thisByte = kReturn then
 		        inComment = false
+		        continue while // Let the code below deal with it
 		      end if
 		      bytePos = bytePos + 1
 		      
@@ -27,7 +28,17 @@ Protected Module M_JSON
 		        inComment = true
 		        bytePos = bytePos + 1
 		        
-		      case kTab, kLinefeed, kReturn, kSpace
+		      case kLineFeed, kReturn
+		        bytePos = bytePos + 1
+		        
+		        if stopAtEOL then
+		          dim nextByte as integer = if( bytePos = mbSize, -1, p.Byte( bytePos ) )
+		          if nextByte <> kLinefeed and nextByte <> kReturn then
+		            return // This is the last EOL in the line
+		          end if
+		        end if
+		        
+		      case kTab, kSpace
 		        bytePos = bytePos + 1
 		        
 		      case else
@@ -41,6 +52,51 @@ Protected Module M_JSON
 		  raise new JSONException( "Unexpected end of data", 2, bytePos )
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CountYAMLIndents(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer) As Integer
+		  dim counter as integer
+		  dim inComment as boolean
+		  
+		  dim thisByte as integer
+		  
+		  while bytePos < mb.Size
+		    thisByte = p.Byte( bytePos )
+		    
+		    if inComment then
+		      
+		      if thisByte = kLineFeed then
+		        inComment = false
+		      end if
+		      
+		    else
+		      
+		      select case thisByte
+		      case kHash
+		        inComment = true
+		        counter = 0
+		        
+		      case kLineFeed
+		        //
+		        // Just skip this
+		        //
+		        counter = 0
+		        
+		      case kSpace
+		        counter = counter + 1
+		        
+		      case else
+		        return counter
+		        
+		      end select
+		      
+		    end if
+		    
+		    bytePos = bytePos + 1
+		  wend
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -664,6 +720,28 @@ Protected Module M_JSON
 		  
 		  dim result as string = outBuffer.StringValue( 0, outIndex ).DefineEncoding( Encodings.UTF8 )
 		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetNextEOLPosition(mb As MemoryBlock, p As Ptr, startPos As Integer) As Integer
+		  dim mbSize as integer = mb.Size
+		  
+		  dim bytePos as integer = startPos
+		  while bytePos < mbSize
+		    dim thisByte as integer = p.Byte( bytePos )
+		    
+		    select case thisByte
+		    case kReturn, kLineFeed
+		      exit while
+		      
+		    end select
+		    
+		    bytePos = bytePos + 1
+		  wend
+		  
+		  return bytePos
 		  
 		End Function
 	#tag EndMethod
@@ -1320,6 +1398,378 @@ Protected Module M_JSON
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Function ParseYAMLBlock(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, startingIndents As Integer, aliasDict As Dictionary) As Variant
+		  //
+		  // A "block" is multiple lines that have the same or greater indent
+		  // The bytePos will point at the first non-space byte
+		  // startingIndents will tell us how this block is defined
+		  //
+		  
+		  dim value as variant
+		  
+		  dim dataType as YAMLTypes
+		  dim keyIndent as integer
+		  dim lineValue as variant = ParseYAMLLine( mb, p, bytePos, aliasDict, dataType, keyIndent )
+		  
+		  //
+		  // Collect all the values in this block
+		  //
+		  dim values() as variant
+		  dim dataTypes() as YAMLTypes
+		  dim keyIndents() as integer
+		  
+		  values.Append lineValue
+		  dataTypes.Append dataType
+		  keyIndents.Append keyIndent
+		  
+		  while bytePos < mb.Size
+		    dim indents as integer = CountYAMLIndents( mb, p, bytePos )
+		    if indents < startingIndents then
+		      //
+		      // We're done
+		      //
+		      bytePos = bytePos - indents // Reset to the start of the line
+		      exit while
+		      
+		    elseif indents > startingIndents then
+		      lineValue = ParseYAMLBlock( mb, p, bytePos, indents, aliasDict )
+		      values.Append lineValue
+		      dataTypes.Append YAMLTypes.SomeValue
+		      keyIndents.Append -1
+		      
+		    else
+		      lineValue = ParseYAMLLine( mb, p, bytePos, aliasDict, dataType, keyIndent )
+		      values.Append lineValue
+		      dataTypes.Append dataType
+		      keyIndents.Append keyIndent
+		      
+		    end if
+		  wend
+		  
+		  //
+		  // Consolidate the values
+		  //
+		  for i as integer = values.Ubound - 1 downto 0
+		    dim removeNext as boolean
+		    dim nextType as YAMLTypes = dataTypes( i + 1 )
+		    
+		    select case dataTypes( i )
+		    case YAMLTypes.ArrayRowWithoutValue
+		      
+		      if nextType = YAMLTypes.SomeValue then
+		        values ( i ) = values( i + 1 )
+		        dataTypes( i ) = YAMLTypes.ArrayRow
+		        keyIndents( i ) = keyIndents( i + 1 )
+		        removeNext = true
+		      end if
+		      
+		    case YAMLTypes.ArrayRowWithKeyWithoutValue
+		      if nextType = YAMLTypes.SomeValue then
+		        values ( i ) = values( i + 1 )
+		        dataTypes( i ) = YAMLTypes.ArrayRowWithKeyValuePair
+		        keyIndents( i ) = keyIndents( i + 1 )
+		        removeNext = true
+		      end if
+		      
+		    case YAMLTypes.KeyWithoutValue
+		      if nextType = YAMLTypes.SomeValue then
+		        values ( i ) = values( i + 1 )
+		        dataTypes( i ) = YAMLTypes.KeyValuePair
+		        keyIndents( i ) = keyIndents( i + 1 )
+		        removeNext = true
+		      end if
+		      
+		    case YAMLTypes.SomeValue
+		      dim thisValue as variant = values( i )
+		      dim nextValue as variant = values( i + 1 )
+		      
+		      if thisValue.Type <> Variant.TypeObject and nextValue.Type <> Variant.TypeObject and nextType = YAMLTypes.SomeValue then
+		        thisValue = thisValue.StringValue + " " + nextValue.StringValue
+		        thisValue = thisValue.StringValue.Trim
+		        removeNext = true
+		      end if
+		      
+		    end select
+		    
+		    if removeNext then
+		      values.Remove i + 1
+		      dataTypes.Remove i + 1
+		      keyIndents.Remove i + 1
+		    end if
+		  next
+		  
+		  //
+		  // Let's see what we have
+		  //
+		  dim allArray as boolean = true
+		  dim allDict as boolean = true
+		  dim allStrings as boolean = true
+		  dim allLiteralStrings as boolean = true
+		  dim allWrappedStrings as boolean = true
+		  
+		  for i as integer = 0 to values.Ubound
+		    dataType = dataTypes( i )
+		    
+		    select case dataType
+		    case YAMLTypes.ArrayRow, YAMLTypes.ArrayRowWithKeyValuePair, YAMLTypes.ArrayRowWithKeyWithoutValue, YAMLTypes.ArrayRowWithoutValue
+		      allDict = false
+		      allStrings = false
+		      allLiteralStrings = false
+		      allWrappedStrings = false
+		      
+		    case YAMLTypes.KeyValuePair, YAMLTypes.KeyWithoutValue
+		      allArray = false
+		      allStrings = false
+		      allLiteralStrings = false
+		      allWrappedStrings = false
+		      
+		    case YAMLTypes.LiteralString
+		      allArray = false
+		      allDict = false
+		      allWrappedStrings = false
+		      allStrings = false
+		      
+		    case YAMLTypes.WrappedString
+		      allArray = false
+		      allDict = false
+		      allLiteralStrings = false
+		      allStrings = false
+		      
+		    case YAMLTypes.SomeValue
+		      allArray = false
+		      allDict = false
+		      allLiteralStrings = false
+		      allWrappedStrings = false
+		      
+		      dim thisValue as variant = values( i )
+		      if thisValue.Type = Variant.TypeObject then
+		        allStrings = false
+		      end if
+		      
+		    end select
+		    
+		  next
+		  
+		  select case true
+		  case allArray
+		    value = values
+		    
+		  case allDict
+		    dim dict as new Dictionary
+		    value = dict
+		    
+		    for each entry as pair in values
+		      dict.Value( entry.Left ) = entry.Right
+		    next
+		    
+		  end select
+		  
+		  return value
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ParseYAMLLine(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, aliasDict As Dictionary, ByRef dataType As YAMLTypes, ByRef keyIndent As Integer) As Variant
+		  //
+		  // A line is the current position till the eol
+		  //
+		  
+		  //
+		  // Initialize
+		  //
+		  dataType = YAMLTypes.Unknown
+		  
+		  dim startingBytePos as integer = bytePos
+		  dim eolPos as integer = GetNextEOLPosition( mb, p, bytePos )
+		  dim thiskeyIndent as integer = keyIndent
+		  
+		  dim value as variant
+		  
+		  //
+		  // See what we're dealing with
+		  //
+		  dim thisByte as integer = p.Byte( bytePos )
+		  
+		  //
+		  // Maybe JSON
+		  //
+		  if thisByte = kCurlyBrace then
+		    bytePos = bytePos + 1
+		    value = ParseObject( mb, p, bytePos, true, true )
+		    dataType = YAMLTypes.SomeValue
+		    return value
+		  end if
+		  
+		  if thisByte = kSquareBracket then
+		    bytePos = bytePos + 1
+		    value = ParseArray( mb, p, bytePos, true, true )
+		    dataType = YAMLTypes.SomeValue
+		    return value
+		  end if
+		  
+		  //
+		  // Maybe an array item
+		  //
+		  if thisByte = kHyphen then
+		    bytePos = bytePos + 1
+		    
+		    AdvancePastWhiteSpace mb, p, bytePos, true
+		    
+		    if bytePos >= eolPos then
+		      //
+		      // It's an empty array row
+		      //
+		      dataType = YAMLTypes.ArrayRowWithoutValue
+		      return nil
+		    end if
+		    
+		    if bytePos > ( keyIndent + 1 ) then
+		      //
+		      // It's an array row, and we know something is coming up
+		      //
+		      dataType = YAMLTypes.ArrayRow
+		      thiskeyIndent = bytePos - startingBytePos
+		    end if
+		  end if
+		  
+		  value = ParseYAMLValue( mb, p, bytePos, eolPos, aliasDict )
+		  
+		  //
+		  // Is that it?
+		  //
+		  if bytePos >= eolPos then
+		    if dataType = YAMLTypes.Unknown then
+		      dataType = YAMLTypes.SomeValue
+		    end if
+		    return value
+		  end if
+		  
+		  //
+		  // Now it has to be key-value pair, so let's make sure
+		  //
+		  thisByte = p.Byte( bytePos )
+		  bytePos = bytePos + 1
+		  
+		  if thisByte <> kColon then
+		    //
+		    // Something is wrong
+		    //
+		    raise new YAMLException( "Unexpected additional data" )
+		  end if
+		  
+		  //
+		  // Confirm the keyIndent
+		  //
+		  if keyIndent <> 0 and keyIndent <> thiskeyIndent then
+		    raise new YAMLException( "Improper key indentation" )
+		  end if
+		  
+		  AdvancePastWhiteSpace mb, p, bytePos, true
+		  if bytePos >= eolPos then
+		    if dataType = YAMLTypes.ArrayRow then
+		      dataType = YAMLTypes.ArrayRowWithKeyWithoutValue
+		    else
+		      dataType = YAMLTypes.KeyWithoutValue
+		    end if
+		    return value
+		  end if
+		  
+		  //
+		  // It's a key/value pair
+		  //
+		  dim key as variant = value
+		  value = ParseYAMLValue( mb, p, bytePos, eolPos, aliasDict )
+		  
+		  if bytePos < eolPos then
+		    //
+		    // Something is wrong
+		    //
+		    raise new YAMLException( "Unexpected additional data" )
+		  end if
+		  
+		  if dataType = YAMLTypes.ArrayRow then
+		    dataType = YAMLTypes.ArrayRowWithKeyValuePair
+		  else
+		    dataType = YAMLTypes.KeyValuePair
+		  end if
+		  
+		  return key : value
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ParseYAMLValue(mb As MemoryBlock, p As Ptr, ByRef bytePos As Integer, eolPos As Integer, aliasDict As Dictionary) As Variant
+		  dim value as variant = ParseValue( mb, p, bytePos, true, true )
+		  AdvancePastWhiteSpace mb, p, bytePos, true
+		  
+		  if value.Type = Variant.TypeString then
+		    dim stringValue as string = value.StringValue
+		    dim firstChar as string = stringValue.Left( 1 )
+		    if firstChar = "*" or firstChar = "&" then
+		      if stringValue.Len < 2 then
+		        raise new YAMLException( "An alias node must contain at least one character" )
+		      end if
+		      
+		      select case firstChar
+		      case "*" 
+		        //
+		        // An alias
+		        //
+		        try
+		          value = aliasDict.Value( value )
+		        catch err as KeyNotFoundException
+		          raise new YAMLException( "No alias defined for " + value.StringValue )
+		        end try
+		        
+		      case "&"
+		        if bytePos >= eolPos then
+		          raise new YAMLException( "Unexpected end of line" )
+		        end if
+		        
+		        dim aliasKey as string = "*" + stringValue.Mid( 2 )
+		        value = ParseValue( mb, p, bytePos, true, true )
+		        
+		        aliasDict.Value( aliasKey ) = value
+		        
+		      end select
+		    end if
+		  end if
+		  
+		  return value
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function ParseYAML_MTC(yaml As String) As Variant
+		  yaml = PrepareInputString( yaml )
+		  
+		  if yaml = "" then
+		    return nil
+		  end if
+		  
+		  //
+		  // Make sure there is a trailing EOL
+		  //
+		  dim lastChar as string = yaml.Right( 1 )
+		  if lastChar <> &uA and lastChar <> &uD then
+		    yaml = yaml + &uA
+		  end if
+		  
+		  dim mbYAML as MemoryBlock = yaml
+		  dim pYAML as ptr = mbYAML
+		  dim bytePos as integer = 0
+		  
+		  dim indents as integer = CountYAMLIndents( mbYAML, pYAML, bytePos )
+		  
+		  dim result as variant = ParseYAMLBlock( mbYAML, pYAML, bytePos, indents, new Dictionary )
+		  return result
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function PrepareInputString(s As String) As String
 		  //
 		  // Make sure we have a well encoded string.
@@ -1390,6 +1840,9 @@ Protected Module M_JSON
 	#tag Constant, Name = kHash, Type = Double, Dynamic = False, Default = \"35", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = kHyphen, Type = Double, Dynamic = False, Default = \"45", Scope = Private
+	#tag EndConstant
+
 	#tag Constant, Name = kLineFeed, Type = Double, Dynamic = False, Default = \"10", Scope = Private
 	#tag EndConstant
 
@@ -1413,6 +1866,20 @@ Protected Module M_JSON
 
 	#tag Constant, Name = kVersion, Type = String, Dynamic = False, Default = \"4.2", Scope = Protected
 	#tag EndConstant
+
+
+	#tag Enum, Name = YAMLTypes, Type = Integer, Flags = &h21
+		Unknown
+		  KeyValuePair
+		  KeyWithoutValue
+		  ArrayRow
+		  ArrayRowWithoutValue
+		  ArrayRowWithKeyValuePair
+		  ArrayRowWithKeyWithoutValue
+		  SomeValue
+		  LiteralString
+		WrappedString
+	#tag EndEnum
 
 
 	#tag ViewBehavior

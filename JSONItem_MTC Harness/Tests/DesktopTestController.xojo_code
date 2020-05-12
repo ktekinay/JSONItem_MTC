@@ -20,7 +20,7 @@ Inherits TestController
 		  group = new M_JSONTests( self, "M_JSON Tests" )
 		  group = New StressTests(Self, "Stress Tests")
 		  group = new XojoJSONItemTests( self, "Xojo's Unit Tests" )
-		  
+		  group = new YAMLTests( self, "YAML Tests" )
 		End Sub
 	#tag EndEvent
 
