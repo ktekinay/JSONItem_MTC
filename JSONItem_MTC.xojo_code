@@ -2039,6 +2039,16 @@ Inherits JSONItem
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function toDict() As Dictionary
+		  If Me.IsObject Then
+		    Return Me.ToNativeValue
+		  Else 
+		    Raise New RuntimeException("This JSONItem refers to an array! So to dict does not work!")
+		  End If
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21
 		Private Sub Validate(ByRef value As Variant)
 		  //
