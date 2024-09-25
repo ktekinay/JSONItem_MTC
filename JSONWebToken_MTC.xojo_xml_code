@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RBProject version="2019r3.1" FormatVersion="2" MinIDEVersion="20070100">
+<RBProject version="2024r3" FormatVersion="2" MinIDEVersion="20070100">
 <block type="Module" ID="1069731839">
  <ObjName>JSONWebToken_MTC</ObjName>
- <ObjContainerID>0</ObjContainerID>
+ <ObjContainerID>1447604198</ObjContainerID>
  <IsClass>1</IsClass>
  <ItemFlags>1</ItemFlags>
  <IsInterface>0</IsInterface>
@@ -112,10 +112,10 @@
    <SourceLine>dim rxBadChars as new RegEx</SourceLine>
    <SourceLine>rxBadChars.SearchPattern = "(?mi-Us)""(\\""|[^""])*""(*SKIP)(*FAIL)|(true|false|null)(*SKIP)(*FAIL)|(?:\d*\.)?\d+(*SKIP)(*FAIL)|[^:{[\]},]"</SourceLine>
    <SourceLine></SourceLine>
-   <SourceLine>if rxBadChars.Search( headerJSON ) isa RegExMatch or rxBadChars.Search( claimJSON ) isa RegExMatch then</SourceLine>
-   <SourceLine>return false</SourceLine>
-   <SourceLine>end if</SourceLine>
-   <SourceLine></SourceLine>
+   <SourceLine>'if rxBadChars.Search( headerJSON ) isa RegExMatch or rxBadChars.Search( claimJSON ) isa RegExMatch then</SourceLine>
+   <SourceLine>'return false</SourceLine>
+   <SourceLine>'end if</SourceLine>
+   <SourceLine>'</SourceLine>
    <SourceLine>dim header as Dictionary = ParseJSON( headerJSON )</SourceLine>
    <SourceLine></SourceLine>
    <SourceLine>if header.HasKey( kKeyType ) then</SourceLine>
@@ -1058,7 +1058,7 @@
   <PartID>185184255</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property RawClaim As Dictionary</SourceLine>
+   <SourceLine>RawClaim As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
@@ -1089,7 +1089,7 @@
   <PartID>716843007</PartID>
   <ItemSource>
    <TextEncoding>134217984</TextEncoding>
-   <SourceLine>Property RawHeader As Dictionary</SourceLine>
+   <SourceLine>RawHeader As Dictionary</SourceLine>
    <SourceLine></SourceLine>
   </ItemSource>
   <TextEncoding>134217984</TextEncoding>
